@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCM Simulator</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #1e1e1e; background: #f0f2f5; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.app { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+.header { background: #1d2327; color: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+.header h1 { font-size: 16px; font-weight: 600; white-space: nowrap; }
+.header .badge { background: #2271b1; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+.main { display: grid; grid-template-columns: 260px 1fr 1fr; gap: 0; overflow: hidden; }
+
+/* ── Sidebar (kontrollpanel) ──────────────────────────────── */
+.sidebar { background: #fff; border-right: 1px solid #ddd; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.sidebar h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; font-weight: 600; color: #444; }
+.field input[type="url"], .field input[type="text"] {
+  padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 100%;
+}
+.field input:focus { outline: none; border-color: #2271b1; box-shadow: 0 0 0 2px rgba(34,113,177,.2); }
+.btn { padding: 8px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.btn-primary { background: #2271b1; color: #fff; }
+.btn-primary:hover { background: #135e96; }
+.btn-primary:disabled { background: #a0a0a0; cursor: not-allowed; }
+.btn-stop { background: #d63638; color: #fff; }
+.btn-stop:hover { background: #b02a2c; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Radio group */
+.radio-group { display: flex; flex-direction: column; gap: 6px; }
+.radio-group label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.radio-group input[type="radio"] { accent-color: #2271b1; }
+
+/* Category toggles */
+.toggle-list { display: flex; flex-direction: column; gap: 6px; }
+.toggle-item { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.toggle-item span { flex: 1; }
+.toggle-switch { position: relative; width: 36px; height: 20px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-switch .slider {
+  position: absolute; inset: 0; background: #ccc; border-radius: 10px; cursor: pointer; transition: background .2s;
+}
+.toggle-switch .slider::before {
+  content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px;
+  background: #fff; border-radius: 50%; transition: transform .2s;
+}
+.toggle-switch input:checked + .slider { background: #2271b1; }
+.toggle-switch input:checked + .slider::before { transform: translateX(16px); }
+.toggle-switch input:disabled + .slider { opacity: .5; cursor: not-allowed; }
+
+/* Auto-refresh */
+.auto-refresh { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; }
+.auto-refresh input[type="checkbox"] { accent-color: #2271b1; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status-dot.active { background: #00a32a; animation: pulse 1.5s infinite; }
+.status-dot.inactive { background: #999; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+/* ── Preview (iframe) ─────────────────────────────────────── */
+.preview { position: relative; background: #e8e8e8; display: flex; flex-direction: column; }
+.preview-toolbar { background: #fff; border-bottom: 1px solid #ddd; padding: 6px 12px; font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px; }
+.preview-toolbar .url-display { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; }
+.preview iframe { flex: 1; border: none; width: 100%; height: 100%; background: #fff; }
+.preview .placeholder {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  color: #999; font-size: 15px; text-align: center; padding: 40px;
+}
+
+/* CORS banner */
+.cors-banner {
+  background: #fcf0c1; border-bottom: 1px solid #dba617; padding: 10px 14px;
+  font-size: 12px; color: #6e4b00; display: none;
+}
+.cors-banner.visible { display: block; }
+.cors-banner strong { color: #4a3200; }
+
+/* ── Analysis panel ───────────────────────────────────────── */
+.analysis { background: #fff; border-left: 1px solid #ddd; display: flex; flex-direction: column; overflow: hidden; }
+.tabs { display: flex; background: #f6f7f7; border-bottom: 1px solid #ddd; overflow-x: auto; flex-shrink: 0; }
+.tab {
+  padding: 10px 14px; font-size: 12px; font-weight: 500; cursor: pointer;
+  border-bottom: 2px solid transparent; white-space: nowrap; color: #555; transition: all .15s;
+}
+.tab:hover { color: #1d2327; background: #eee; }
+.tab.active { color: #2271b1; border-bottom-color: #2271b1; background: #fff; }
+.tab .count {
+  display: inline-block; background: #e0e0e0; color: #444; padding: 1px 6px;
+  border-radius: 8px; font-size: 10px; margin-left: 4px;
+}
+.tab .count.red { background: #facfd2; color: #8b1a1f; }
+.tab .count.yellow { background: #fcf0c1; color: #6e4b00; }
+.tab .count.green { background: #d4edda; color: #155724; }
+.tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* Overview cards */
+.overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.card { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px; padding: 14px; }
+.card h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+.card .value { font-size: 28px; font-weight: 700; }
+.card .value.green { color: #00a32a; }
+.card .value.red { color: #d63638; }
+.card .value.yellow { color: #dba617; }
+.card .value.blue { color: #2271b1; }
+.card .sub { font-size: 11px; color: #888; margin-top: 4px; }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  text-align: left; padding: 8px 10px; background: #f6f7f7; border-bottom: 2px solid #ddd;
+  font-size: 11px; text-transform: uppercase; color: #666; position: sticky; top: 0;
+}
+.data-table td { padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+.data-table tr:hover td { background: #f9fbfd; }
+.data-table .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; }
+
+/* Status badges */
+.badge-status {
+  display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+}
+.badge-ok { background: #d4edda; color: #155724; }
+.badge-violation { background: #facfd2; color: #8b1a1f; }
+.badge-warning { background: #fcf0c1; color: #6e4b00; }
+.badge-unknown { background: #e8e8e8; color: #555; }
+.badge-blocked { background: #e8d5f5; color: #4a235a; }
+
+/* GCM grid */
+.gcm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gcm-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px;
+}
+.gcm-item .label { font-size: 12px; font-weight: 500; }
+.gcm-state { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.gcm-granted { background: #d4edda; color: #155724; }
+.gcm-denied { background: #facfd2; color: #8b1a1f; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; color: #999; }
+.empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+.empty-state p { font-size: 13px; line-height: 1.5; }
+
+/* Blocked list */
+.blocked-list { display: flex; flex-direction: column; gap: 6px; }
+.blocked-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 4px; font-size: 13px;
+}
+.blocked-item .x-icon { color: #d63638; font-weight: 700; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 1fr; grid-template-rows: auto 300px 1fr; }
+  .sidebar { flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid #ddd; }
+  .sidebar h2 { width: 100%; }
+  .preview { min-height: 250px; }
+  .analysis { border-left: none; border-top: 1px solid #ddd; }
+}
+@media (max-width: 600px) {
+  .overview-grid { grid-template-columns: 1fr; }
+  .gcm-grid { grid-template-columns: 1fr; }
+  .tabs { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>CCM Simulator</h1>
+    <span class="badge">Cookie Consent Manager</span>
+  </div>
+
+  <div class="main">
+    <!-- Sidebar: Control panel -->
+    <div class="sidebar">
+      <h2>Kontrollpanel</h2>
+
+      <div class="field">
+        <label for="site-url">Webbplatsens URL</label>
+        <input type="url" id="site-url" placeholder="https://example.com" />
+      </div>
+
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-primary" id="btn-start" onclick="startSimulation()">Starta simulering</button>
+        <button class="btn btn-stop btn-sm" id="btn-stop" onclick="stopSimulation()" style="display:none;">Stoppa</button>
+      </div>
+
+      <h2>Samtyckesläge</h2>
+      <div class="radio-group" id="consent-mode">
+        <label><input type="radio" name="consent" value="none" checked onchange="onConsentModeChange()"> Inget samtycke</label>
+        <label><input type="radio" name="consent" value="all" onchange="onConsentModeChange()"> Alla accepterade</label>
+        <label><input type="radio" name="consent" value="necessary" onchange="onConsentModeChange()"> Endast nödvändiga</label>
+        <label><input type="radio" name="consent" value="custom" onchange="onConsentModeChange()"> Anpassat</label>
+      </div>
+
+      <h2>Kategorier</h2>
+      <div class="toggle-list" id="category-toggles">
+        <div class="empty-state"><p>Starta simulering för att ladda kategorier</p></div>
+      </div>
+
+      <div class="auto-refresh">
+        <input type="checkbox" id="auto-refresh" checked>
+        <label for="auto-refresh">Auto-uppdatera (2s)</label>
+        <span class="status-dot inactive" id="poll-dot"></span>
+      </div>
+    </div>
+
+    <!-- Preview iframe -->
+    <div class="preview">
+      <div class="preview-toolbar">
+        <span>Förhandsgranskning:</span>
+        <span class="url-display" id="url-display">Ingen sajt laddad</span>
+      </div>
+      <div class="cors-banner" id="cors-banner">
+        <strong>CORS-varning:</strong> Kan inte läsa cookies/data från iframen p.g.a. cross-origin-begränsningar.
+        Ladda upp <code>simulator.html</code> till samma domän som sajten och öppna den därifrån.
+      </div>
+      <div class="placeholder" id="iframe-placeholder">
+        Ange en URL och klicka &quot;Starta simulering&quot; för att börja
+      </div>
+      <iframe id="site-iframe" style="display:none;" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- Analysis panel -->
+    <div class="analysis">
+      <div class="tabs">
+        <div class="tab active" data-tab="overview" onclick="switchTab('overview')">Översikt</div>
+        <div class="tab" data-tab="registered" onclick="switchTab('registered')">Registrerade <span class="count" id="count-registered">0</span></div>
+        <div class="tab" data-tab="unregistered" onclick="switchTab('unregistered')">Oregistrerade <span class="count" id="count-unregistered">0</span></div>
+        <div class="tab" data-tab="gcm" onclick="switchTab('gcm')">GCM</div>
+        <div class="tab" data-tab="blocked" onclick="switchTab('blocked')">Blockerade <span class="count" id="count-blocked">0</span></div>
+      </div>
+
+      <div class="tab-content">
+        <!-- Overview -->
+        <div class="tab-pane active" id="pane-overview">
+          <div class="overview-grid">
+            <div class="card">
+              <h3>Hittade cookies</h3>
+              <div class="value blue" id="stat-found">0</div>
+            </div>
+            <div class="card">
+              <h3>Registrerade</h3>
+              <div class="value green" id="stat-registered">0</div>
+            </div>
+            <div class="card">
+              <h3>Överträdelser</h3>
+              <div class="value red" id="stat-violations">0</div>
+              <div class="sub" id="stat-violations-sub"></div>
+            </div>
+            <div class="card">
+              <h3>Oregistrerade</h3>
+              <div class="value yellow" id="stat-unknown">0</div>
+            </div>
+          </div>
+          <h3 style="margin-bottom:10px;">GCM-sammanfattning</h3>
+          <div class="gcm-grid" id="gcm-overview">
+            <div class="empty-state"><p>Starta simulering för att se GCM-status</p></div>
+          </div>
+        </div>
+
+        <!-- Registered cookies -->
+        <div class="tab-pane" id="pane-registered">
+          <table class="data-table">
+            <thead>
+              <tr><th>Namn</th><th>Kategori</th><th>Leverantör</th><th>Hittad</th><th>Status</th></tr>
+            </thead>
+            <tbody id="table-registered">
+              <tr><td colspan="5" class="empty-state">Ingen data ännu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Unregistered cookies -->
+        <div class="tab-pane" id="pane-unregistered">
+          <table class="data-table">
+            <thead>
+              <tr><th>Namn</th><th>Värde (trunkerat)</th><th>Källa</th></tr>
+            </thead>
+            <tbody id="table-unregistered">
+              <tr><td colspan="3" class="empty-state">Ingen data ännu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- GCM -->
+        <div class="tab-pane" id="pane-gcm">
+          <h3 style="margin-bottom:12px;">Google Consent Mode — Aktuellt tillstånd</h3>
+          <div class="gcm-grid" id="gcm-detail">
+            <div class="empty-state"><p>Starta simulering för att se GCM-status</p></div>
+          </div>
+          <div style="margin-top:20px;">
+            <h3 style="margin-bottom:8px;">Förväntat GCM-tillstånd (baserat på samtyckesläge)</h3>
+            <div class="gcm-grid" id="gcm-expected">
+              <div class="empty-state"><p>Välj samtyckesläge ovan</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blocked -->
+        <div class="tab-pane" id="pane-blocked">
+          <h3 style="margin-bottom:12px;">Manuellt blockerade cookies</h3>
+          <div class="blocked-list" id="blocked-list">
+            <div class="empty-state"><p>Ingen data ännu</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   CCM Simulator — Fristående analysverktyg
+   ================================================================ */
+
+// ── State ────────────────────────────────────────────────────────
+let config = null;          // API-config
+let pollTimer = null;       // Polling interval ID
+let corsBlocked = false;    // Whether CORS prevents iframe access
+let foundCookies = {};      // { name: { value, source } }
+let consentState = {};      // { category_slug: bool }
+
+// ── DOM refs ─────────────────────────────────────────────────────
+const $url        = document.getElementById('site-url');
+const $btnStart   = document.getElementById('btn-start');
+const $btnStop    = document.getElementById('btn-stop');
+const $iframe     = document.getElementById('site-iframe');
+const $placeholder = document.getElementById('iframe-placeholder');
+const $urlDisplay = document.getElementById('url-display');
+const $corsBanner = document.getElementById('cors-banner');
+const $pollDot    = document.getElementById('poll-dot');
+
+// ── Tab switching ────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
+}
+
+// ── Start / Stop ─────────────────────────────────────────────────
+async function startSimulation() {
+  let url = $url.value.trim();
+  if (!url) { alert('Ange en URL'); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  // Normalize: remove trailing slash
+  url = url.replace(/\/+$/, '');
+  $url.value = url;
+
+  $btnStart.disabled = true;
+  $btnStart.textContent = 'Laddar...';
+
+  try {
+    config = await fetchConfig(url);
+  } catch (e) {
+    alert('Kunde inte hämta config: ' + e.message);
+    $btnStart.disabled = false;
+    $btnStart.textContent = 'Starta simulering';
+    return;
+  }
+
+  // Reset state
+  foundCookies = {};
+  corsBlocked = false;
+  $corsBanner.classList.remove('visible');
+
+  // Build category toggles
+  buildCategoryToggles();
+  applyConsentMode();
+
+  // Load iframe
+  $placeholder.style.display = 'none';
+  $iframe.style.display = 'block';
+  $iframe.src = url;
+  $urlDisplay.textContent = url;
+
+  // UI state
+  $btnStart.style.display = 'none';
+  $btnStop.style.display = 'inline-block';
+
+  // Wait for iframe to load, then start polling
+  $iframe.onload = () => {
+    checkCORSAccess();
+    startPolling();
+    runAnalysis();
+  };
+}
+
+function stopSimulation() {
+  stopPolling();
+  $iframe.src = 'about:blank';
+  $iframe.style.display = 'none';
+  $placeholder.style.display = 'flex';
+  $urlDisplay.textContent = 'Ingen sajt laddad';
+  $btnStop.style.display = 'none';
+  $btnStart.style.display = 'inline-block';
+  $btnStart.disabled = false;
+  $btnStart.textContent = 'Starta simulering';
+  $corsBanner.classList.remove('visible');
+}
+
+// ── Fetch config from WP REST API ────────────────────────────────
+async function fetchConfig(baseUrl) {
+  const res = await fetch(baseUrl + '/wp-json/cc/v1/config');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+
+  // Also try to fetch blocked cookies (separate option exposed on the config endpoint or via settings)
+  // The config endpoint returns categories + settings; blocked cookies may be in settings or a separate field.
+  // We'll look for data.blocked or data.settings.blocked_cookies or fetch them separately.
+  if (!data.blocked) {
+    try {
+      const bRes = await fetch(baseUrl + '/wp-json/cc/v1/blocked-cookies');
+      if (bRes.ok) data.blocked = await bRes.json();
+    } catch (_) { /* not available */ }
+  }
+  if (!data.blocked) data.blocked = [];
+  return data;
+}
+
+// ── CORS check ───────────────────────────────────────────────────
+function checkCORSAccess() {
+  try {
+    // Try to access iframe document
+    const doc = $iframe.contentDocument || $iframe.contentWindow.document;
+    if (doc) {
+      corsBlocked = false;
+      return;
+    }
+  } catch (_) {}
+  corsBlocked = true;
+  $corsBanner.classList.add('visible');
+}
+
+// ── Polling ──────────────────────────────────────────────────────
+function startPolling() {
+  stopPolling();
+  $pollDot.classList.add('active');
+  $pollDot.classList.remove('inactive');
+  pollTimer = setInterval(() => {
+    if (!document.getElementById('auto-refresh').checked) return;
+    readCookiesFromIframe();
+    runAnalysis();
+  }, 2000);
+}
+
+function stopPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+  $pollDot.classList.remove('active');
+  $pollDot.classList.add('inactive');
+}
+
+// ── Read cookies from iframe ─────────────────────────────────────
+function readCookiesFromIframe() {
+  if (corsBlocked) return;
+  try {
+    const doc = $iframe.contentDocument || $iframe.contentWindow.document;
+    const raw = doc.cookie || '';
+    // Parse document.cookie
+    raw.split(';').forEach(pair => {
+      const [name, ...rest] = pair.split('=');
+      const n = (name || '').trim();
+      if (n) {
+        foundCookies[n] = { value: rest.join('=').trim(), source: 'cookie' };
+      }
+    });
+    // Read localStorage
+    try {
+      const ls = $iframe.contentWindow.localStorage;
+      for (let i = 0; i < ls.length; i++) {
+        const key = ls.key(i);
+        foundCookies['[ls] ' + key] = { value: (ls.getItem(key) || '').substring(0, 80), source: 'localStorage' };
+      }
+    } catch (_) {}
+    // Read sessionStorage
+    try {
+      const ss = $iframe.contentWindow.sessionStorage;
+      for (let i = 0; i < ss.length; i++) {
+        const key = ss.key(i);
+        foundCookies['[ss] ' + key] = { value: (ss.getItem(key) || '').substring(0, 80), source: 'sessionStorage' };
+      }
+    } catch (_) {}
+  } catch (e) {
+    corsBlocked = true;
+    $corsBanner.classList.add('visible');
+  }
+}
+
+// ── Read GCM from dataLayer ──────────────────────────────────────
+function readGCMState() {
+  const gcmKeys = [
+    'ad_storage', 'ad_user_data', 'ad_personalization',
+    'analytics_storage', 'functionality_storage',
+    'personalization_storage', 'security_storage'
+  ];
+  const state = {};
+  gcmKeys.forEach(k => state[k] = null);
+
+  if (corsBlocked) return state;
+  try {
+    const win = $iframe.contentWindow;
+    if (win && win.dataLayer && Array.isArray(win.dataLayer)) {
+      // Walk through dataLayer looking for consent default/update commands
+      win.dataLayer.forEach(entry => {
+        // gtag pushes: [arguments object] or {event, ...}
+        // Consent commands appear as: ['consent', 'default'|'update', { ... }]
+        if (Array.isArray(entry) && entry.length >= 3 &&
+            entry[0] === 'consent' && (entry[1] === 'default' || entry[1] === 'update')) {
+          const obj = entry[2];
+          gcmKeys.forEach(k => { if (obj[k]) state[k] = obj[k]; });
+        }
+        // Also check if pushed as object with consent data
+        if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+          gcmKeys.forEach(k => { if (entry[k]) state[k] = entry[k]; });
+        }
+      });
+
+      // Also try the google_tag_data approach
+      if (win.google_tag_data && win.google_tag_data.ics) {
+        try {
+          const ics = win.google_tag_data.ics.entries;
+          if (ics) {
+            for (const [key, val] of Object.entries(ics)) {
+              if (gcmKeys.includes(key) && val) {
+                state[key] = val.update === true ? 'granted' : (val.update === false ? 'denied' : (val.default || null));
+              }
+            }
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (_) {}
+  return state;
+}
+
+// ── Expected GCM for current consent ────────────────────────────
+function getExpectedGCM() {
+  const hasMarketing = !!consentState.marketing;
+  const hasAnalytics = !!consentState.analytics;
+  return {
+    ad_storage:             hasMarketing ? 'granted' : 'denied',
+    ad_user_data:           hasMarketing ? 'granted' : 'denied',
+    ad_personalization:     hasMarketing ? 'granted' : 'denied',
+    analytics_storage:      hasAnalytics ? 'granted' : 'denied',
+    functionality_storage:  'granted',
+    personalization_storage: hasAnalytics ? 'granted' : 'denied',
+    security_storage:       'granted'
+  };
+}
+
+// ── Consent mode change ──────────────────────────────────────────
+function onConsentModeChange() {
+  applyConsentMode();
+  runAnalysis();
+}
+
+function applyConsentMode() {
+  const mode = document.querySelector('input[name="consent"]:checked').value;
+  const cats = config ? config.categories || [] : [];
+
+  if (mode === 'none') {
+    consentState = {};
+    cats.forEach(c => { consentState[c.slug] = c.is_required ? true : false; });
+  } else if (mode === 'all') {
+    consentState = {};
+    cats.forEach(c => { consentState[c.slug] = true; });
+  } else if (mode === 'necessary') {
+    consentState = {};
+    cats.forEach(c => { consentState[c.slug] = !!c.is_required; });
+  }
+  // 'custom' mode — read from toggles
+  if (mode === 'custom') {
+    readToggles();
+  }
+
+  updateTogglesUI(mode);
+  renderExpectedGCM();
+}
+
+function readToggles() {
+  consentState = {};
+  document.querySelectorAll('#category-toggles input[type="checkbox"]').forEach(cb => {
+    consentState[cb.dataset.slug] = cb.checked;
+  });
+}
+
+// ── Build category toggles ──────────────────────────────────────
+function buildCategoryToggles() {
+  const $list = document.getElementById('category-toggles');
+  const cats = config ? config.categories || [] : [];
+  if (!cats.length) {
+    $list.innerHTML = '<div class="empty-state"><p>Inga kategorier i config</p></div>';
+    return;
+  }
+  $list.innerHTML = cats.map(c => `
+    <div class="toggle-item">
+      <span>${esc(c.title)}${c.is_required ? ' (obligatorisk)' : ''}</span>
+      <label class="toggle-switch">
+        <input type="checkbox" data-slug="${esc(c.slug)}" ${c.is_required ? 'checked disabled' : ''}
+               onchange="onToggleCategory()">
+        <span class="slider"></span>
+      </label>
+    </div>
+  `).join('');
+}
+
+function updateTogglesUI(mode) {
+  document.querySelectorAll('#category-toggles input[type="checkbox"]').forEach(cb => {
+    const slug = cb.dataset.slug;
+    const cat = (config.categories || []).find(c => c.slug === slug);
+    const isRequired = cat && cat.is_required;
+    cb.checked = !!consentState[slug];
+    cb.disabled = mode !== 'custom' || isRequired;
+  });
+}
+
+function onToggleCategory() {
+  // Force custom mode
+  document.querySelector('input[name="consent"][value="custom"]').checked = true;
+  readToggles();
+  runAnalysis();
+}
+
+// ── Analysis ─────────────────────────────────────────────────────
+function runAnalysis() {
+  if (!config) return;
+  readCookiesFromIframe();
+
+  const cats = config.categories || [];
+  const blocked = config.blocked || [];
+
+  // Build registry map: cookieName → { category, provider, purpose, expiry, categorySlug, isRequired }
+  const registry = {};
+  cats.forEach(cat => {
+    (cat.cookies || []).forEach(ck => {
+      registry[ck.name] = {
+        category: cat.title,
+        categorySlug: cat.slug,
+        provider: ck.provider || '',
+        purpose: ck.purpose || '',
+        expiry: ck.expiry || '',
+        isRequired: !!cat.is_required
+      };
+    });
+  });
+
+  // Only consider actual cookies (not localStorage/sessionStorage prefixed ones) for registry matching
+  const cookieNames = Object.keys(foundCookies).filter(n => !n.startsWith('[ls] ') && !n.startsWith('[ss] '));
+
+  // Classify
+  const registered = [];    // registered cookies (found or not)
+  const violations = [];    // found but should be blocked (no consent for category)
+  const unknown = [];       // found but not in registry
+
+  // Walk registered cookies — check if found
+  for (const [name, info] of Object.entries(registry)) {
+    const found = cookieNames.includes(name);
+    const hasConsent = !!consentState[info.categorySlug];
+    let status = 'ok';
+
+    if (found && !hasConsent && !info.isRequired) {
+      status = 'violation';
+    } else if (!found) {
+      status = 'missing';
+    }
+
+    registered.push({ name, ...info, found, hasConsent, status });
+    if (status === 'violation') violations.push({ name, ...info });
+  }
+
+  // Walk found cookies — find unknowns
+  cookieNames.forEach(name => {
+    if (!registry[name]) {
+      unknown.push({ name, value: (foundCookies[name].value || '').substring(0, 60), source: foundCookies[name].source });
+    }
+  });
+
+  // Also add localStorage/sessionStorage items as unknown (they won't be in registry)
+  Object.keys(foundCookies).filter(n => n.startsWith('[ls] ') || n.startsWith('[ss] ')).forEach(name => {
+    unknown.push({ name, value: (foundCookies[name].value || '').substring(0, 60), source: foundCookies[name].source });
+  });
+
+  // GCM
+  const gcmState = readGCMState();
+  const gcmExpected = getExpectedGCM();
+
+  // Render everything
+  renderOverview(cookieNames.length, registered, violations, unknown, gcmState);
+  renderRegistered(registered);
+  renderUnregistered(unknown);
+  renderGCM(gcmState, gcmExpected);
+  renderBlocked(blocked);
+
+  // Update tab counts
+  updateCount('count-registered', registered.length, 'green');
+  updateCount('count-unregistered', unknown.length, unknown.length > 0 ? 'yellow' : '');
+  updateCount('count-blocked', blocked.length, '');
+}
+
+function updateCount(id, n, colorClass) {
+  const el = document.getElementById(id);
+  el.textContent = n;
+  el.className = 'count' + (colorClass ? ' ' + colorClass : '');
+}
+
+// ── Render: Overview ─────────────────────────────────────────────
+function renderOverview(foundCount, registered, violations, unknown, gcmState) {
+  document.getElementById('stat-found').textContent = foundCount;
+  document.getElementById('stat-registered').textContent = registered.filter(r => r.found).length;
+  document.getElementById('stat-violations').textContent = violations.length;
+  document.getElementById('stat-violations-sub').textContent =
+    violations.length > 0 ? violations.map(v => v.name).join(', ') : '';
+  document.getElementById('stat-unknown').textContent = unknown.length;
+
+  // GCM summary in overview
+  const $gcm = document.getElementById('gcm-overview');
+  const keys = Object.keys(gcmState);
+  if (keys.every(k => gcmState[k] === null)) {
+    $gcm.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Ingen GCM-data hittad (kräver åtkomst till iframe)</p></div>';
+  } else {
+    $gcm.innerHTML = keys.map(k => {
+      const val = gcmState[k] || 'okänd';
+      const cls = val === 'granted' ? 'gcm-granted' : val === 'denied' ? 'gcm-denied' : '';
+      return `<div class="gcm-item"><span class="label">${esc(k)}</span><span class="gcm-state ${cls}">${esc(val)}</span></div>`;
+    }).join('');
+  }
+}
+
+// ── Render: Registered cookies table ─────────────────────────────
+function renderRegistered(list) {
+  const $tb = document.getElementById('table-registered');
+  if (!list.length) {
+    $tb.innerHTML = '<tr><td colspan="5" class="empty-state">Inga registrerade cookies i konfigurationen</td></tr>';
+    return;
+  }
+  $tb.innerHTML = list.map(r => {
+    let badgeClass = 'badge-ok';
+    let badgeText = 'OK';
+    if (r.status === 'violation') { badgeClass = 'badge-violation'; badgeText = 'Överträdelse'; }
+    else if (r.status === 'missing') { badgeClass = 'badge-warning'; badgeText = 'Ej hittad'; }
+
+    return `<tr>
+      <td class="mono">${esc(r.name)}</td>
+      <td>${esc(r.category)}</td>
+      <td>${esc(r.provider)}</td>
+      <td>${r.found ? 'Ja' : 'Nej'}</td>
+      <td><span class="badge-status ${badgeClass}">${badgeText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Render: Unregistered cookies table ───────────────────────────
+function renderUnregistered(list) {
+  const $tb = document.getElementById('table-unregistered');
+  if (!list.length) {
+    $tb.innerHTML = '<tr><td colspan="3" class="empty-state">Inga oregistrerade cookies hittade</td></tr>';
+    return;
+  }
+  $tb.innerHTML = list.map(u => `<tr>
+    <td class="mono">${esc(u.name)}</td>
+    <td class="mono">${esc(u.value)}</td>
+    <td>${esc(u.source)}</td>
+  </tr>`).join('');
+}
+
+// ── Render: GCM detail ──────────────────────────────────────────
+function renderGCM(state, expected) {
+  const keys = Object.keys(state);
+  const $det = document.getElementById('gcm-detail');
+
+  if (keys.every(k => state[k] === null)) {
+    $det.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Ingen GCM-data hittad i iframens dataLayer</p></div>';
+  } else {
+    $det.innerHTML = keys.map(k => {
+      const val = state[k] || 'okänd';
+      const cls = val === 'granted' ? 'gcm-granted' : val === 'denied' ? 'gcm-denied' : '';
+      return `<div class="gcm-item"><span class="label">${esc(k)}</span><span class="gcm-state ${cls}">${esc(val)}</span></div>`;
+    }).join('');
+  }
+
+  renderExpectedGCM();
+}
+
+function renderExpectedGCM() {
+  const expected = getExpectedGCM();
+  const $exp = document.getElementById('gcm-expected');
+  $exp.innerHTML = Object.entries(expected).map(([k, v]) => {
+    const cls = v === 'granted' ? 'gcm-granted' : 'gcm-denied';
+    return `<div class="gcm-item"><span class="label">${esc(k)}</span><span class="gcm-state ${cls}">${esc(v)}</span></div>`;
+  }).join('');
+}
+
+// ── Render: Blocked cookies ──────────────────────────────────────
+function renderBlocked(list) {
+  const $bl = document.getElementById('blocked-list');
+  if (!list.length) {
+    $bl.innerHTML = '<div class="empty-state"><p>Inga manuellt blockerade cookies konfigurerade</p></div>';
+    return;
+  }
+  $bl.innerHTML = list.map(name => `
+    <div class="blocked-item">
+      <span class="x-icon">&times;</span>
+      <span class="mono">${esc(typeof name === 'string' ? name : JSON.stringify(name))}</span>
+    </div>
+  `).join('');
+}
+
+// ── Utility ──────────────────────────────────────────────────────
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Allow Enter key in URL field
+$url.addEventListener('keydown', e => {
+  if (e.key === 'Enter') startSimulation();
+});
+</script>
+</body>
+</html>
