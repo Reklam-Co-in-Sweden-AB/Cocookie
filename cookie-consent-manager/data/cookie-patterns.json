@@ -1,0 +1,1334 @@
+{
+	"version": "2.0.0",
+	"updated": "2026-03-31",
+	"patterns": [
+		{
+			"pattern": "^wordpress_[a-f0-9]+$",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Autentisering och inloggningssession.",
+			"purpose_en": "Authentication and login session.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wordpress_logged_in_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Identifierar inloggad användare.",
+			"purpose_en": "Identifies logged-in user.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wordpress_sec_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Säker autentisering.",
+			"purpose_en": "Secure authentication.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wp-settings-\\d+$",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Sparar användarens adminpanelsinställningar.",
+			"purpose_en": "Stores user admin panel settings.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^wp-settings-time-\\d+$",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Tidsstämpel för wp-settings.",
+			"purpose_en": "Timestamp for wp-settings.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^wordpress_test_cookie$",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Testar om cookies är aktiverade i webbläsaren.",
+			"purpose_en": "Tests if cookies are enabled in the browser.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wp-postpass_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Lösenordsskydd för inlägg.",
+			"purpose_en": "Password protection for posts.",
+			"duration": "10 dagar"
+		},
+		{
+			"pattern": "^comment_author_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Sparar kommentarsförfattarens namn.",
+			"purpose_en": "Stores comment author name.",
+			"duration": "347 dagar"
+		},
+		{
+			"pattern": "^comment_author_email_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Sparar kommentarsförfattarens e-post.",
+			"purpose_en": "Stores comment author email.",
+			"duration": "347 dagar"
+		},
+		{
+			"pattern": "^comment_author_url_",
+			"category": "necessary",
+			"service": "WordPress",
+			"purpose_sv": "Sparar kommentarsförfattarens webbplats.",
+			"purpose_en": "Stores comment author URL.",
+			"duration": "347 dagar"
+		},
+		{
+			"pattern": "^PHPSESSID$",
+			"category": "necessary",
+			"service": "PHP",
+			"purpose_sv": "PHP-sessionsidentifierare.",
+			"purpose_en": "PHP session identifier.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^cc_consent$",
+			"category": "necessary",
+			"service": "CoCookie",
+			"purpose_sv": "Sparar besökarens cookie-samtycke.",
+			"purpose_en": "Stores visitor cookie consent.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^woocommerce_cart_hash$",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Hjälper WooCommerce att avgöra när kundvagnen ändras.",
+			"purpose_en": "Helps WooCommerce detect cart changes.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^woocommerce_items_in_cart$",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Hjälper WooCommerce att avgöra när kundvagnen ändras.",
+			"purpose_en": "Helps WooCommerce detect cart changes.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^woocommerce_recently_viewed$",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Sparar senast visade produkter.",
+			"purpose_en": "Stores recently viewed products.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wp_woocommerce_session_",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Unikt sessions-ID för varje kund.",
+			"purpose_en": "Unique session ID per customer.",
+			"duration": "2 dagar"
+		},
+		{
+			"pattern": "^wc_cart_",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Kundvagnsinformation.",
+			"purpose_en": "Shopping cart information.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wc_fragments_",
+			"category": "necessary",
+			"service": "WooCommerce",
+			"purpose_sv": "Cachefragment för kundvagn.",
+			"purpose_en": "Cart cache fragments.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^tk_ai$",
+			"category": "necessary",
+			"service": "Jetpack",
+			"purpose_sv": "Jetpack anti-spam-identifierare.",
+			"purpose_en": "Jetpack anti-spam identifier.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^__cf_bm$",
+			"category": "necessary",
+			"service": "Cloudflare",
+			"purpose_sv": "Bot-hantering och säkerhet.",
+			"purpose_en": "Bot management and security.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^cf_clearance$",
+			"category": "necessary",
+			"service": "Cloudflare",
+			"purpose_sv": "Clearance-cookie efter säkerhetskontroll.",
+			"purpose_en": "Clearance cookie after security check.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^__cfduid$",
+			"category": "necessary",
+			"service": "Cloudflare",
+			"purpose_sv": "Identifierar betrodd webbtrafik.",
+			"purpose_en": "Identifies trusted web traffic.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_cfruid$",
+			"category": "necessary",
+			"service": "Cloudflare",
+			"purpose_sv": "Rate limiting.",
+			"purpose_en": "Rate limiting.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wordfence_verifiedHuman$",
+			"category": "necessary",
+			"service": "Wordfence",
+			"purpose_sv": "Verifiering av mänsklig besökare.",
+			"purpose_en": "Human visitor verification.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^wfwaf-authcookie-",
+			"category": "necessary",
+			"service": "Wordfence",
+			"purpose_sv": "Brandväggsautentisering.",
+			"purpose_en": "Firewall authentication.",
+			"duration": "12 timmar"
+		},
+		{
+			"pattern": "^elementor$",
+			"category": "necessary",
+			"service": "Elementor",
+			"purpose_sv": "Elementor-sidbyggarens sessionsdata.",
+			"purpose_en": "Elementor page builder session data.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^wpml_browser_redirect_test$",
+			"category": "necessary",
+			"service": "WPML",
+			"purpose_sv": "Testar webbläsaromdirigering.",
+			"purpose_en": "Tests browser redirect.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^icl_current_language$",
+			"category": "necessary",
+			"service": "WPML",
+			"purpose_sv": "Sparar valt språk.",
+			"purpose_en": "Stores selected language.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^pll_language$",
+			"category": "necessary",
+			"service": "Polylang",
+			"purpose_sv": "Sparar valt språk.",
+			"purpose_en": "Stores selected language.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^gdpr\\[consent_types\\]$",
+			"category": "necessary",
+			"service": "GDPR",
+			"purpose_sv": "Sparar GDPR-samtycke.",
+			"purpose_en": "Stores GDPR consent.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^viewed_cookie_policy$",
+			"category": "necessary",
+			"service": "Cookie Law Info",
+			"purpose_sv": "Sparar att cookie-policyn har visats.",
+			"purpose_en": "Stores that cookie policy has been viewed.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^cookielawinfo-",
+			"category": "necessary",
+			"service": "Cookie Law Info",
+			"purpose_sv": "Cookie-samtyckesstatus.",
+			"purpose_en": "Cookie consent status.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^CookieConsent$",
+			"category": "necessary",
+			"service": "Cookiebot",
+			"purpose_sv": "Sparar besökarens cookie-samtycke.",
+			"purpose_en": "Stores visitor cookie consent.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^CookieConsentBulkTicket$",
+			"category": "necessary",
+			"service": "Cookiebot",
+			"purpose_sv": "Möjliggör samtycke på flera domäner.",
+			"purpose_en": "Enables consent across multiple domains.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^sucuri_cloudproxy_",
+			"category": "necessary",
+			"service": "Sucuri",
+			"purpose_sv": "Sucuri brandvägg och säkerhet.",
+			"purpose_en": "Sucuri firewall and security.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^itsec-hb-login-",
+			"category": "necessary",
+			"service": "iThemes Security",
+			"purpose_sv": "Dold inloggningssida.",
+			"purpose_en": "Hidden login page.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_ga$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Unik besöksidentifierare för Google Analytics.",
+			"purpose_en": "Unique visitor identifier for Google Analytics.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_ga_",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Används av GA4 för att särskilja sessioner.",
+			"purpose_en": "Used by GA4 to distinguish sessions.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_gid$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Identifierar unika besökare under 24 timmar.",
+			"purpose_en": "Identifies unique visitors for 24 hours.",
+			"duration": "24 timmar"
+		},
+		{
+			"pattern": "^_gat$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Begränsar antalet förfrågningar till Google Analytics.",
+			"purpose_en": "Throttles request rate to Google Analytics.",
+			"duration": "1 minut"
+		},
+		{
+			"pattern": "^_gat_",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Begränsar förfrågningar (anpassad tracker).",
+			"purpose_en": "Throttles requests (custom tracker).",
+			"duration": "1 minut"
+		},
+		{
+			"pattern": "^__utma$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Unik besökare och sessionsspårning (klassisk).",
+			"purpose_en": "Unique visitor and session tracking (classic).",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^__utmb$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Sessionsidentifiering (klassisk).",
+			"purpose_en": "Session identification (classic).",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^__utmc$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Session-cookie (klassisk).",
+			"purpose_en": "Session cookie (classic).",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^__utmt$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Begränsar förfrågningsfrekvens (klassisk).",
+			"purpose_en": "Throttles request rate (classic).",
+			"duration": "10 minuter"
+		},
+		{
+			"pattern": "^__utmz$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Spårar trafikkälla och kampanj (klassisk).",
+			"purpose_en": "Tracks traffic source and campaign (classic).",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^__utmv$",
+			"category": "analytics",
+			"service": "Google Analytics",
+			"purpose_sv": "Anpassade besökarvariabler (klassisk).",
+			"purpose_en": "Custom visitor variables (classic).",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_dc_gtm_",
+			"category": "analytics",
+			"service": "Google Tag Manager",
+			"purpose_sv": "Spårar laddning av Google Tag Manager.",
+			"purpose_en": "Tracks Google Tag Manager loading.",
+			"duration": "1 minut"
+		},
+		{
+			"pattern": "^_hj[A-Z]",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Hotjar-session och beteendespårning.",
+			"purpose_en": "Hotjar session and behavior tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjid$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Unikt användar-ID för Hotjar.",
+			"purpose_en": "Unique user ID for Hotjar.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjSession_",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Hotjar-sessionsdata.",
+			"purpose_en": "Hotjar session data.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^_hjSessionUser_",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Identifierar Hotjar-användare.",
+			"purpose_en": "Identifies Hotjar user.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjAbsoluteSessionInProgress$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Indikerar pågående Hotjar-session.",
+			"purpose_en": "Indicates ongoing Hotjar session.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^_hjFirstSeen$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Identifierar första besöket.",
+			"purpose_en": "Identifies first visit.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^_hjIncludedInPageviewSample$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Avgör om besökaren inkluderas i sidvisningsurvalet.",
+			"purpose_en": "Determines if visitor is included in pageview sample.",
+			"duration": "2 minuter"
+		},
+		{
+			"pattern": "^_hjIncludedInSessionSample$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Avgör om besökaren inkluderas i sessionsurvalet.",
+			"purpose_en": "Determines if visitor is included in session sample.",
+			"duration": "2 minuter"
+		},
+		{
+			"pattern": "^_pk_id\\.",
+			"category": "analytics",
+			"service": "Matomo",
+			"purpose_sv": "Unikt besökar-ID för Matomo.",
+			"purpose_en": "Unique visitor ID for Matomo.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_pk_ses\\.",
+			"category": "analytics",
+			"service": "Matomo",
+			"purpose_sv": "Sessionsdata för Matomo.",
+			"purpose_en": "Session data for Matomo.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^_pk_ref\\.",
+			"category": "analytics",
+			"service": "Matomo",
+			"purpose_sv": "Referrer-information för Matomo.",
+			"purpose_en": "Referrer information for Matomo.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^_pk_cvar\\.",
+			"category": "analytics",
+			"service": "Matomo",
+			"purpose_sv": "Anpassade variabler för Matomo.",
+			"purpose_en": "Custom variables for Matomo.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^amplitude_id",
+			"category": "analytics",
+			"service": "Amplitude",
+			"purpose_sv": "Besöksidentifiering för Amplitude.",
+			"purpose_en": "Visitor identification for Amplitude.",
+			"duration": "10 år"
+		},
+		{
+			"pattern": "^mp_[a-f0-9]+_mixpanel$",
+			"category": "analytics",
+			"service": "Mixpanel",
+			"purpose_sv": "Besöksspårning för Mixpanel.",
+			"purpose_en": "Visitor tracking for Mixpanel.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^ajs_anonymous_id$",
+			"category": "analytics",
+			"service": "Segment",
+			"purpose_sv": "Anonym besöksidentifiering.",
+			"purpose_en": "Anonymous visitor identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^ajs_user_id$",
+			"category": "analytics",
+			"service": "Segment",
+			"purpose_sv": "Användaridentifiering.",
+			"purpose_en": "User identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^ajs_group_id$",
+			"category": "analytics",
+			"service": "Segment",
+			"purpose_sv": "Gruppidentifiering.",
+			"purpose_en": "Group identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^hubspotutk$",
+			"category": "analytics",
+			"service": "HubSpot",
+			"purpose_sv": "Spårar besökarens identitet.",
+			"purpose_en": "Tracks visitor identity.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^__hssc$",
+			"category": "analytics",
+			"service": "HubSpot",
+			"purpose_sv": "Sessionsinformation för HubSpot.",
+			"purpose_en": "Session information for HubSpot.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^__hssrc$",
+			"category": "analytics",
+			"service": "HubSpot",
+			"purpose_sv": "Avgör om ny session.",
+			"purpose_en": "Determines if new session.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^__hstc$",
+			"category": "analytics",
+			"service": "HubSpot",
+			"purpose_sv": "Huvudspårning för HubSpot.",
+			"purpose_en": "Main tracking for HubSpot.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_clck$",
+			"category": "analytics",
+			"service": "Microsoft Clarity",
+			"purpose_sv": "Besöksidentifierare för Clarity.",
+			"purpose_en": "Visitor identifier for Clarity.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_clsk$",
+			"category": "analytics",
+			"service": "Microsoft Clarity",
+			"purpose_sv": "Sessionsdata för Clarity.",
+			"purpose_en": "Session data for Clarity.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^CLID$",
+			"category": "analytics",
+			"service": "Microsoft Clarity",
+			"purpose_sv": "Clarity-identifierare.",
+			"purpose_en": "Clarity identifier.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^intercom-id-",
+			"category": "analytics",
+			"service": "Intercom",
+			"purpose_sv": "Identifierar besökare för Intercom.",
+			"purpose_en": "Identifies visitors for Intercom.",
+			"duration": "9 månader"
+		},
+		{
+			"pattern": "^intercom-device-id-",
+			"category": "analytics",
+			"service": "Intercom",
+			"purpose_sv": "Identifierar enheten för Intercom.",
+			"purpose_en": "Identifies device for Intercom.",
+			"duration": "9 månader"
+		},
+		{
+			"pattern": "^intercom-session-",
+			"category": "analytics",
+			"service": "Intercom",
+			"purpose_sv": "Sessionsinformation för Intercom.",
+			"purpose_en": "Session information for Intercom.",
+			"duration": "1 vecka"
+		},
+		{
+			"pattern": "^_lfa$",
+			"category": "analytics",
+			"service": "Leadfeeder",
+			"purpose_sv": "Identifierar företagsbesökare för Leadfeeder.",
+			"purpose_en": "Identifies company visitors for Leadfeeder.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_li_ses",
+			"category": "analytics",
+			"service": "Leadinfo",
+			"purpose_sv": "Sessionsspårning för Leadinfo.",
+			"purpose_en": "Session tracking for Leadinfo.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^_li_id",
+			"category": "analytics",
+			"service": "Leadinfo",
+			"purpose_sv": "Besöksidentifierare för Leadinfo.",
+			"purpose_en": "Visitor identifier for Leadinfo.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^li_sesn$",
+			"category": "analytics",
+			"service": "Leadinfo",
+			"purpose_sv": "Sessionsnummer för Leadinfo.",
+			"purpose_en": "Session number for Leadinfo.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^li_sesd$",
+			"category": "analytics",
+			"service": "Leadinfo",
+			"purpose_sv": "Sessionsdata för Leadinfo.",
+			"purpose_en": "Session data for Leadinfo.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^snowplowOutQueue_",
+			"category": "analytics",
+			"service": "Snowplow",
+			"purpose_sv": "Kö för statistikdata.",
+			"purpose_en": "Statistics data queue.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_fbp$",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Spårar besök för Facebook-annonsering.",
+			"purpose_en": "Tracks visits for Facebook advertising.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_fbc$",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Spårar klick från Facebook-annonser.",
+			"purpose_en": "Tracks clicks from Facebook ads.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^fbm_",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Facebook Messenger-integration.",
+			"purpose_en": "Facebook Messenger integration.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^fbsr_",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Facebook-inloggningstoken.",
+			"purpose_en": "Facebook login token.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^fr$",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Annonsvisning och retargeting.",
+			"purpose_en": "Ad delivery and retargeting.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^tr$",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Facebook Pixel-spårning.",
+			"purpose_en": "Facebook Pixel tracking.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^datr$",
+			"category": "marketing",
+			"service": "Meta (Facebook)",
+			"purpose_sv": "Webbläsaridentifiering för Facebook.",
+			"purpose_en": "Browser identification for Facebook.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_gcl_au$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Google Ads konverteringsattribuering.",
+			"purpose_en": "Google Ads conversion attribution.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gcl_aw$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Spårar klick från Google Ads.",
+			"purpose_en": "Tracks clicks from Google Ads.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gcl_dc$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "DoubleClick konverteringsspårning.",
+			"purpose_en": "DoubleClick conversion tracking.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gcl_gb$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Google Booking konvertering.",
+			"purpose_en": "Google Booking conversion.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gcl_gf$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Google Flights konvertering.",
+			"purpose_en": "Google Flights conversion.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gcl_ha$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Google Hotel Ads konvertering.",
+			"purpose_en": "Google Hotel Ads conversion.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_gac_",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Google Ads kampanjinformation.",
+			"purpose_en": "Google Ads campaign information.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^goog_pem_mod$",
+			"category": "marketing",
+			"service": "Google Ads",
+			"purpose_sv": "Konverteringsmätning.",
+			"purpose_en": "Conversion measurement.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^IDE$",
+			"category": "marketing",
+			"service": "Google DoubleClick",
+			"purpose_sv": "Visar riktade annonser baserat på surfbeteende.",
+			"purpose_en": "Shows targeted ads based on browsing behavior.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^test_cookie$",
+			"category": "marketing",
+			"service": "Google DoubleClick",
+			"purpose_sv": "Kontrollerar om webbläsaren stöder cookies.",
+			"purpose_en": "Checks if the browser supports cookies.",
+			"duration": "15 minuter"
+		},
+		{
+			"pattern": "^li_sugr$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn Insight Tag besöksidentifiering.",
+			"purpose_en": "LinkedIn Insight Tag visitor identification.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^li_fat_id$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn medlemsidentifiering.",
+			"purpose_en": "LinkedIn member identification.",
+			"duration": "1 månad"
+		},
+		{
+			"pattern": "^lidc$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn routing-optimering.",
+			"purpose_en": "LinkedIn routing optimization.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^bcookie$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn webbläsaridentifiering.",
+			"purpose_en": "LinkedIn browser identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^UserMatchHistory$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn annonssync.",
+			"purpose_en": "LinkedIn ad sync.",
+			"duration": "1 månad"
+		},
+		{
+			"pattern": "^AnalyticsSyncHistory$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn analysspårning.",
+			"purpose_en": "LinkedIn analytics tracking.",
+			"duration": "1 månad"
+		},
+		{
+			"pattern": "^ln_or$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn Insight-konvertering.",
+			"purpose_en": "LinkedIn Insight conversion.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^li_mc$",
+			"category": "marketing",
+			"service": "LinkedIn",
+			"purpose_sv": "LinkedIn marknadsföringscookie.",
+			"purpose_en": "LinkedIn marketing cookie.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^muc_ads$",
+			"category": "marketing",
+			"service": "Twitter/X",
+			"purpose_sv": "Twitter annonsspårning.",
+			"purpose_en": "Twitter ad tracking.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^personalization_id$",
+			"category": "marketing",
+			"service": "Twitter/X",
+			"purpose_sv": "Twitter personalisering.",
+			"purpose_en": "Twitter personalization.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^guest_id$",
+			"category": "marketing",
+			"service": "Twitter/X",
+			"purpose_sv": "Twitter gäst-ID.",
+			"purpose_en": "Twitter guest ID.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_ttp$",
+			"category": "marketing",
+			"service": "TikTok",
+			"purpose_sv": "TikTok Pixel spårning.",
+			"purpose_en": "TikTok Pixel tracking.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^tt_",
+			"category": "marketing",
+			"service": "TikTok",
+			"purpose_sv": "TikTok annonsspårning.",
+			"purpose_en": "TikTok ad tracking.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_pinterest_",
+			"category": "marketing",
+			"service": "Pinterest",
+			"purpose_sv": "Pinterest annonskonvertering.",
+			"purpose_en": "Pinterest ad conversion.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_pin_unauth$",
+			"category": "marketing",
+			"service": "Pinterest",
+			"purpose_sv": "Pinterest gästidentifiering.",
+			"purpose_en": "Pinterest guest identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_epik$",
+			"category": "marketing",
+			"service": "Pinterest",
+			"purpose_sv": "Pinterest Tag-spårning.",
+			"purpose_en": "Pinterest Tag tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_uetsid$",
+			"category": "marketing",
+			"service": "Microsoft Ads (Bing)",
+			"purpose_sv": "Bing Ads konverteringsspårning.",
+			"purpose_en": "Bing Ads conversion tracking.",
+			"duration": "1 dag"
+		},
+		{
+			"pattern": "^_uetvid$",
+			"category": "marketing",
+			"service": "Microsoft Ads (Bing)",
+			"purpose_sv": "Bing Ads besökaridentifiering.",
+			"purpose_en": "Bing Ads visitor identification.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_rdt_uuid$",
+			"category": "marketing",
+			"service": "Reddit",
+			"purpose_sv": "Reddit Pixel konverteringsspårning.",
+			"purpose_en": "Reddit Pixel conversion tracking.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_scid$",
+			"category": "marketing",
+			"service": "Snapchat",
+			"purpose_sv": "Snapchat Pixel identifiering.",
+			"purpose_en": "Snapchat Pixel identification.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^sc_at$",
+			"category": "marketing",
+			"service": "Snapchat",
+			"purpose_sv": "Snapchat annonsspårning.",
+			"purpose_en": "Snapchat ad tracking.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^YSC$",
+			"category": "marketing",
+			"service": "YouTube (Google)",
+			"purpose_sv": "YouTube sessionsidentifiering.",
+			"purpose_en": "YouTube session identification.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^VISITOR_INFO1_LIVE$",
+			"category": "marketing",
+			"service": "YouTube (Google)",
+			"purpose_sv": "YouTube besöksidentifiering.",
+			"purpose_en": "YouTube visitor identification.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^CONSENT$",
+			"category": "marketing",
+			"service": "Google",
+			"purpose_sv": "Google samtyckessparning.",
+			"purpose_en": "Google consent storage.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^NID$",
+			"category": "marketing",
+			"service": "Google",
+			"purpose_sv": "Anpassar annonser på Google-egenskaper.",
+			"purpose_en": "Customizes ads on Google properties.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^DV$",
+			"category": "marketing",
+			"service": "Google",
+			"purpose_sv": "Google annonsanpassning.",
+			"purpose_en": "Google ad customization.",
+			"duration": "7 minuter"
+		},
+		{
+			"pattern": "^1P_JAR$",
+			"category": "marketing",
+			"service": "Google",
+			"purpose_sv": "Googles annonspreferenser.",
+			"purpose_en": "Google ad preferences.",
+			"duration": "1 månad"
+		},
+		{
+			"pattern": "^__gads$",
+			"category": "marketing",
+			"service": "Google AdSense",
+			"purpose_sv": "Google AdSense annonsvisning.",
+			"purpose_en": "Google AdSense ad serving.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^__gpi$",
+			"category": "marketing",
+			"service": "Google AdSense",
+			"purpose_sv": "Google Publisher Tag identifiering.",
+			"purpose_en": "Google Publisher Tag identification.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_opt_awcid$",
+			"category": "analytics",
+			"service": "Google Optimize",
+			"purpose_sv": "Google Optimize experimentspårning.",
+			"purpose_en": "Google Optimize experiment tracking.",
+			"duration": "24 timmar"
+		},
+		{
+			"pattern": "^_opt_awmid$",
+			"category": "analytics",
+			"service": "Google Optimize",
+			"purpose_sv": "Google Optimize kampanj-ID.",
+			"purpose_en": "Google Optimize campaign ID.",
+			"duration": "24 timmar"
+		},
+		{
+			"pattern": "^_opt_expid$",
+			"category": "analytics",
+			"service": "Google Optimize",
+			"purpose_sv": "Google Optimize experiment-ID.",
+			"purpose_en": "Google Optimize experiment ID.",
+			"duration": "10 sekunder"
+		},
+		{
+			"pattern": "^__zlcmid$",
+			"category": "analytics",
+			"service": "Zendesk",
+			"purpose_sv": "Zendesk Chat besöksidentifiering.",
+			"purpose_en": "Zendesk Chat visitor identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_fw_crm_v$",
+			"category": "analytics",
+			"service": "Freshworks",
+			"purpose_sv": "Freshworks CRM besökarspårning.",
+			"purpose_en": "Freshworks CRM visitor tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^crisp-client",
+			"category": "analytics",
+			"service": "Crisp",
+			"purpose_sv": "Crisp chattwidget besöksidentifiering.",
+			"purpose_en": "Crisp chat widget visitor identification.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^tawk_",
+			"category": "analytics",
+			"service": "Tawk.to",
+			"purpose_sv": "Tawk.to chattwidget sessionsdata.",
+			"purpose_en": "Tawk.to chat widget session data.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^__tawkuuid$",
+			"category": "analytics",
+			"service": "Tawk.to",
+			"purpose_sv": "Tawk.to unik besöksidentifierare.",
+			"purpose_en": "Tawk.to unique visitor identifier.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^_hjDonePolls$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Sparar vilka Hotjar-enkäter som besvarats.",
+			"purpose_en": "Stores which Hotjar surveys have been completed.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjMinimizedPolls$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Sparar vilka Hotjar-enkäter som minimerats.",
+			"purpose_en": "Stores which Hotjar surveys have been minimized.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjShownFeedbackMessage$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Sparar om Hotjar-feedback visats.",
+			"purpose_en": "Stores if Hotjar feedback was shown.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_hjClosedSurveyInvites$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Sparar stängda Hotjar-enkätinbjudningar.",
+			"purpose_en": "Stores closed Hotjar survey invitations.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^__adroll",
+			"category": "marketing",
+			"service": "AdRoll",
+			"purpose_sv": "AdRoll retargeting och annonsvisning.",
+			"purpose_en": "AdRoll retargeting and ad delivery.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_te_$",
+			"category": "marketing",
+			"service": "AdRoll",
+			"purpose_sv": "AdRoll besökaridentifiering.",
+			"purpose_en": "AdRoll visitor identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^__qca$",
+			"category": "marketing",
+			"service": "Quantcast",
+			"purpose_sv": "Quantcast målgruppsanalys.",
+			"purpose_en": "Quantcast audience analysis.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^_cc_id$",
+			"category": "marketing",
+			"service": "Lotame",
+			"purpose_sv": "Lotame datainsamling för målgrupper.",
+			"purpose_en": "Lotame audience data collection.",
+			"duration": "9 månader"
+		},
+		{
+			"pattern": "^pardot$",
+			"category": "marketing",
+			"service": "Salesforce Pardot",
+			"purpose_sv": "Pardot besökarspårning.",
+			"purpose_en": "Pardot visitor tracking.",
+			"duration": "10 år"
+		},
+		{
+			"pattern": "^visitor_id\\d+$",
+			"category": "marketing",
+			"service": "Salesforce Pardot",
+			"purpose_sv": "Pardot besöksidentifiering.",
+			"purpose_en": "Pardot visitor identification.",
+			"duration": "10 år"
+		},
+		{
+			"pattern": "^_mkto_trk$",
+			"category": "marketing",
+			"service": "Marketo",
+			"purpose_sv": "Marketo besökarspårning.",
+			"purpose_en": "Marketo visitor tracking.",
+			"duration": "2 år"
+		},
+		{
+			"pattern": "^_biz_uid$",
+			"category": "marketing",
+			"service": "Bizible",
+			"purpose_sv": "Bizible attributionsspårning.",
+			"purpose_en": "Bizible attribution tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_biz_nA$",
+			"category": "marketing",
+			"service": "Bizible",
+			"purpose_sv": "Bizible konverteringsspårning.",
+			"purpose_en": "Bizible conversion tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^sp_t$",
+			"category": "analytics",
+			"service": "Spotify",
+			"purpose_sv": "Spotify inbäddad spelare sessionsdata.",
+			"purpose_en": "Spotify embedded player session data.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^loglevel$",
+			"category": "necessary",
+			"service": "Diverse",
+			"purpose_sv": "Sparar loggningsnivå för felsökning.",
+			"purpose_en": "Stores logging level for debugging.",
+			"duration": "Permanent"
+		},
+		{
+			"pattern": "^_ce\\.s$",
+			"category": "analytics",
+			"service": "Crazy Egg",
+			"purpose_sv": "Crazy Egg sessionsspårning.",
+			"purpose_en": "Crazy Egg session tracking.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^cebs$",
+			"category": "analytics",
+			"service": "Crazy Egg",
+			"purpose_sv": "Crazy Egg besöksidentifiering.",
+			"purpose_en": "Crazy Egg visitor identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_ceg\\.s$",
+			"category": "analytics",
+			"service": "Crazy Egg",
+			"purpose_sv": "Crazy Egg sessionsinformation.",
+			"purpose_en": "Crazy Egg session information.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^_vwo_uuid_v2$",
+			"category": "analytics",
+			"service": "VWO",
+			"purpose_sv": "VWO A/B-testning besöksidentifiering.",
+			"purpose_en": "VWO A/B testing visitor identification.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^_vwo_ds$",
+			"category": "analytics",
+			"service": "VWO",
+			"purpose_sv": "VWO sessionsinformation.",
+			"purpose_en": "VWO session information.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_vis_opt_",
+			"category": "analytics",
+			"service": "VWO",
+			"purpose_sv": "VWO optimerings- och testdata.",
+			"purpose_en": "VWO optimization and test data.",
+			"duration": "3 månader"
+		},
+		{
+			"pattern": "^optimizelyEndUserId$",
+			"category": "analytics",
+			"service": "Optimizely",
+			"purpose_sv": "Optimizely besöksidentifiering.",
+			"purpose_en": "Optimizely visitor identification.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^optimizelySegments$",
+			"category": "analytics",
+			"service": "Optimizely",
+			"purpose_sv": "Optimizely målgruppssegment.",
+			"purpose_en": "Optimizely audience segments.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^optimizelyBuckets$",
+			"category": "analytics",
+			"service": "Optimizely",
+			"purpose_sv": "Optimizely experimentvariant.",
+			"purpose_en": "Optimizely experiment variant.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^__atuvc$",
+			"category": "marketing",
+			"service": "AddThis",
+			"purpose_sv": "AddThis delningsknapp spårning.",
+			"purpose_en": "AddThis share button tracking.",
+			"duration": "13 månader"
+		},
+		{
+			"pattern": "^__atuvs$",
+			"category": "marketing",
+			"service": "AddThis",
+			"purpose_sv": "AddThis sessionsdata.",
+			"purpose_en": "AddThis session data.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_GRECAPTCHA$",
+			"category": "necessary",
+			"service": "Google reCAPTCHA",
+			"purpose_sv": "Google reCAPTCHA botskydd.",
+			"purpose_en": "Google reCAPTCHA bot protection.",
+			"duration": "6 månader"
+		},
+		{
+			"pattern": "^rc::a$",
+			"category": "necessary",
+			"service": "Google reCAPTCHA",
+			"purpose_sv": "Google reCAPTCHA funktionsdata.",
+			"purpose_en": "Google reCAPTCHA functional data.",
+			"duration": "Permanent"
+		},
+		{
+			"pattern": "^_hjRecordingLastActivity$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Tidsstämpel för senaste Hotjar-inspelningsaktivitet.",
+			"purpose_en": "Timestamp for last Hotjar recording activity.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_hjRecordingEnabled$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Indikerar om Hotjar-inspelning är aktiv.",
+			"purpose_en": "Indicates if Hotjar recording is active.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^_hjViewportId$",
+			"category": "analytics",
+			"service": "Hotjar",
+			"purpose_sv": "Hotjar viewport-identifiering.",
+			"purpose_en": "Hotjar viewport identification.",
+			"duration": "Session"
+		}
+	]
+}

@@ -1,0 +1,376 @@
+# CoCookie Translation Template
+# Copyright (C) 2026 CoCookie
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: CoCookie 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-31 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: public/templates/banner.php
+msgid "Vi använder cookies"
+msgstr ""
+
+msgid "Denna webbplats använder cookies för att förbättra din upplevelse."
+msgstr ""
+
+msgid "Acceptera alla"
+msgstr ""
+
+msgid "Avvisa alla"
+msgstr ""
+
+msgid "Spara inställningar"
+msgstr ""
+
+msgid "Inställningar"
+msgstr ""
+
+msgid "Hantera cookie-inställningar"
+msgstr ""
+
+msgid "Här kan du ändra eller återkalla ditt samtycke."
+msgstr ""
+
+msgid "Samtyckesdatum:"
+msgstr ""
+
+msgid "Ditt samtyckes-ID:"
+msgstr ""
+
+msgid "(krävs alltid)"
+msgstr ""
+
+msgid "Dra tillbaka samtycke"
+msgstr ""
+
+msgid "Dölj detaljer"
+msgstr ""
+
+msgid "Visa detaljer"
+msgstr ""
+
+msgid "Läs vår integritetspolicy."
+msgstr ""
+
+msgid "Din webbläsare har Do Not Track aktiverat. Analys- och marknadsföringscookies är automatiskt inaktiverade."
+msgstr ""
+
+msgid "Cookie"
+msgstr ""
+
+msgid "Leverantör"
+msgstr ""
+
+msgid "Syfte"
+msgstr ""
+
+msgid "Livslängd"
+msgstr ""
+
+msgid "Cookie-inställningar"
+msgstr ""
+
+#: admin views
+msgid "CoCookie Dashboard"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Cookies"
+msgstr ""
+
+msgid "Banner"
+msgstr ""
+
+msgid "Compliance"
+msgstr ""
+
+msgid "Policyer"
+msgstr ""
+
+msgid "Compliance-poäng"
+msgstr ""
+
+msgid "Snabbstatistik"
+msgstr ""
+
+msgid "Totala samtycken"
+msgstr ""
+
+msgid "Registrerade cookies"
+msgstr ""
+
+msgid "Blockerade cookies"
+msgstr ""
+
+msgid "Okända cookies"
+msgstr ""
+
+msgid "Acceptansgrad per kategori"
+msgstr ""
+
+msgid "Kategori"
+msgstr ""
+
+msgid "Accepterad"
+msgstr ""
+
+msgid "Avvisad"
+msgstr ""
+
+msgid "Acceptansgrad"
+msgstr ""
+
+msgid "Obligatorisk"
+msgstr ""
+
+msgid "Snabbåtgärder"
+msgstr ""
+
+msgid "Skanna cookies"
+msgstr ""
+
+msgid "Kör audit"
+msgstr ""
+
+msgid "Redigera banner"
+msgstr ""
+
+msgid "Senaste skanning: %s"
+msgstr ""
+
+msgid "Sparat."
+msgstr ""
+
+msgid "Borttaget."
+msgstr ""
+
+msgid "Import klar."
+msgstr ""
+
+msgid "Kategorier"
+msgstr ""
+
+msgid "Ny kategori"
+msgstr ""
+
+msgid "Redigera kategori"
+msgstr ""
+
+msgid "Slug"
+msgstr ""
+
+msgid "Titel"
+msgstr ""
+
+msgid "Beskrivning"
+msgstr ""
+
+msgid "Sortering"
+msgstr ""
+
+msgid "Lägg till"
+msgstr ""
+
+msgid "Uppdatera"
+msgstr ""
+
+msgid "Import / Export"
+msgstr ""
+
+msgid "Importera"
+msgstr ""
+
+msgid "Exportera"
+msgstr ""
+
+msgid "Redigera"
+msgstr ""
+
+msgid "Radera"
+msgstr ""
+
+msgid "Namn"
+msgstr ""
+
+msgid "Lägg till cookie"
+msgstr ""
+
+msgid "Redigera cookie"
+msgstr ""
+
+msgid "Banner-inställningar"
+msgstr ""
+
+msgid "Inställningar sparade."
+msgstr ""
+
+msgid "Texter"
+msgstr ""
+
+msgid "Brödtext"
+msgstr ""
+
+msgid "Acceptera-knapp"
+msgstr ""
+
+msgid "Avvisa-knapp"
+msgstr ""
+
+msgid "Spara-knapp"
+msgstr ""
+
+msgid "Inställningar-knapp"
+msgstr ""
+
+msgid "Utseende"
+msgstr ""
+
+msgid "Position"
+msgstr ""
+
+msgid "Botten"
+msgstr ""
+
+msgid "Topp"
+msgstr ""
+
+msgid "Center (modal)"
+msgstr ""
+
+msgid "Färger"
+msgstr ""
+
+msgid "Bakgrund"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Primärknapp"
+msgstr ""
+
+msgid "Logotyp"
+msgstr ""
+
+msgid "Cookie-ikon"
+msgstr ""
+
+msgid "Cookie-livslängd (dagar)"
+msgstr ""
+
+msgid "Samtyckes-logg"
+msgstr ""
+
+msgid "Scanner"
+msgstr ""
+
+msgid "Cookie-audit"
+msgstr ""
+
+msgid "Cookie-scanner"
+msgstr ""
+
+msgid "Starta skanning"
+msgstr ""
+
+msgid "Skannar..."
+msgstr ""
+
+msgid "Importera alla"
+msgstr ""
+
+msgid "Kör audit"
+msgstr ""
+
+msgid "Kör audit..."
+msgstr ""
+
+msgid "Avblockera"
+msgstr ""
+
+msgid "Samtyckes-ID"
+msgstr ""
+
+msgid "IP-hash"
+msgstr ""
+
+msgid "Datum"
+msgstr ""
+
+msgid "Företagsinformation"
+msgstr ""
+
+msgid "Företagsnamn"
+msgstr ""
+
+msgid "Organisationsnummer"
+msgstr ""
+
+msgid "Adress"
+msgstr ""
+
+msgid "E-post"
+msgstr ""
+
+msgid "Telefon"
+msgstr ""
+
+msgid "Dataskyddsombud (namn)"
+msgstr ""
+
+msgid "Dataskyddsombud (e-post)"
+msgstr ""
+
+msgid "Integritetspolicy"
+msgstr ""
+
+msgid "Cookiepolicy"
+msgstr ""
+
+msgid "Förhandsvisning"
+msgstr ""
+
+msgid "Skapa sida (utkast)"
+msgstr ""
+
+msgid "Uppdatera sida"
+msgstr ""
+
+#: wizard
+msgid "Välkommen till CoCookie"
+msgstr ""
+
+msgid "CoCookie är redo!"
+msgstr ""
+
+msgid "Gå till Dashboard"
+msgstr ""
+
+msgid "Skanna"
+msgstr ""
+
+msgid "Granska"
+msgstr ""
+
+msgid "Konfigurera"
+msgstr ""
+
+msgid "Klar"
+msgstr ""
+
+msgid "Okänd"
+msgstr ""
+
+msgid "Syftet med denna cookie är okänt. Granska manuellt."
+msgstr ""
