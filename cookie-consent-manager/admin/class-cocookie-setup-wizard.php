@@ -19,6 +19,32 @@ class CoCookie_Setup_Wizard {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_page' ) );
 		add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+	}
+
+	/**
+	 * Enqueue wizard assets on the wizard page only.
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public static function enqueue_assets( $hook ) {
+		if ( ! isset( $_GET['page'] ) || 'cocookie-wizard' !== $_GET['page'] ) {
+			return;
+		}
+
+		wp_enqueue_media();
+		wp_enqueue_style( 'dashicons' );
+		wp_enqueue_style( 'cocookie-admin', COCOOKIE_PLUGIN_URL . 'admin/css/cocookie-admin.css', array(), COCOOKIE_VERSION );
+		wp_enqueue_script( 'cocookie-wizard', COCOOKIE_PLUGIN_URL . 'admin/js/cocookie-wizard.js', array( 'jquery' ), COCOOKIE_VERSION, true );
+		wp_localize_script( 'cocookie-wizard', 'cocookieWizard', array(
+			'restUrl'        => esc_url_raw( rest_url() ),
+			'nonce'          => wp_create_nonce( 'wp_rest' ),
+			'siteUrl'        => esc_url( home_url( '/' ) ),
+			'cleanScanNonce' => wp_create_nonce( 'ccm_clean_scan' ),
+			'step2Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=2' ),
+			'step3Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=3' ),
+			'step4Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=4' ),
+		) );
 	}
 
 	/**
@@ -45,19 +71,6 @@ class CoCookie_Setup_Wizard {
 
 		$step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 1;
 		$step = max( 1, min( 4, $step ) );
-
-		wp_enqueue_style( 'cocookie-admin', COCOOKIE_PLUGIN_URL . 'admin/css/cocookie-admin.css', array(), COCOOKIE_VERSION );
-		wp_enqueue_script( 'cocookie-wizard', COCOOKIE_PLUGIN_URL . 'admin/js/cocookie-wizard.js', array(), COCOOKIE_VERSION, true );
-		wp_enqueue_media(); // För logotyp-uppladdning i steg 3
-		wp_localize_script( 'cocookie-wizard', 'cocookieWizard', array(
-			'restUrl'        => esc_url_raw( rest_url() ),
-			'nonce'          => wp_create_nonce( 'wp_rest' ),
-			'siteUrl'        => esc_url( home_url( '/' ) ),
-			'cleanScanNonce' => wp_create_nonce( 'ccm_clean_scan' ),
-			'step2Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=2' ),
-			'step3Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=3' ),
-			'step4Url'       => admin_url( 'admin.php?page=cocookie-wizard&step=4' ),
-		) );
 
 		echo '<div class="wrap cocookie-admin-wrap">';
 		echo '<div class="cocookie-wizard">';
