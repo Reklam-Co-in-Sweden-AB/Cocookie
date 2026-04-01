@@ -167,6 +167,9 @@ class CoCookie_Setup_Wizard {
 			update_option( 'cocookie_settings', $settings );
 			update_option( 'ccm_settings', $settings );
 
+			// Markera wizarden som klar redan här så länkarna på steg 4 fungerar
+			update_option( 'cocookie_needs_wizard', false );
+
 			wp_redirect( admin_url( 'admin.php?page=cocookie-wizard&step=4' ) );
 			exit;
 		}
