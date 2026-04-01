@@ -307,14 +307,32 @@
 			});
 		}
 
+		// Tab navigation
+		var tabs = banner.querySelectorAll('[data-cocookie-tab]');
+		tabs.forEach(function (tab) {
+			tab.addEventListener('click', function () {
+				var target = tab.getAttribute('data-cocookie-tab');
+				// Deactivate all tabs and panels
+				tabs.forEach(function (t) { t.classList.remove('cocookie-banner__tab--active'); });
+				var panels = banner.querySelectorAll('[data-cocookie-panel]');
+				panels.forEach(function (p) { p.style.display = 'none'; });
+				// Activate selected
+				tab.classList.add('cocookie-banner__tab--active');
+				var panel = banner.querySelector('[data-cocookie-panel="' + target + '"]');
+				if (panel) panel.style.display = '';
+				// Show save button when on details tab
+				if (saveBtn) {
+					saveBtn.style.display = (target === 'details') ? '' : 'none';
+				}
+			});
+		});
+
+		// Legacy settings button (kept for backward compat)
 		if (settingsBtn) {
 			settingsBtn.addEventListener('click', function () {
-				var visible = details.style.display !== 'none';
-				details.style.display = visible ? 'none' : '';
-				saveBtn.style.display = visible ? 'none' : '';
-				settingsBtn.textContent = visible
-					? config.settings.settings_text
-					: config.settings.hide_details_text;
+				// Switch to details tab
+				var detailsTab = banner.querySelector('[data-cocookie-tab="details"]');
+				if (detailsTab) detailsTab.click();
 			});
 		}
 
