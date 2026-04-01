@@ -99,10 +99,10 @@ $position   = $s['position'] ?? 'bottom';
 							<table class="cocookie-category__table">
 								<thead>
 									<tr>
-										<th><?php esc_html_e( 'Cookie', 'cocookie' ); ?></th>
-										<th><?php esc_html_e( 'Leverantör', 'cocookie' ); ?></th>
-										<th><?php esc_html_e( 'Syfte', 'cocookie' ); ?></th>
-										<th><?php esc_html_e( 'Livslängd', 'cocookie' ); ?></th>
+										<th><?php echo esc_html( $s['table_cookie'] ?? __( 'Cookie', 'cocookie' ) ); ?></th>
+										<th><?php echo esc_html( $s['table_provider'] ?? __( 'Leverantör', 'cocookie' ) ); ?></th>
+										<th><?php echo esc_html( $s['table_purpose'] ?? __( 'Syfte', 'cocookie' ) ); ?></th>
+										<th><?php echo esc_html( $s['table_expiry'] ?? __( 'Livslängd', 'cocookie' ) ); ?></th>
 									</tr>
 								</thead>
 								<tbody>

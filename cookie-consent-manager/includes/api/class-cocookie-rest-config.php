@@ -46,6 +46,83 @@ class CoCookie_REST_Config {
 	}
 
 	/**
+	 * Get built-in translations for supported languages.
+	 *
+	 * @return array Keyed by language prefix (e.g. 'en', 'sv').
+	 */
+	private static function get_translations() {
+		return array(
+			'en' => array(
+				'banner_title'       => 'We use cookies',
+				'banner_text'        => 'This website uses cookies to improve your experience.',
+				'accept_all_text'    => 'Accept all',
+				'reject_all_text'    => 'Reject all',
+				'save_text'          => 'Save settings',
+				'settings_text'      => 'Settings',
+				'manage_title'       => 'Manage cookie settings',
+				'manage_text'        => 'Here you can change or withdraw your consent.',
+				'consent_date_label' => 'Consent date:',
+				'consent_id_label'   => 'Your consent ID:',
+				'required_label'     => '(always required)',
+				'withdraw_text'      => 'Withdraw consent',
+				'hide_details_text'  => 'Hide details',
+				'show_details_text'  => 'Show details',
+				'policy_link_text'   => 'Read our privacy policy.',
+				'dnt_notice'         => 'Your browser has Do Not Track enabled. Analytics and marketing cookies are automatically disabled.',
+				// Tabellrubriker
+				'table_cookie'       => 'Cookie',
+				'table_provider'     => 'Provider',
+				'table_purpose'      => 'Purpose',
+				'table_expiry'       => 'Expiry',
+				// Kategoriöversättningar
+				'cat_necessary'      => 'Necessary',
+				'cat_analytics'      => 'Analytics',
+				'cat_marketing'      => 'Marketing',
+				'desc_necessary'     => 'These cookies are necessary for the website to function and cannot be disabled.',
+				'desc_analytics'     => 'These cookies help us understand how visitors use the website.',
+				'desc_marketing'     => 'These cookies are used to display relevant advertisements.',
+			),
+		);
+	}
+
+	/**
+	 * Detect current language.
+	 *
+	 * Supports Polylang, WPML, and WordPress locale.
+	 *
+	 * @return string Two-letter language code (e.g. 'sv', 'en').
+	 */
+	private static function get_current_language() {
+		// Polylang
+		if ( function_exists( 'pll_current_language' ) ) {
+			$lang = pll_current_language( 'slug' );
+			if ( $lang ) {
+				return substr( $lang, 0, 2 );
+			}
+		}
+
+		// WPML
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
+			return substr( ICL_LANGUAGE_CODE, 0, 2 );
+		}
+
+		// Coscribe Translator
+		if ( function_exists( 'coscribe_translator' ) ) {
+			$plugin = coscribe_translator();
+			if ( $plugin ) {
+				$lang = $plugin->get_current_language();
+				if ( $lang ) {
+					return substr( $lang, 0, 2 );
+				}
+			}
+		}
+
+		// WordPress locale fallback
+		$locale = get_locale();
+		return substr( $locale, 0, 2 );
+	}
+
+	/**
 	 * Build the full banner configuration array.
 	 *
 	 * Used both by the REST endpoint and by wp_localize_script.
@@ -95,6 +172,10 @@ class CoCookie_REST_Config {
 				'show_details_text'  => $settings['show_details_text'] ?? __( 'Visa detaljer', 'cocookie' ),
 				'policy_link_text'   => $settings['policy_link_text'] ?? __( 'Läs vår integritetspolicy.', 'cocookie' ),
 				'dnt_notice'         => $settings['dnt_notice'] ?? __( 'Din webbläsare har Do Not Track aktiverat. Analys- och marknadsföringscookies är automatiskt inaktiverade.', 'cocookie' ),
+				'table_cookie'       => __( 'Cookie', 'cocookie' ),
+				'table_provider'     => __( 'Leverantör', 'cocookie' ),
+				'table_purpose'      => __( 'Syfte', 'cocookie' ),
+				'table_expiry'       => __( 'Livslängd', 'cocookie' ),
 			),
 		);
 
@@ -118,15 +199,119 @@ class CoCookie_REST_Config {
 			);
 		}
 
+		// Apply built-in language translations if not Swedish
+		$lang = self::get_current_language();
+		if ( 'sv' !== $lang ) {
+			$config = self::apply_translation( $config, $lang );
+		}
+
 		/**
 		 * Filter the banner configuration before it's sent to the frontend.
 		 *
 		 * Translation plugins can hook here to translate strings.
 		 * Replaces the hardcoded Coscribe integration.
 		 *
-		 * @param array $config The full banner configuration.
+		 * @param array  $config The full banner configuration.
+		 * @param string $lang   Current two-letter language code.
 		 */
-		$config = apply_filters( 'cocookie_translate_config', $config );
+		$config = apply_filters( 'cocookie_translate_config', $config, $lang );
+
+		return $config;
+	}
+
+	/**
+	 * Apply a built-in translation to the config.
+	 *
+	 * Only overrides default Swedish texts — if the admin has customized
+	 * a text in settings, it's left unchanged.
+	 *
+	 * @param array  $config Banner configuration.
+	 * @param string $lang   Two-letter language code.
+	 * @return array Modified configuration.
+	 */
+	private static function apply_translation( $config, $lang ) {
+		$translations = self::get_translations();
+		if ( ! isset( $translations[ $lang ] ) ) {
+			return $config;
+		}
+
+		$t        = $translations[ $lang ];
+		$settings = get_option( 'cocookie_settings', get_option( 'ccm_settings', array() ) );
+
+		// Swedish defaults — only override if admin hasn't customized the text
+		$swedish_defaults = array(
+			'banner_title'       => 'Vi använder cookies',
+			'banner_text'        => 'Denna webbplats använder cookies för att förbättra din upplevelse.',
+			'accept_all_text'    => 'Acceptera alla',
+			'reject_all_text'    => 'Avvisa alla',
+			'save_text'          => 'Spara inställningar',
+			'settings_text'      => 'Inställningar',
+			'manage_title'       => 'Hantera cookie-inställningar',
+			'manage_text'        => 'Här kan du ändra eller återkalla ditt samtycke.',
+			'consent_date_label' => 'Samtyckesdatum:',
+			'consent_id_label'   => 'Ditt samtyckes-ID:',
+			'required_label'     => '(krävs alltid)',
+			'withdraw_text'      => 'Dra tillbaka samtycke',
+			'hide_details_text'  => 'Dölj detaljer',
+			'show_details_text'  => 'Visa detaljer',
+			'policy_link_text'   => 'Läs vår integritetspolicy.',
+			'dnt_notice'         => 'Din webbläsare har Do Not Track aktiverat. Analys- och marknadsföringscookies är automatiskt inaktiverade.',
+			'table_cookie'       => 'Cookie',
+			'table_provider'     => 'Leverantör',
+			'table_purpose'      => 'Syfte',
+			'table_expiry'       => 'Livslängd',
+		);
+
+		// Override settings texts that haven't been customized
+		foreach ( $t as $key => $value ) {
+			// Skip category translations (handled below)
+			if ( strpos( $key, 'cat_' ) === 0 || strpos( $key, 'desc_' ) === 0 ) {
+				continue;
+			}
+
+			if ( ! isset( $config['settings'][ $key ] ) ) {
+				continue;
+			}
+
+			// Only translate if the current value matches the Swedish default
+			// (meaning the admin hasn't customized it)
+			$current_value = $config['settings'][ $key ];
+			$swedish_value = $swedish_defaults[ $key ] ?? '';
+
+			if ( $current_value === $swedish_value || empty( $settings[ $key ] ) ) {
+				$config['settings'][ $key ] = $value;
+			}
+		}
+
+		// Translate category titles and descriptions
+		$cat_map = array(
+			'necessary' => array( 'title' => $t['cat_necessary'] ?? '', 'desc' => $t['desc_necessary'] ?? '' ),
+			'analytics' => array( 'title' => $t['cat_analytics'] ?? '', 'desc' => $t['desc_analytics'] ?? '' ),
+			'marketing' => array( 'title' => $t['cat_marketing'] ?? '', 'desc' => $t['desc_marketing'] ?? '' ),
+		);
+
+		// Swedish category defaults
+		$swedish_cats = array(
+			'necessary' => array( 'title' => 'Nödvändiga', 'desc' => 'Dessa cookies är nödvändiga för att webbplatsen ska fungera och kan inte stängas av.' ),
+			'analytics' => array( 'title' => 'Analys',      'desc' => 'Dessa cookies hjälper oss att förstå hur besökare använder webbplatsen.' ),
+			'marketing' => array( 'title' => 'Marknadsföring', 'desc' => 'Dessa cookies används för att visa relevanta annonser.' ),
+		);
+
+		foreach ( $config['categories'] as &$cat ) {
+			$slug = $cat['slug'];
+			if ( isset( $cat_map[ $slug ] ) ) {
+				// Only translate if matching Swedish default
+				if ( isset( $swedish_cats[ $slug ] ) ) {
+					if ( $cat['title'] === $swedish_cats[ $slug ]['title'] && ! empty( $cat_map[ $slug ]['title'] ) ) {
+						$cat['title'] = $cat_map[ $slug ]['title'];
+					}
+					if ( $cat['description'] === $swedish_cats[ $slug ]['desc'] && ! empty( $cat_map[ $slug ]['desc'] ) ) {
+						$cat['description'] = $cat_map[ $slug ]['desc'];
+					}
+				}
+			}
+		}
+		unset( $cat );
 
 		return $config;
 	}
