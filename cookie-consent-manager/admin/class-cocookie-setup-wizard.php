@@ -72,6 +72,10 @@ class CoCookie_Setup_Wizard {
 		$step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 1;
 		$step = max( 1, min( 4, $step ) );
 
+		// Dölj alla admin notices från andra plugins i wizarden
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+
 		echo '<div class="wrap cocookie-admin-wrap">';
 		echo '<div class="cocookie-wizard">';
 

@@ -192,40 +192,43 @@ $s        = wp_parse_args( $settings, $defaults );
 		});
 	});
 
-	// Logotyp-uppladdning via WordPress mediabiblioteket
-	var logoFrame;
-	var uploadBtn = document.getElementById('cocookie-wizard-upload-logo');
-	var removeBtn = document.getElementById('cocookie-wizard-remove-logo');
-	var logoInput = document.getElementById('logo_url');
-	var preview   = document.getElementById('cocookie-wizard-logo-preview');
+	// Logotyp-uppladdning via WordPress mediabiblioteket (jQuery-baserat)
+	jQuery(function($){
+		var logoFrame;
 
-	if (uploadBtn && typeof wp !== 'undefined' && wp.media) {
-		uploadBtn.addEventListener('click', function(e){
+		$('#cocookie-wizard-upload-logo').on('click', function(e){
 			e.preventDefault();
+
+			if (typeof wp === 'undefined' || !wp.media) {
+				alert('Mediabiblioteket kunde inte laddas. Försök ladda om sidan.');
+				return;
+			}
+
 			if (logoFrame) { logoFrame.open(); return; }
+
 			logoFrame = wp.media({
 				title: '<?php echo esc_js( __( 'Välj logotyp', 'cocookie' ) ); ?>',
 				button: { text: '<?php echo esc_js( __( 'Använd denna bild', 'cocookie' ) ); ?>' },
 				multiple: false,
 				library: { type: 'image' }
 			});
+
 			logoFrame.on('select', function(){
 				var attachment = logoFrame.state().get('selection').first().toJSON();
-				logoInput.value = attachment.url;
-				preview.innerHTML = '<img src="' + attachment.url + '" alt="" style="max-height:50px;border:1px solid var(--cocookie-neutral-200);padding:6px;border-radius:6px;background:#fff;">';
-				removeBtn.style.display = '';
+				$('#logo_url').val(attachment.url);
+				$('#cocookie-wizard-logo-preview').html('<img src="' + attachment.url + '" alt="" style="max-height:50px;border:1px solid #e5e7eb;padding:6px;border-radius:6px;background:#fff;">');
+				$('#cocookie-wizard-remove-logo').show();
 			});
+
 			logoFrame.open();
 		});
-	}
 
-	if (removeBtn) {
-		removeBtn.addEventListener('click', function(e){
+		$('#cocookie-wizard-remove-logo').on('click', function(e){
 			e.preventDefault();
-			logoInput.value = '';
-			preview.innerHTML = '';
-			removeBtn.style.display = 'none';
+			$('#logo_url').val('');
+			$('#cocookie-wizard-logo-preview').html('');
+			$(this).hide();
 		});
-	}
+	});
 })();
 </script>
