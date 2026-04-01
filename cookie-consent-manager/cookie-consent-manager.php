@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'COCOOKIE_VERSION', '2.0.0' );
+define( 'COCOOKIE_VERSION', '2.0.2' );
 define( 'COCOOKIE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COCOOKIE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
