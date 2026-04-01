@@ -103,7 +103,8 @@
 	}
 
 	function activateIframes(cats) {
-		var placeholders = document.querySelectorAll('.cocookie-iframe-placeholder[data-cc-category]');
+		// Matcha både nya (.cocookie-) och gamla (.ccm-) placeholder-klasser
+		var placeholders = document.querySelectorAll('.cocookie-iframe-placeholder[data-cc-category], .ccm-iframe-placeholder[data-cc-category]');
 		for (var i = 0; i < placeholders.length; i++) {
 			var cat = placeholders[i].getAttribute('data-cc-category');
 			if (cats[cat]) {
@@ -358,7 +359,7 @@
 
 		// Iframe placeholder accept buttons
 		document.addEventListener('click', function (e) {
-			if (!e.target.classList.contains('cocookie-iframe-placeholder__btn')) return;
+			if (!e.target.classList.contains('cocookie-iframe-placeholder__btn') && !e.target.classList.contains('ccm-iframe-accept')) return;
 			e.preventDefault();
 			if (banner.style.display !== 'none') return;
 			showBanner(getConsent());
