@@ -22,6 +22,7 @@ class CoCookie_Admin {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_global_assets' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_redirect_to_wizard' ) );
 		add_action( 'admin_init', array( __CLASS__, 'handle_run_wizard' ) );
+		add_action( 'admin_init', array( __CLASS__, 'handle_check_update' ) );
 	}
 
 	/**
@@ -182,6 +183,77 @@ class CoCookie_Admin {
 		update_option( 'cocookie_needs_wizard', true );
 		wp_safe_redirect( admin_url( 'admin.php?page=cocookie-wizard' ) );
 		exit;
+	}
+
+	/**
+	 * Handle manual update check from dashboard.
+	 */
+	public static function handle_check_update() {
+		if ( ! isset( $_GET['cocookie_check_update'] ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'cocookie_check_update' ) ) {
+			return;
+		}
+
+		// Rensa cachad release-data så en ny kontroll görs
+		delete_transient( 'cocookie_github_release' );
+		// Tvinga WordPress att kontrollera uppdateringar
+		delete_site_transient( 'update_plugins' );
+
+		// Kolla om det finns en ny version
+		$release = self::get_github_release();
+		if ( $release ) {
+			$remote_version = ltrim( $release['tag_name'], 'v' );
+			if ( version_compare( $remote_version, COCOOKIE_VERSION, '>' ) ) {
+				set_transient( 'cocookie_update_message', sprintf(
+					__( 'Version %s finns tillgänglig! Gå till Tillägg för att uppdatera.', 'cocookie' ),
+					$remote_version
+				), 60 );
+				set_transient( 'cocookie_update_type', 'success', 60 );
+			} else {
+				set_transient( 'cocookie_update_message',
+					sprintf( __( 'Du kör senaste versionen (%s).', 'cocookie' ), COCOOKIE_VERSION ),
+					60
+				);
+				set_transient( 'cocookie_update_type', 'info', 60 );
+			}
+		} else {
+			set_transient( 'cocookie_update_message',
+				__( 'Kunde inte kontakta GitHub. Försök igen senare.', 'cocookie' ),
+				60
+			);
+			set_transient( 'cocookie_update_type', 'warning', 60 );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=cocookie' ) );
+		exit;
+	}
+
+	/**
+	 * Fetch latest release from GitHub API.
+	 *
+	 * @return array|false
+	 */
+	private static function get_github_release() {
+		$url = 'https://api.github.com/repos/Reklam-Co-in-Sweden-AB/Cocookie/releases/latest';
+		$response = wp_remote_get( $url, array(
+			'timeout' => 10,
+			'headers' => array(
+				'Accept'     => 'application/vnd.github.v3+json',
+				'User-Agent' => 'CoCookie/' . COCOOKIE_VERSION,
+			),
+		) );
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return false;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		return is_array( $body ) && ! empty( $body['tag_name'] ) ? $body : false;
 	}
 
 	/**

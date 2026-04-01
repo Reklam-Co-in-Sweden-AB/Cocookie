@@ -61,6 +61,14 @@ class CoCookie_Dashboard_Controller {
 			);
 		}
 
+		// Uppdateringsmeddelande (sätts av handle_check_update)
+		$update_message = get_transient( 'cocookie_update_message' );
+		$update_type    = get_transient( 'cocookie_update_type' );
+		if ( $update_message ) {
+			delete_transient( 'cocookie_update_message' );
+			delete_transient( 'cocookie_update_type' );
+		}
+
 		$data = array(
 			'compliance'       => $compliance,
 			'stats'            => $stats,
@@ -69,6 +77,8 @@ class CoCookie_Dashboard_Controller {
 			'unknown_count'    => $unknown_count,
 			'last_scan'        => $last_scan,
 			'alerts'           => $alerts,
+			'update_message'   => $update_message ?: '',
+			'update_type'      => $update_type ?: 'info',
 		);
 
 		include COCOOKIE_PLUGIN_DIR . 'admin/views/dashboard.php';

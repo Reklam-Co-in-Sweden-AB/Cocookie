@@ -205,7 +205,17 @@ $checklist_done = array_sum( array( $has_cookies, $has_scan, $has_banner_set ) )
 				<span class="dashicons dashicons-welcome-learn-more"></span>
 				<?php esc_html_e( 'Kör Setup Wizard', 'cocookie' ); ?>
 			</a>
+			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?cocookie_check_update=1' ), 'cocookie_check_update' ) ); ?>" class="cocookie-quick-action-btn">
+				<span class="dashicons dashicons-update"></span>
+				<?php esc_html_e( 'Sök efter uppdateringar', 'cocookie' ); ?>
+			</a>
 		</div>
+
+		<?php if ( ! empty( $data['update_message'] ) ) : ?>
+			<div class="cocookie-notice cocookie-notice--<?php echo esc_attr( $data['update_type'] ?? 'info' ); ?>" style="margin-bottom:20px;">
+				<p><?php echo esc_html( $data['update_message'] ); ?></p>
+			</div>
+		<?php endif; ?>
 
 		<!-- Getting Started checklista -->
 		<div class="cocookie-card__section">
