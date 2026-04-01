@@ -32,6 +32,11 @@ class CoCookie_Setup_Wizard {
 			return;
 		}
 
+		// Dölj alla admin notices i wizarden
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'network_admin_notices' );
+
 		wp_enqueue_media();
 		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_style( 'cocookie-admin', COCOOKIE_PLUGIN_URL . 'admin/css/cocookie-admin.css', array(), COCOOKIE_VERSION );
@@ -72,9 +77,8 @@ class CoCookie_Setup_Wizard {
 		$step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 1;
 		$step = max( 1, min( 4, $step ) );
 
-		// Dölj alla admin notices från andra plugins i wizarden
-		remove_all_actions( 'admin_notices' );
-		remove_all_actions( 'all_admin_notices' );
+		// Dölj kvarvarande notices med CSS (backup om remove_all_actions inte räckte)
+		echo '<style>.notice, .updated, .update-nag, .error, #wpbody-content > .wrap > .notice, .wp-header-end + .notice { display: none !important; }</style>';
 
 		echo '<div class="wrap cocookie-admin-wrap">';
 		echo '<div class="cocookie-wizard">';
