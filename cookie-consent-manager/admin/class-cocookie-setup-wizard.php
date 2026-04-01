@@ -160,7 +160,6 @@ class CoCookie_Setup_Wizard {
 				'banner_text_color'  => '#333333',
 				'reject_bg_color'    => '#f0f0f0',
 				'reject_text_color'  => '#333333',
-				'logo_url'           => '',
 				'cookie_lifetime'    => 365,
 				'cookie_icon'        => '',
 			);
