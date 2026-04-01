@@ -88,6 +88,32 @@ $s        = wp_parse_args( $settings, $defaults );
 			</div>
 		</div>
 
+		<!-- Logotyp -->
+		<div style="margin-bottom:24px;">
+			<label style="display:block;font-size:13px;font-weight:600;color:var(--cocookie-neutral-700);margin-bottom:10px;">
+				<?php esc_html_e( 'Logotyp i bannern', 'cocookie' ); ?>
+				<span style="font-size:12px;font-weight:400;color:var(--cocookie-neutral-500);margin-left:6px;"><?php esc_html_e( '(valfritt)', 'cocookie' ); ?></span>
+			</label>
+			<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+				<input type="hidden" id="logo_url" name="logo_url" value="<?php echo esc_attr( $s['logo_url'] ); ?>">
+				<button type="button" id="cocookie-wizard-upload-logo" class="button">
+					<span class="dashicons dashicons-upload" style="vertical-align:middle;font-size:15px;width:15px;height:15px;margin-right:4px;"></span>
+					<?php esc_html_e( 'Välj logotyp', 'cocookie' ); ?>
+				</button>
+				<button type="button" id="cocookie-wizard-remove-logo" class="button" <?php echo empty( $s['logo_url'] ) ? 'style="display:none;"' : ''; ?>>
+					<?php esc_html_e( 'Ta bort', 'cocookie' ); ?>
+				</button>
+			</div>
+			<div id="cocookie-wizard-logo-preview" style="margin-top:10px;">
+				<?php if ( ! empty( $s['logo_url'] ) ) : ?>
+					<img src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" style="max-height:50px;border:1px solid var(--cocookie-neutral-200);padding:6px;border-radius:6px;background:#fff;">
+				<?php endif; ?>
+			</div>
+			<p style="font-size:12px;color:var(--cocookie-neutral-500);margin-top:6px;">
+				<?php esc_html_e( 'Visas ovanför titeln i bannern. Rekommenderad höjd: 40px.', 'cocookie' ); ?>
+			</p>
+		</div>
+
 		<!-- Texter -->
 		<div style="background:var(--cocookie-neutral-50);border:1px solid var(--cocookie-neutral-200);border-radius:var(--cocookie-radius-md);padding:16px 20px;margin-bottom:24px;">
 			<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--cocookie-neutral-500);margin:0 0 16px;"><?php esc_html_e( 'Texter', 'cocookie' ); ?></p>
@@ -165,5 +191,41 @@ $s        = wp_parse_args( $settings, $defaults );
 			}
 		});
 	});
+
+	// Logotyp-uppladdning via WordPress mediabiblioteket
+	var logoFrame;
+	var uploadBtn = document.getElementById('cocookie-wizard-upload-logo');
+	var removeBtn = document.getElementById('cocookie-wizard-remove-logo');
+	var logoInput = document.getElementById('logo_url');
+	var preview   = document.getElementById('cocookie-wizard-logo-preview');
+
+	if (uploadBtn && typeof wp !== 'undefined' && wp.media) {
+		uploadBtn.addEventListener('click', function(e){
+			e.preventDefault();
+			if (logoFrame) { logoFrame.open(); return; }
+			logoFrame = wp.media({
+				title: '<?php echo esc_js( __( 'Välj logotyp', 'cocookie' ) ); ?>',
+				button: { text: '<?php echo esc_js( __( 'Använd denna bild', 'cocookie' ) ); ?>' },
+				multiple: false,
+				library: { type: 'image' }
+			});
+			logoFrame.on('select', function(){
+				var attachment = logoFrame.state().get('selection').first().toJSON();
+				logoInput.value = attachment.url;
+				preview.innerHTML = '<img src="' + attachment.url + '" alt="" style="max-height:50px;border:1px solid var(--cocookie-neutral-200);padding:6px;border-radius:6px;background:#fff;">';
+				removeBtn.style.display = '';
+			});
+			logoFrame.open();
+		});
+	}
+
+	if (removeBtn) {
+		removeBtn.addEventListener('click', function(e){
+			e.preventDefault();
+			logoInput.value = '';
+			preview.innerHTML = '';
+			removeBtn.style.display = 'none';
+		});
+	}
 })();
 </script>

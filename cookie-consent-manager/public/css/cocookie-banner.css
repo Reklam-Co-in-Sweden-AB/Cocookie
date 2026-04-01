@@ -141,24 +141,38 @@
 .cocookie-banner__tab {
 	padding: 10px 18px;
 	border: none;
-	background: none;
+	border-bottom: 2px solid transparent;
+	border-radius: 0;
+	background: none !important;
 	font-size: 13px;
 	font-weight: 600;
 	color: #888;
 	cursor: pointer;
-	border-bottom: 2px solid transparent;
 	margin-bottom: -2px;
 	transition: color 0.2s, border-color 0.2s;
 	white-space: nowrap;
+	box-shadow: none;
+	outline: none;
+	text-decoration: none;
+	line-height: 1.4;
 }
 
-.cocookie-banner__tab:hover {
+.cocookie-banner__tab:hover,
+.cocookie-banner__tab:focus {
 	color: #555;
+	background: none !important;
+	box-shadow: none;
+	border-color: transparent;
+	border-bottom-color: #ccc;
 }
 
-.cocookie-banner__tab--active {
+.cocookie-banner__tab--active,
+.cocookie-banner__tab--active:hover,
+.cocookie-banner__tab--active:focus {
 	color: var(--cocookie-accent, #29A166);
+	background: none !important;
 	border-bottom-color: var(--cocookie-accent, #29A166);
+	box-shadow: none;
 }
 
 /* Panels */
@@ -228,7 +242,7 @@
 
 .cocookie-btn {
 	padding: 12px 24px;
-	border: none;
+	border: none !important;
 	border-radius: 8px;
 	font-size: 14px;
 	font-weight: 600;
@@ -236,6 +250,9 @@
 	transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
 	letter-spacing: 0.1px;
 	line-height: 1;
+	text-transform: none;
+	text-decoration: none;
+	outline: none;
 }
 
 .cocookie-btn:hover {
@@ -249,34 +266,43 @@
 }
 
 .cocookie-btn--accept,
-.cocookie-btn--save {
-	background: var(--cocookie-accent);
-	color: var(--cocookie-accent-text);
+.cocookie-btn--accept:hover,
+.cocookie-btn--accept:focus,
+.cocookie-btn--save,
+.cocookie-btn--save:hover,
+.cocookie-btn--save:focus {
+	background: var(--cocookie-accent) !important;
+	color: var(--cocookie-accent-text) !important;
 }
 
-.cocookie-btn--reject {
-	background: var(--cocookie-reject-bg);
-	color: var(--cocookie-reject-text);
-	border: 1px solid #e0e0e0;
+.cocookie-btn--reject,
+.cocookie-btn--reject:focus {
+	background: var(--cocookie-reject-bg) !important;
+	color: var(--cocookie-reject-text) !important;
+	border: 1px solid #e0e0e0 !important;
 }
 
 .cocookie-btn--reject:hover {
-	background: #ebebeb;
+	background: #ebebeb !important;
+	color: var(--cocookie-reject-text) !important;
 }
 
-.cocookie-btn--settings {
-	background: transparent;
-	color: #888;
+.cocookie-btn--settings,
+.cocookie-btn--settings:focus {
+	background: transparent !important;
+	color: #888 !important;
 	text-decoration: underline;
 	text-underline-offset: 3px;
 	padding: 12px 14px;
 	font-weight: 500;
+	box-shadow: none !important;
 }
 
 .cocookie-btn--settings:hover {
-	box-shadow: none;
+	box-shadow: none !important;
 	transform: none;
-	color: #555;
+	background: transparent !important;
+	color: #555 !important;
 }
 
 /* === Details / Categories === */

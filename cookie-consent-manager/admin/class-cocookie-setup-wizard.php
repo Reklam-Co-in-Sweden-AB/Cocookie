@@ -48,6 +48,7 @@ class CoCookie_Setup_Wizard {
 
 		wp_enqueue_style( 'cocookie-admin', COCOOKIE_PLUGIN_URL . 'admin/css/cocookie-admin.css', array(), COCOOKIE_VERSION );
 		wp_enqueue_script( 'cocookie-wizard', COCOOKIE_PLUGIN_URL . 'admin/js/cocookie-wizard.js', array(), COCOOKIE_VERSION, true );
+		wp_enqueue_media(); // För logotyp-uppladdning i steg 3
 		wp_localize_script( 'cocookie-wizard', 'cocookieWizard', array(
 			'restUrl'        => esc_url_raw( rest_url() ),
 			'nonce'          => wp_create_nonce( 'wp_rest' ),
@@ -137,6 +138,7 @@ class CoCookie_Setup_Wizard {
 				'position'           => sanitize_text_field( $_POST['position'] ?? 'bottom' ),
 				'primary_color'      => sanitize_hex_color( $_POST['primary_color'] ?? '#29A166' ),
 				'primary_text_color' => '#ffffff',
+				'logo_url'           => esc_url_raw( $_POST['logo_url'] ?? '' ),
 				'banner_bg_color'    => '#ffffff',
 				'banner_text_color'  => '#333333',
 				'reject_bg_color'    => '#f0f0f0',
