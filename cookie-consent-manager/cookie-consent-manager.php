@@ -73,6 +73,7 @@ function cocookie_init() {
 	require_once COCOOKIE_PLUGIN_DIR . 'admin/class-cocookie-setup-wizard.php';
 	require_once COCOOKIE_PLUGIN_DIR . 'public/class-cocookie-public.php';
 	require_once COCOOKIE_PLUGIN_DIR . 'includes/scanner/class-cocookie-background-scan.php';
+	require_once COCOOKIE_PLUGIN_DIR . 'includes/class-cocookie-updater.php';
 
 	// Register new REST API routes
 	add_action( 'rest_api_init', array( 'CoCookie_REST_Consent', 'register_routes' ) );
@@ -85,6 +86,7 @@ function cocookie_init() {
 	CoCookie_Setup_Wizard::init();
 	CoCookie_Public::init();
 	CoCookie_Background_Scan::init();
+	CoCookie_Updater::init();
 
 	// Initialize legacy modules (kept during transition — will be removed)
 	CCM_Admin::init();
