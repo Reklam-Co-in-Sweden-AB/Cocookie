@@ -51,7 +51,7 @@ class CoCookie_Updater {
 				'plugin'       => self::PLUGIN_BASENAME,
 				'new_version'  => $remote_version,
 				'url'          => 'https://github.com/' . self::GITHUB_REPO,
-				'package'      => $release['zipball_url'],
+				'package'      => self::get_download_url( $release ),
 				'icons'        => array(),
 				'banners'      => array(),
 				'tested'       => '',
@@ -90,7 +90,7 @@ class CoCookie_Updater {
 				'description' => 'CoCookie — GDPR-kompatibel cookie consent med Google Consent Mode v2.',
 				'changelog'   => nl2br( esc_html( $release['body'] ?? '' ) ),
 			),
-			'download_link'     => $release['zipball_url'],
+			'download_link'     => self::get_download_url( $release ),
 			'requires'          => '5.0',
 			'tested'            => '',
 			'requires_php'      => '7.4',
@@ -167,6 +167,29 @@ class CoCookie_Updater {
 		}
 
 		return $source;
+	}
+
+	/**
+	 * Hämta nedladdnings-URL för en release.
+	 *
+	 * Föredrar en uppladdad asset (cocookie-*.zip) framför GitHub zipball,
+	 * eftersom zipball har fel mappstruktur.
+	 *
+	 * @param array $release GitHub release-data.
+	 * @return string Nedladdnings-URL.
+	 */
+	private static function get_download_url( $release ) {
+		// Kolla om det finns en uppladdad zip-asset
+		if ( ! empty( $release['assets'] ) && is_array( $release['assets'] ) ) {
+			foreach ( $release['assets'] as $asset ) {
+				if ( isset( $asset['name'] ) && preg_match( '/cocookie.*\.zip$/i', $asset['name'] ) ) {
+					return $asset['browser_download_url'];
+				}
+			}
+		}
+
+		// Fallback: använd zipball (kräver fix_source_dir)
+		return $release['zipball_url'] ?? '';
 	}
 
 	/**
