@@ -8,26 +8,82 @@ class CCM_Scanner {
     /**
      * Known third-party iframe providers mapped to consent categories.
      */
+    /**
+     * Iframes som ska blockeras helt tills consent ges.
+     * YouTube, Vimeo och Google Maps hanteras separat via URL-omskrivning.
+     */
     public static function get_iframe_providers() {
         return array(
-            'player.vimeo.com'   => array( 'category' => 'analytics', 'provider' => 'Vimeo',       'icon' => '&#9654;' ),
-            'vimeo.com'          => array( 'category' => 'analytics', 'provider' => 'Vimeo',       'icon' => '&#9654;' ),
-            'youtube.com'        => array( 'category' => 'marketing', 'provider' => 'YouTube',     'icon' => '&#9654;' ),
-            'youtube-nocookie.com' => array( 'category' => 'marketing', 'provider' => 'YouTube',   'icon' => '&#9654;' ),
-            'youtu.be'           => array( 'category' => 'marketing', 'provider' => 'YouTube',     'icon' => '&#9654;' ),
-            'maps.google.com'    => array( 'category' => 'analytics', 'provider' => 'Google Maps', 'icon' => '&#128205;' ),
-            'google.com/maps'    => array( 'category' => 'analytics', 'provider' => 'Google Maps', 'icon' => '&#128205;' ),
-            'open.spotify.com'   => array( 'category' => 'analytics', 'provider' => 'Spotify',     'icon' => '&#9654;' ),
             'facebook.com/plugins' => array( 'category' => 'marketing', 'provider' => 'Facebook',  'icon' => '&#128172;' ),
             'platform.twitter.com' => array( 'category' => 'marketing', 'provider' => 'Twitter/X', 'icon' => '&#128172;' ),
-            'twitter.com'        => array( 'category' => 'marketing', 'provider' => 'Twitter/X',   'icon' => '&#128172;' ),
-            'linkedin.com'       => array( 'category' => 'marketing', 'provider' => 'LinkedIn',    'icon' => '&#128172;' ),
-            'intercom.io'        => array( 'category' => 'analytics', 'provider' => 'Intercom',    'icon' => '&#128172;' ),
-            'intercomcdn.com'    => array( 'category' => 'analytics', 'provider' => 'Intercom',    'icon' => '&#128172;' ),
-            'hubspot.com'        => array( 'category' => 'analytics', 'provider' => 'HubSpot',     'icon' => '&#128172;' ),
-            'hs-scripts.com'     => array( 'category' => 'analytics', 'provider' => 'HubSpot',     'icon' => '&#128172;' ),
-            'hsforms.com'        => array( 'category' => 'analytics', 'provider' => 'HubSpot',     'icon' => '&#128172;' ),
+            'twitter.com'          => array( 'category' => 'marketing', 'provider' => 'Twitter/X', 'icon' => '&#128172;' ),
+            'linkedin.com'         => array( 'category' => 'marketing', 'provider' => 'LinkedIn',  'icon' => '&#128172;' ),
+            'intercom.io'          => array( 'category' => 'analytics', 'provider' => 'Intercom',  'icon' => '&#128172;' ),
+            'intercomcdn.com'      => array( 'category' => 'analytics', 'provider' => 'Intercom',  'icon' => '&#128172;' ),
+            'hubspot.com'          => array( 'category' => 'analytics', 'provider' => 'HubSpot',   'icon' => '&#128172;' ),
+            'hs-scripts.com'       => array( 'category' => 'analytics', 'provider' => 'HubSpot',   'icon' => '&#128172;' ),
+            'hsforms.com'          => array( 'category' => 'analytics', 'provider' => 'HubSpot',   'icon' => '&#128172;' ),
         );
+    }
+
+    /**
+     * Skriv om iframe-URL:er till privacy-vänliga versioner.
+     *
+     * YouTube → youtube-nocookie.com (sätter inga cookies)
+     * Vimeo → lägg till dnt=1 (Do Not Track)
+     * Google Maps → lägg till dnt=1 om möjligt
+     *
+     * Dessa iframes blockeras INTE utan visas direkt — men utan cookies.
+     *
+     * @param string $html Sidans HTML.
+     * @return string Modifierad HTML.
+     */
+    public static function rewrite_privacy_iframes( $html ) {
+        // YouTube: byt youtube.com till youtube-nocookie.com
+        $html = preg_replace(
+            '/(<iframe[^>]*\bsrc=["\'])https?:\/\/(www\.)?youtube\.com\/embed\//i',
+            '$1https://www.youtube-nocookie.com/embed/',
+            $html
+        );
+
+        // Vimeo: lägg till dnt=1 om det inte redan finns
+        $html = preg_replace_callback(
+            '/(<iframe[^>]*\bsrc=["\'])(https?:\/\/player\.vimeo\.com\/video\/[^"\']+)(["\'][^>]*>)/i',
+            function ( $matches ) {
+                $before = $matches[1];
+                $url    = $matches[2];
+                $after  = $matches[3];
+
+                // Lägg till dnt=1 om det saknas
+                if ( stripos( $url, 'dnt=' ) === false ) {
+                    $separator = ( strpos( $url, '?' ) !== false ) ? '&' : '?';
+                    $url .= $separator . 'dnt=1';
+                }
+
+                return $before . $url . $after;
+            },
+            $html
+        );
+
+        // Vimeo: hantera även data-src (lazy loading)
+        $html = preg_replace_callback(
+            '/(<iframe[^>]*\bdata-src=["\'])(https?:\/\/player\.vimeo\.com\/video\/[^"\']+)(["\'][^>]*>)/i',
+            function ( $matches ) {
+                $before = $matches[1];
+                $url    = $matches[2];
+                $after  = $matches[3];
+
+                if ( stripos( $url, 'dnt=' ) === false ) {
+                    $separator = ( strpos( $url, '?' ) !== false ) ? '&' : '?';
+                    $url .= $separator . 'dnt=1';
+                }
+
+                return $before . $url . $after;
+            },
+            $html
+        );
+
+        return $html;
     }
 
     public static function init() {
@@ -51,6 +107,10 @@ class CCM_Scanner {
         if ( empty( $html ) ) {
             return $html;
         }
+
+        // Skriv om YouTube/Vimeo-iframes till privacy-vänliga versioner
+        // (nocookie/dnt=1) istället för att blockera dem
+        $html = self::rewrite_privacy_iframes( $html );
 
         // Convert <script data-cc-category="..." src="..."> to type="text/plain"
         // This ensures scripts are blocked until consent is given.
