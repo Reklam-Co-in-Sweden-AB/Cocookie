@@ -229,42 +229,45 @@ class CCM_Scanner {
             return $full_tag;
         }
 
-        // Extract width, height, style, class from original iframe
-        $extra_attrs = '';
-        $style_parts = array();
+        // Neutralisera iframen istället för att ersätta med div.
+        // Behåller <iframe>-taggen (så tredjeparts-JS som PowerPack inte kraschar)
+        // men tar bort src och lägger det i data-cc-src istället.
+        $neutralized = $attributes;
 
-        if ( preg_match( '/\bwidth\s*=\s*["\']([^"\']+)["\']/i', $attributes, $w ) ) {
-            $style_parts[] = 'width:' . ( is_numeric( $w[1] ) ? $w[1] . 'px' : $w[1] );
-        }
-        if ( preg_match( '/\bheight\s*=\s*["\']([^"\']+)["\']/i', $attributes, $h ) ) {
-            $style_parts[] = 'height:' . ( is_numeric( $h[1] ) ? $h[1] . 'px' : $h[1] );
-        }
-        if ( preg_match( '/\bstyle\s*=\s*["\']([^"\']+)["\']/i', $attributes, $s ) ) {
-            $style_parts[] = $s[1];
+        // Flytta src till data-cc-src
+        if ( $src ) {
+            $neutralized = preg_replace( '/\bsrc\s*=\s*["\'][^"\']+["\']/i', 'src="about:blank"', $neutralized );
         }
 
-        $class = 'ccm-iframe-placeholder';
-        if ( preg_match( '/\bclass\s*=\s*["\']([^"\']+)["\']/i', $attributes, $c ) ) {
-            $class .= ' ' . $c[1];
-        }
+        // Lägg till data-attribut för consent-hantering
+        $neutralized .= ' data-cc-src="' . esc_attr( $src ) . '"';
+        $neutralized .= ' data-cc-category="' . esc_attr( $category ) . '"';
 
-        $style_attr = ! empty( $style_parts ) ? ' style="' . esc_attr( implode( ';', $style_parts ) ) . '"' : '';
-
-        $category_label = $category === 'analytics' ? 'analys' : 'marknadsförings';
+        // Bygg placeholder-overlay som visas ovanpå den tomma iframen
+        $category_label = 'analytics' === $category
+            ? __( 'analys', 'cocookie' )
+            : __( 'marknadsförings', 'cocookie' );
 
         $provider_text = $provider
-            ? '<p>Det här innehållet tillhandahålls av <strong>' . esc_html( $provider ) . '</strong>.</p>'
+            ? '<p>' . sprintf( __( 'Det här innehållet tillhandahålls av %s.', 'cocookie' ), '<strong>' . esc_html( $provider ) . '</strong>' ) . '</p>'
             : '';
 
-        $placeholder = '<div class="' . esc_attr( $class ) . '" data-cc-category="' . esc_attr( $category ) . '" data-cc-src="' . esc_attr( $src ) . '"' . $style_attr . '>'
-            . '<div class="ccm-iframe-placeholder-inner">'
-            . '<span class="ccm-iframe-icon">' . $icon . '</span>'
+        $placeholder_html = '<div class="ccm-iframe-placeholder cocookie-iframe-placeholder" data-cc-category="' . esc_attr( $category ) . '" data-cc-src="' . esc_attr( $src ) . '" style="position:relative;">'
+            . '<div class="ccm-iframe-placeholder-inner cocookie-iframe-placeholder__inner" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(240,241,243,0.95);z-index:1;">'
+            . '<div style="text-align:center;padding:20px;">'
+            . '<span class="ccm-iframe-icon cocookie-iframe-placeholder__icon">' . $icon . '</span>'
             . $provider_text
-            . '<p>Klicka för att godkänna <strong>' . esc_html( $category_label ) . '</strong>-cookies och ladda innehållet.</p>'
-            . '<button class="ccm-iframe-accept" type="button">Godkänn och visa</button>'
+            . '<p>' . sprintf( __( 'Klicka för att godkänna %s-cookies och ladda innehållet.', 'cocookie' ), '<strong>' . esc_html( $category_label ) . '</strong>' ) . '</p>'
+            . '<button class="ccm-iframe-accept cocookie-iframe-placeholder__btn" type="button">' . __( 'Godkänn och visa', 'cocookie' ) . '</button>'
+            . '</div>'
             . '</div>'
             . '</div>';
 
-        return $placeholder;
+        // Wrappa iframen i en container med overlay
+        return '<div style="position:relative;">'
+            . '<iframe' . $neutralized . '></iframe>'
+            . $placeholder_html
+            . '</div>';
+
     }
 }

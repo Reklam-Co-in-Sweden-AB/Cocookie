@@ -103,21 +103,39 @@
 	}
 
 	function activateIframes(cats) {
-		// Matcha både nya (.cocookie-) och gamla (.ccm-) placeholder-klasser
-		var placeholders = document.querySelectorAll('.cocookie-iframe-placeholder[data-cc-category], .ccm-iframe-placeholder[data-cc-category]');
-		for (var i = 0; i < placeholders.length; i++) {
-			var cat = placeholders[i].getAttribute('data-cc-category');
+		// Metod 1: Neutraliserade iframes (nya metoden — iframe finns kvar med src="about:blank")
+		var neutralized = document.querySelectorAll('iframe[data-cc-category][data-cc-src]');
+		for (var i = 0; i < neutralized.length; i++) {
+			var cat = neutralized[i].getAttribute('data-cc-category');
 			if (cats[cat]) {
-				var src = placeholders[i].getAttribute('data-cc-src');
-				if (!src) continue;
+				var realSrc = neutralized[i].getAttribute('data-cc-src');
+				if (realSrc) {
+					neutralized[i].src = realSrc;
+					neutralized[i].removeAttribute('data-cc-src');
+					neutralized[i].removeAttribute('data-cc-category');
+				}
+				// Ta bort overlay-placeholder om den finns
+				var wrapper = neutralized[i].parentNode;
+				var overlay = wrapper ? wrapper.querySelector('.ccm-iframe-placeholder, .cocookie-iframe-placeholder') : null;
+				if (overlay) overlay.parentNode.removeChild(overlay);
+			}
+		}
+
+		// Metod 2: Gamla placeholder-divs (bakåtkompatibilitet)
+		var placeholders = document.querySelectorAll('.cocookie-iframe-placeholder[data-cc-category], .ccm-iframe-placeholder[data-cc-category]');
+		for (var j = 0; j < placeholders.length; j++) {
+			var pCat = placeholders[j].getAttribute('data-cc-category');
+			if (cats[pCat]) {
+				var pSrc = placeholders[j].getAttribute('data-cc-src');
+				if (!pSrc) continue;
 				var iframe = document.createElement('iframe');
-				iframe.src = src;
+				iframe.src = pSrc;
 				iframe.setAttribute('frameborder', '0');
 				iframe.setAttribute('allowfullscreen', '');
-				var ps = placeholders[i].style;
+				var ps = placeholders[j].style;
 				if (ps.width) iframe.style.width = ps.width;
 				if (ps.height) iframe.style.height = ps.height;
-				placeholders[i].parentNode.replaceChild(iframe, placeholders[i]);
+				placeholders[j].parentNode.replaceChild(iframe, placeholders[j]);
 			}
 		}
 	}
