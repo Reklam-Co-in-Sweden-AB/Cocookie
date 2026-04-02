@@ -110,7 +110,11 @@
 			if (cats[cat]) {
 				var realSrc = neutralized[i].getAttribute('data-cc-src');
 				if (realSrc) {
+					// Sätt tillbaka både src och data-src (lazy load)
 					neutralized[i].src = realSrc;
+					if (neutralized[i].hasAttribute('data-src')) {
+						neutralized[i].setAttribute('data-src', realSrc);
+					}
 					neutralized[i].removeAttribute('data-cc-src');
 					neutralized[i].removeAttribute('data-cc-category');
 				}

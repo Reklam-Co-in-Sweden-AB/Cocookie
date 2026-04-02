@@ -234,13 +234,25 @@ class CCM_Scanner {
         // men tar bort src och lägger det i data-cc-src istället.
         $neutralized = $attributes;
 
-        // Flytta src till data-cc-src
+        // Hämta eventuell data-src (lazy load, t.ex. PowerPack/Beaver Builder)
+        $lazy_src = '';
+        if ( preg_match( '/\bdata-src\s*=\s*["\']([^"\']+)["\']/i', $attributes, $lazy_match ) ) {
+            $lazy_src = $lazy_match[1];
+        }
+
+        // Använd data-src som källa om den finns (den är den "riktiga" URL:en vid lazy load)
+        $real_src = $lazy_src ?: $src;
+
+        // Neutralisera: sätt src och data-src till about:blank
         if ( $src ) {
             $neutralized = preg_replace( '/\bsrc\s*=\s*["\'][^"\']+["\']/i', 'src="about:blank"', $neutralized );
         }
+        if ( $lazy_src ) {
+            $neutralized = preg_replace( '/\bdata-src\s*=\s*["\'][^"\']+["\']/i', 'data-src="about:blank"', $neutralized );
+        }
 
         // Lägg till data-attribut för consent-hantering
-        $neutralized .= ' data-cc-src="' . esc_attr( $src ) . '"';
+        $neutralized .= ' data-cc-src="' . esc_attr( $real_src ) . '"';
         $neutralized .= ' data-cc-category="' . esc_attr( $category ) . '"';
 
         // Bygg placeholder-overlay som visas ovanpå den tomma iframen
