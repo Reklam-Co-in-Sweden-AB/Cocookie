@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CoCookie
  * Description: GDPR-compliant cookie consent management for WordPress. Category-based consent with Google Consent Mode v2.
- * Version: 2.0.5
+ * Version: 2.0.6
  * Author: CoCookie
  * License: GPL-2.0+
  * Text Domain: cocookie
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'COCOOKIE_VERSION', '2.0.5' );
+define( 'COCOOKIE_VERSION', '2.0.6' );
 define( 'COCOOKIE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COCOOKIE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

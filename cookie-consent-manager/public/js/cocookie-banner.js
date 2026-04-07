@@ -218,6 +218,12 @@
 			window.__ccmUpdateConsent(data);
 		}
 
+		// Sätt cookien direkt så samtycket sparas även om REST-anropet misslyckas
+		// (t.ex. pga cachad nonce). UUID uppdateras i efterhand om anropet lyckas.
+		var timestamp = Date.now();
+		var cookieVal = JSON.stringify(Object.assign({}, data, { timestamp: timestamp }));
+		setCookie(COOKIE_NAME, cookieVal, config.settings.cookie_lifetime);
+
 		fetch(config.restUrl + '/consent', {
 			method: 'POST',
 			credentials: 'same-origin',
@@ -225,9 +231,14 @@
 			body: JSON.stringify({ categories: data })
 		}).then(function (r) { return r.json(); }).then(function (resp) {
 			if (resp.uuid) {
-				var val = JSON.stringify(Object.assign({}, data, { uuid: resp.uuid, timestamp: Date.now() }));
+				var val = JSON.stringify(Object.assign({}, data, { uuid: resp.uuid, timestamp: timestamp }));
 				setCookie(COOKIE_NAME, val, config.settings.cookie_lifetime);
 			}
+			if (isReopen) {
+				window.location.reload();
+			}
+		}).catch(function () {
+			// REST-anropet misslyckades — cookien är redan satt ovan
 			if (isReopen) {
 				window.location.reload();
 			}
