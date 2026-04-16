@@ -226,6 +226,13 @@ class CCM_Cookie_Scanner {
         );
     }
 
+    /**
+     * Classify a cookie by name.
+     *
+     * @deprecated 2.1.0 Använd CoCookie_Cookie_Patterns::match() istället. Tas bort i 2.2.0.
+     * @param string $name Cookie name.
+     * @return array Associative array with category_slug, provider, purpose.
+     */
     public static function classify_cookie( $name ) {
         $known = self::get_known_cookies();
 
@@ -240,9 +247,9 @@ class CCM_Cookie_Scanner {
         }
 
         return array(
-            'category_slug' => 'necessary',
+            'category_slug' => 'unclassified',
             'provider'      => 'Okänd',
-            'purpose'       => 'Syftet med denna cookie är okänt. Granska manuellt.',
+            'purpose'       => 'Syftet med denna cookie är okänt. Granska manuellt och flytta till rätt kategori.',
         );
     }
 

@@ -75,9 +75,9 @@ class CoCookie_Cookie_Patterns {
 		}
 
 		return array(
-			'category_slug' => 'necessary',
+			'category_slug' => 'unclassified',
 			'provider'      => __( 'Okänd', 'cocookie' ),
-			'purpose'       => __( 'Syftet med denna cookie är okänt. Granska manuellt.', 'cocookie' ),
+			'purpose'       => __( 'Syftet med denna cookie är okänt. Granska manuellt och flytta till rätt kategori.', 'cocookie' ),
 			'duration'      => '',
 		);
 	}
