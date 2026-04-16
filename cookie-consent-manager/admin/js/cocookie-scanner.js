@@ -134,6 +134,12 @@
 			var code = document.createElement('code');
 			code.textContent = r.name;
 			tdName.appendChild(code);
+			if (r.suggested_role_hint) {
+				var hint = document.createElement('div');
+				hint.className = 'cocookie-role-hint';
+				hint.textContent = '⚠ ' + r.suggested_role_hint;
+				tdName.appendChild(hint);
+			}
 			tr.appendChild(tdName);
 
 			// Type

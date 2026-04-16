@@ -51,6 +51,7 @@ function cocookie_init() {
 
 	// New model and API classes
 	require_once COCOOKIE_PLUGIN_DIR . 'includes/models/class-cocookie-cookie-patterns.php';
+	require_once COCOOKIE_PLUGIN_DIR . 'includes/models/class-cocookie-cookie-heuristics.php';
 	require_once COCOOKIE_PLUGIN_DIR . 'includes/models/class-cocookie-categories.php';
 	require_once COCOOKIE_PLUGIN_DIR . 'includes/models/class-cocookie-consent.php';
 	require_once COCOOKIE_PLUGIN_DIR . 'includes/api/class-cocookie-rest-consent.php';

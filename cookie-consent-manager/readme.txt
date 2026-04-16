@@ -44,6 +44,8 @@ The plugin will automatically activate the script when the visitor consents to t
 * Ny kategori "Okategoriserade" läggs till automatiskt via migrering.
 * Befintliga okända cookies i scan-resultat flyttas till rätt kategori.
 * Underhållsverktyg i Cookies-vyn: "Flytta okända till Okategoriserade" och "Städa bort försvunna cookies".
+* Heuristik-baserade rekommendationer för cookies — flaggar troliga inloggnings-, admin- och utvecklingscookies.
+* Nytt filter: cocookie_cookie_heuristics för anpassning av heuristikreglerna.
 * Nya patterns: Stripe (__stripe_mid, __stripe_sid, stripe.csrf), i18next (i18next, i18nextLng).
 * Admin-only cookies från Beaver Builder filtreras bort från publika scans.
 * Nytt filter: cocookie_admin_only_cookies för utökning av admin-only-listan.

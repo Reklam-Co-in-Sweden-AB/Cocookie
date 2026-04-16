@@ -145,6 +145,11 @@ class CoCookie_REST_Scanner {
 			// Use JSON pattern matcher instead of hardcoded patterns
 			$match = CoCookie_Cookie_Patterns::match( $name );
 
+			// Heuristik-baserad hint — hjälper admin identifiera troliga inloggnings- eller admin-cookies
+			$role_hint = class_exists( 'CoCookie_Cookie_Heuristics' )
+				? CoCookie_Cookie_Heuristics::suggest( $name )
+				: null;
+
 			$wpdb->insert( $table, array(
 				'name'               => $name,
 				'value_sample'       => $value_sample,
@@ -166,6 +171,7 @@ class CoCookie_REST_Scanner {
 				'suggested_category' => $match['category_slug'],
 				'suggested_provider' => $match['provider'],
 				'suggested_purpose'  => $match['purpose'],
+				'suggested_role_hint' => $role_hint,
 				'is_imported'        => false,
 			);
 		}

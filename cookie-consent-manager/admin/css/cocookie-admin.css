@@ -1705,3 +1705,16 @@ p.cocookie-empty {
 		to   { opacity: 1; transform: translateY(0); }
 	}
 }
+
+/* Heuristik-hint — visas under cookienamn när en misstänkt roll upptäcks */
+.cocookie-role-hint {
+	display: inline-block;
+	margin-top: 4px;
+	padding: 2px 8px;
+	border-radius: 4px;
+	background: #fef3c7;
+	color: #78350f;
+	font-size: 11px;
+	line-height: 1.4;
+	font-weight: 500;
+}

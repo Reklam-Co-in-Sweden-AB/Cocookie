@@ -235,9 +235,18 @@ $msg_n           = isset( $_GET['n'] ) ? intval( $_GET['n'] ) : 0;
 							</tr>
 						</thead>
 						<tbody>
-							<?php foreach ( $cookies as $c ) : ?>
+							<?php foreach ( $cookies as $c ) :
+								$role_hint = class_exists( 'CoCookie_Cookie_Heuristics' )
+									? CoCookie_Cookie_Heuristics::suggest( $c['name'] )
+									: null;
+							?>
 								<tr>
-									<td><code><?php echo esc_html( $c['name'] ); ?></code></td>
+									<td>
+										<code><?php echo esc_html( $c['name'] ); ?></code>
+										<?php if ( $role_hint ) : ?>
+											<div class="cocookie-role-hint">⚠ <?php echo esc_html( $role_hint ); ?></div>
+										<?php endif; ?>
+									</td>
 									<td>
 										<?php if ( ! empty( $c['provider'] ) ) : ?>
 											<?php echo esc_html( $c['provider'] ); ?>
