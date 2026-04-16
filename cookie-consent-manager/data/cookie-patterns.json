@@ -1,6 +1,6 @@
 {
-	"version": "2.0.0",
-	"updated": "2026-03-31",
+	"version": "2.1.0",
+	"updated": "2026-04-16",
 	"patterns": [
 		{
 			"pattern": "^wordpress_[a-f0-9]+$",
@@ -1329,6 +1329,46 @@
 			"purpose_sv": "Hotjar viewport-identifiering.",
 			"purpose_en": "Hotjar viewport identification.",
 			"duration": "Session"
+		},
+		{
+			"pattern": "^__stripe_mid$",
+			"category": "necessary",
+			"service": "Stripe",
+			"purpose_sv": "Bedrägeribekämpning och säker betalningssession.",
+			"purpose_en": "Fraud prevention and secure payment session.",
+			"duration": "1 år"
+		},
+		{
+			"pattern": "^__stripe_sid$",
+			"category": "necessary",
+			"service": "Stripe",
+			"purpose_sv": "Aktiv betalningssession.",
+			"purpose_en": "Active payment session.",
+			"duration": "30 minuter"
+		},
+		{
+			"pattern": "^stripe\\.csrf$",
+			"category": "necessary",
+			"service": "Stripe",
+			"purpose_sv": "CSRF-skydd för Stripe-betalning.",
+			"purpose_en": "CSRF protection for Stripe payments.",
+			"duration": "Session"
+		},
+		{
+			"pattern": "^i18nextLng$",
+			"category": "necessary",
+			"service": "i18next",
+			"purpose_sv": "Sparar besökarens språkval.",
+			"purpose_en": "Stores visitor's language preference.",
+			"duration": "Permanent"
+		},
+		{
+			"pattern": "^i18next$",
+			"category": "necessary",
+			"service": "i18next",
+			"purpose_sv": "i18next översättningsdata.",
+			"purpose_en": "i18next translation data.",
+			"duration": "Permanent"
 		}
 	]
 }
