@@ -36,6 +36,11 @@ class CoCookie_Migrator {
 			self::migrate_to_2_0_0();
 		}
 
+		// Migration: lägg till unclassified-kategori och flytta okända scan-resultat
+		if ( version_compare( $current, '2.1.0', '<' ) ) {
+			self::migrate_to_2_1_0();
+		}
+
 		update_option( 'cocookie_db_version', COCOOKIE_VERSION );
 	}
 
@@ -90,5 +95,52 @@ class CoCookie_Migrator {
 
 		// Existing installs skip the setup wizard
 		update_option( 'cocookie_needs_wizard', false );
+	}
+
+	/**
+	 * v2.1.0: Lägg till kategorin "unclassified" och flytta okända cookies dit.
+	 *
+	 * Idempotent — insert körs endast om slug saknas.
+	 * Uppdaterar cc_scan_results men lämnar cc_cookies orört (admin-kurerad data).
+	 */
+	private static function migrate_to_2_1_0() {
+		global $wpdb;
+		$categories_table   = $wpdb->prefix . 'cc_categories';
+		$scan_results_table = $wpdb->prefix . 'cc_scan_results';
+
+		// 1. Säkerställ att unclassified-kategorin finns
+		$exists = $wpdb->get_var( $wpdb->prepare(
+			"SELECT id FROM {$categories_table} WHERE slug = %s",
+			'unclassified'
+		) );
+
+		if ( ! $exists ) {
+			$wpdb->insert( $categories_table, array(
+				'slug'        => 'unclassified',
+				'title'       => 'Okategoriserade',
+				'description' => 'Cookies som ännu inte granskats och klassificerats. Kräver samtycke tills de flyttats till rätt kategori.',
+				'is_required' => 0,
+				'sort_order'  => 99,
+			) );
+		}
+
+		// 2. Flytta okända scan-resultat från necessary till unclassified
+		$wpdb->query( $wpdb->prepare(
+			"UPDATE {$scan_results_table}
+			 SET suggested_category = %s
+			 WHERE suggested_category = %s
+			   AND suggested_provider = %s",
+			'unclassified',
+			'necessary',
+			'Okänd'
+		) );
+
+		// 3. Invalidera pattern-cache så nya regler träder i kraft direkt
+		if ( class_exists( 'CoCookie_Cookie_Patterns' ) ) {
+			CoCookie_Cookie_Patterns::clear_cache();
+		}
+
+		// 4. Flagga för admin-notis
+		set_transient( 'cocookie_show_rescan_notice', 1, DAY_IN_SECONDS );
 	}
 }

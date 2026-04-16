@@ -112,6 +112,13 @@ class CoCookie_Database {
 				'is_required' => 0,
 				'sort_order'  => 3,
 			),
+			array(
+				'slug'        => 'unclassified',
+				'title'       => 'Okategoriserade',
+				'description' => 'Cookies som ännu inte granskats och klassificerats. Kräver samtycke tills de flyttats till rätt kategori.',
+				'is_required' => 0,
+				'sort_order'  => 99,
+			),
 		);
 
 		foreach ( $defaults as $cat ) {
