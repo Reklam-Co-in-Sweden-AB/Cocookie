@@ -70,6 +70,45 @@ class CoCookie_REST_Scanner {
 	}
 
 	/**
+	 * Kontrollerar om en cookie är admin-only och inte ska rapporteras för anonyma besökare.
+	 *
+	 * Admin-only-cookies (t.ex. Beaver Builders fl-* debugcookies) sätts endast när
+	 * admin är inloggad och läcker inte till publika besökare. Dessa filtreras bort
+	 * från scanresultat så de inte felaktigt listas som "cookies sajten sätter".
+	 *
+	 * Filtret cocookie_admin_only_cookies låter tredjepartskod utöka listan.
+	 *
+	 * @param string $name Cookie-namn.
+	 * @return bool True om cookien är admin-only.
+	 */
+	private static function is_admin_only_cookie( $name ) {
+		$default = array(
+			'fl-builder-settings',
+			'fl-cache-updater',
+			'fl-assistant',
+			'fl-asset-cache',
+		);
+
+		/**
+		 * Filter: lista av prefix för admin-only cookies som aldrig ska listas i publika scans.
+		 *
+		 * @param array $list Lista med cookie-namnprefix.
+		 */
+		$admin_only = apply_filters( 'cocookie_admin_only_cookies', $default );
+
+		foreach ( (array) $admin_only as $needle ) {
+			if ( ! is_string( $needle ) || '' === $needle ) {
+				continue;
+			}
+			if ( 0 === stripos( $name, $needle ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Handle cookie scan results from the frontend scanner.
 	 *
 	 * @param WP_REST_Request $request Request object.
@@ -95,6 +134,11 @@ class CoCookie_REST_Scanner {
 			$storage_type = sanitize_text_field( $cookie['storage_type'] ?? 'cookie' );
 
 			if ( empty( $name ) ) {
+				continue;
+			}
+
+			// Hoppa över admin-only cookies — de läcker inte till publika besökare.
+			if ( self::is_admin_only_cookie( $name ) ) {
 				continue;
 			}
 
