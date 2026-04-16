@@ -43,9 +43,11 @@ The plugin will automatically activate the script when the visitor consents to t
 * GDPR-fix: Okända cookies klassificeras nu som "Okategoriserade" istället för "Nödvändiga".
 * Ny kategori "Okategoriserade" läggs till automatiskt via migrering.
 * Befintliga okända cookies i scan-resultat flyttas till rätt kategori.
+* Underhållsverktyg i Cookies-vyn: "Flytta okända till Okategoriserade" och "Städa bort försvunna cookies".
 * Nya patterns: Stripe (__stripe_mid, __stripe_sid, stripe.csrf), i18next (i18next, i18nextLng).
 * Admin-only cookies från Beaver Builder filtreras bort från publika scans.
 * Nytt filter: cocookie_admin_only_cookies för utökning av admin-only-listan.
+* Högre kontrast på inaktiva tabbar i cookiebannern — WCAG AA-kompatibelt.
 * Deprekerar CCM_Cookie_Scanner::classify_cookie() — använd CoCookie_Cookie_Patterns::match().
 
 = 1.0.0 =
