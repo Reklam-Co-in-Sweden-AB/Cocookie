@@ -16,7 +16,9 @@ $selected_cat    = $data['selected_cat'];
 $cookies         = $data['cookies'];
 $editing_cat     = $data['editing_cat'];
 $editing_cookie  = $data['editing_cookie'];
+$maintenance     = $data['maintenance'] ?? array( 'unknown_in_necessary' => 0, 'missing' => 0, 'has_scan' => false );
 $msg             = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
+$msg_n           = isset( $_GET['n'] ) ? intval( $_GET['n'] ) : 0;
 ?>
 
 <!-- Sidhuvud -->
@@ -40,6 +42,26 @@ $msg             = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) :
 	<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Import klar.', 'cocookie' ); ?></p></div>
 <?php elseif ( 'import_error' === $msg ) : ?>
 	<div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'Importfel. Kontrollera att filen är giltig JSON.', 'cocookie' ); ?></p></div>
+<?php elseif ( 'reclassified' === $msg ) : ?>
+	<div class="notice notice-success is-dismissible"><p>
+		<?php
+		printf(
+			/* translators: %d = antal flyttade cookies */
+			esc_html( _n( '%d okänd cookie flyttad till Okategoriserade.', '%d okända cookies flyttade till Okategoriserade.', $msg_n, 'cocookie' ) ),
+			intval( $msg_n )
+		);
+		?>
+	</p></div>
+<?php elseif ( 'cleaned' === $msg ) : ?>
+	<div class="notice notice-success is-dismissible"><p>
+		<?php
+		printf(
+			/* translators: %d = antal borttagna cookies */
+			esc_html( _n( '%d cookie som inte längre finns togs bort.', '%d cookies som inte längre finns togs bort.', $msg_n, 'cocookie' ) ),
+			intval( $msg_n )
+		);
+		?>
+	</p></div>
 <?php endif; ?>
 
 <div class="cocookie-cookies-layout">
@@ -128,6 +150,59 @@ $msg             = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) :
 				<?php submit_button( __( 'Exportera alla cookies', 'cocookie' ), 'secondary', 'cocookie_export_cookies', false ); ?>
 			</form>
 		</div>
+
+		<?php if ( $maintenance['unknown_in_necessary'] > 0 || ( $maintenance['has_scan'] && $maintenance['missing'] > 0 ) ) : ?>
+			<!-- Underhåll -->
+			<div class="cocookie-sidebar-form">
+				<h4><?php esc_html_e( 'Underhåll', 'cocookie' ); ?></h4>
+
+				<?php if ( $maintenance['unknown_in_necessary'] > 0 ) : ?>
+					<form method="post" style="margin-bottom:10px;"
+						onsubmit="return confirm('<?php
+							printf(
+								/* translators: %d = antal cookies */
+								esc_attr( _n( '%d okänd cookie kommer flyttas från Nödvändiga till Okategoriserade. Fortsätta?', '%d okända cookies kommer flyttas från Nödvändiga till Okategoriserade. Fortsätta?', $maintenance['unknown_in_necessary'], 'cocookie' ) ),
+								intval( $maintenance['unknown_in_necessary'] )
+							);
+						?>');">
+						<?php wp_nonce_field( 'cocookie_reclassify_unknown' ); ?>
+						<p class="description" style="margin-top:0;">
+							<?php
+							printf(
+								/* translators: %d = antal */
+								esc_html( _n( '%d cookie i Nödvändiga saknar leverantör och är troligen felklassad.', '%d cookies i Nödvändiga saknar leverantör och är troligen felklassade.', $maintenance['unknown_in_necessary'], 'cocookie' ) ),
+								intval( $maintenance['unknown_in_necessary'] )
+							);
+							?>
+						</p>
+						<?php submit_button( __( 'Flytta okända till Okategoriserade', 'cocookie' ), 'secondary', 'cocookie_reclassify_unknown', false ); ?>
+					</form>
+				<?php endif; ?>
+
+				<?php if ( $maintenance['has_scan'] && $maintenance['missing'] > 0 ) : ?>
+					<form method="post"
+						onsubmit="return confirm('<?php
+							printf(
+								/* translators: %d = antal cookies */
+								esc_attr( _n( '%d cookie saknades i senaste scanningen och kommer tas bort permanent. Fortsätta?', '%d cookies saknades i senaste scanningen och kommer tas bort permanent. Fortsätta?', $maintenance['missing'], 'cocookie' ) ),
+								intval( $maintenance['missing'] )
+							);
+						?>');">
+						<?php wp_nonce_field( 'cocookie_cleanup_missing' ); ?>
+						<p class="description" style="margin-top:0;">
+							<?php
+							printf(
+								/* translators: %d = antal */
+								esc_html( _n( '%d cookie i registret syntes inte i senaste scanningen.', '%d cookies i registret syntes inte i senaste scanningen.', $maintenance['missing'], 'cocookie' ) ),
+								intval( $maintenance['missing'] )
+							);
+							?>
+						</p>
+						<?php submit_button( __( 'Städa bort försvunna cookies', 'cocookie' ), 'secondary', 'cocookie_cleanup_missing', false ); ?>
+					</form>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 
 	</div><!-- .cocookie-sidebar -->
 

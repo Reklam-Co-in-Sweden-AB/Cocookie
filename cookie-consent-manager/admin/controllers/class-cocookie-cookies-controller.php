@@ -35,6 +35,8 @@ class CoCookie_Cookies_Controller {
 		$editing_cat   = isset( $_GET['edit_cat'] ) ? CoCookie_Categories::get( intval( $_GET['edit_cat'] ) ) : null;
 		$editing_cookie = isset( $_GET['edit_cookie'] ) ? CoCookie_Categories::get_cookie( intval( $_GET['edit_cookie'] ) ) : null;
 
+		$maintenance = self::get_maintenance_counts();
+
 		$data = array(
 			'categories'      => $categories,
 			'selected_cat_id' => $selected_cat_id,
@@ -42,9 +44,47 @@ class CoCookie_Cookies_Controller {
 			'cookies'         => $cookies,
 			'editing_cat'     => $editing_cat,
 			'editing_cookie'  => $editing_cookie,
+			'maintenance'     => $maintenance,
 		);
 
 		include COCOOKIE_PLUGIN_DIR . 'admin/views/new/cookies.php';
+	}
+
+	/**
+	 * Räknar underhållskandidater: okända cookies i Nödvändiga och cookies som inte syntes i senaste scan.
+	 *
+	 * @return array{unknown_in_necessary:int, missing:int}
+	 */
+	private static function get_maintenance_counts() {
+		global $wpdb;
+		$cookies_table    = $wpdb->prefix . 'cc_cookies';
+		$categories_table = $wpdb->prefix . 'cc_categories';
+		$scan_table       = $wpdb->prefix . 'cc_scan_results';
+
+		$unknown_in_necessary = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$cookies_table} c
+			 JOIN {$categories_table} cat ON c.category_id = cat.id
+			 WHERE cat.slug = %s AND c.provider = %s",
+			'necessary',
+			'Okänd'
+		) );
+
+		$scan_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$scan_table}" );
+		$missing    = 0;
+		if ( $scan_count > 0 ) {
+			$missing = (int) $wpdb->get_var(
+				"SELECT COUNT(*) FROM {$cookies_table} c
+				 WHERE NOT EXISTS (
+					SELECT 1 FROM {$scan_table} s WHERE s.name = c.name
+				 )"
+			);
+		}
+
+		return array(
+			'unknown_in_necessary' => $unknown_in_necessary,
+			'missing'              => $missing,
+			'has_scan'             => $scan_count > 0,
+		);
 	}
 
 	/**
@@ -187,6 +227,52 @@ class CoCookie_Cookies_Controller {
 			header( 'Content-Type: application/json' );
 			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
 			echo wp_json_encode( $export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+			exit;
+		}
+
+		// Flytta okända cookies från Nödvändiga till Okategoriserade
+		if ( isset( $_POST['cocookie_reclassify_unknown'] ) && check_admin_referer( 'cocookie_reclassify_unknown' ) ) {
+			global $wpdb;
+			$cookies_table    = $wpdb->prefix . 'cc_cookies';
+			$categories_table = $wpdb->prefix . 'cc_categories';
+
+			$necessary_id    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$categories_table} WHERE slug = %s", 'necessary' ) );
+			$unclassified_id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$categories_table} WHERE slug = %s", 'unclassified' ) );
+
+			$moved = 0;
+			if ( $necessary_id && $unclassified_id ) {
+				$moved = (int) $wpdb->query( $wpdb->prepare(
+					"UPDATE {$cookies_table} SET category_id = %d WHERE category_id = %d AND provider = %s",
+					$unclassified_id,
+					$necessary_id,
+					'Okänd'
+				) );
+			}
+
+			wp_redirect( admin_url( 'admin.php?page=cocookie-cookies&msg=reclassified&n=' . $moved ) );
+			exit;
+		}
+
+		// Städa bort cookies som inte finns i senaste scan
+		if ( isset( $_POST['cocookie_cleanup_missing'] ) && check_admin_referer( 'cocookie_cleanup_missing' ) ) {
+			global $wpdb;
+			$cookies_table = $wpdb->prefix . 'cc_cookies';
+			$scan_table    = $wpdb->prefix . 'cc_scan_results';
+
+			$scan_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$scan_table}" );
+			$deleted    = 0;
+
+			// Säkerhetsnät: städa bara om det finns scanresultat att jämföra mot
+			if ( $scan_count > 0 ) {
+				$deleted = (int) $wpdb->query(
+					"DELETE c FROM {$cookies_table} c
+					 WHERE NOT EXISTS (
+						SELECT 1 FROM {$scan_table} s WHERE s.name = c.name
+					 )"
+				);
+			}
+
+			wp_redirect( admin_url( 'admin.php?page=cocookie-cookies&msg=cleaned&n=' . $deleted ) );
 			exit;
 		}
 	}
