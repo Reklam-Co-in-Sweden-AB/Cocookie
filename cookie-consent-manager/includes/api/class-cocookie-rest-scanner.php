@@ -83,10 +83,30 @@ class CoCookie_REST_Scanner {
 	 */
 	private static function is_admin_only_cookie( $name ) {
 		$default = array(
+			// Beaver Builder admin + tema-state
 			'fl-builder-settings',
 			'fl-cache-updater',
 			'fl-assistant',
 			'fl-asset-cache',
+			'fl-theme-',
+			// Elementor admin
+			'elementor-',
+			// Avada / Fusion
+			'fusionPanel',
+			'fusionbuilder',
+			'avada_',
+			// LiteSpeed Cache admin
+			'litespeed_',
+			// Redirection-plugin admin
+			'redirection-',
+			// Google Site Kit admin-data
+			'googlesitekit',
+			// WordPress REST-cachade scheman (admin-fetch)
+			'wp-api-schema',
+			// WP Stream (aktivitetsloggen)
+			'wp-stream-',
+			// React/Redux-state från admin-UIs
+			'History.store',
 		);
 
 		/**
