@@ -147,7 +147,10 @@
 	// --- Show/hide banner ---
 	function showBanner(existingConsent) {
 		isReopen = !!existingConsent;
-		banner.style.display = '';
+		// Växla med visibility/opacity istället för display för att undvika CLS
+		banner.style.visibility = 'visible';
+		banner.style.opacity = '1';
+		banner.style.pointerEvents = 'auto';
 
 		if (isReopen && existingConsent) {
 			// Update title/text for manage mode
@@ -189,7 +192,10 @@
 	}
 
 	function hideBanner() {
-		banner.style.display = 'none';
+		// Växla med visibility/opacity istället för display för att undvika CLS
+		banner.style.visibility = 'hidden';
+		banner.style.opacity = '0';
+		banner.style.pointerEvents = 'none';
 		// Reset to initial state
 		if (consentInfo) consentInfo.style.display = 'none';
 		if (details) details.style.display = 'none';
@@ -372,7 +378,7 @@
 
 		if (floatBtn) {
 			floatBtn.addEventListener('click', function () {
-				if (banner.style.display !== 'none') return;
+				if (banner.style.visibility !== 'hidden') return;
 				showBanner(getConsent());
 			});
 		}
@@ -394,7 +400,7 @@
 		document.addEventListener('click', function (e) {
 			if (!e.target.classList.contains('cocookie-iframe-placeholder__btn') && !e.target.classList.contains('ccm-iframe-accept')) return;
 			e.preventDefault();
-			if (banner.style.display !== 'none') return;
+			if (banner.style.visibility !== 'hidden') return;
 			showBanner(getConsent());
 		});
 	}

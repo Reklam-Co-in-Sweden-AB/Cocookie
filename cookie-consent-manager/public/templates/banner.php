@@ -23,7 +23,7 @@ $position   = $s['position'] ?? 'bottom';
 	role="dialog"
 	aria-label="<?php echo esc_attr( $s['banner_title'] ); ?>"
 	aria-modal="<?php echo 'center' === $position ? 'true' : 'false'; ?>"
-	style="display:none;
+	style="visibility:hidden; opacity:0; pointer-events:none;
 		--cocookie-bg: <?php echo esc_attr( $s['banner_bg_color'] ); ?>;
 		--cocookie-text: <?php echo esc_attr( $s['banner_text_color'] ); ?>;
 		--cocookie-accent: <?php echo esc_attr( $s['primary_color'] ); ?>;
