@@ -23,6 +23,33 @@ class CoCookie_Admin {
 		add_action( 'admin_init', array( __CLASS__, 'maybe_redirect_to_wizard' ) );
 		add_action( 'admin_init', array( __CLASS__, 'handle_run_wizard' ) );
 		add_action( 'admin_init', array( __CLASS__, 'handle_check_update' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_rescan_notice' ) );
+	}
+
+	/**
+	 * Visar en engångs-dismissibel admin-notis efter 2.1.0-migrering
+	 * som uppmanar till ny cookie-scan.
+	 */
+	public static function maybe_show_rescan_notice() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( ! get_transient( 'cocookie_show_rescan_notice' ) ) {
+			return;
+		}
+
+		$scan_url = admin_url( 'admin.php?page=cocookie-cookies' );
+
+		printf(
+			'<div class="notice notice-info is-dismissible"><p>%s <a href="%s">%s</a></p></div>',
+			esc_html__( 'CoCookie 2.1.0: En ny kategori "Okategoriserade" har lagts till. Tidigare okända cookies har flyttats dit. Vi rekommenderar en ny scan och granskning.', 'cocookie' ),
+			esc_url( $scan_url ),
+			esc_html__( 'Granska cookies →', 'cocookie' )
+		);
+
+		// Ta bort transienten efter första visningen
+		delete_transient( 'cocookie_show_rescan_notice' );
 	}
 
 	/**
