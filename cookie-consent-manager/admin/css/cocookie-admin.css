@@ -1718,3 +1718,26 @@ p.cocookie-empty {
 	line-height: 1.4;
 	font-weight: 500;
 }
+
+/* Bulk-actions-toolbar ovanför cookie-tabellen */
+.cocookie-bulk-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 12px;
+	padding: 8px 12px;
+	background: var(--cocookie-neutral-50, #f8f9fa);
+	border: 1px solid var(--cocookie-neutral-200, #e5e7eb);
+	border-radius: 6px;
+}
+.cocookie-bulk-toolbar__select-all {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: var(--cocookie-neutral-700, #374151);
+}
+.cocookie-bulk-toolbar button[disabled] {
+	opacity: 0.5;
+	cursor: not-allowed;
+}

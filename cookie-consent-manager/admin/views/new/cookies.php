@@ -52,6 +52,16 @@ $msg_n           = isset( $_GET['n'] ) ? intval( $_GET['n'] ) : 0;
 		);
 		?>
 	</p></div>
+<?php elseif ( 'bulk_deleted' === $msg ) : ?>
+	<div class="notice notice-success is-dismissible"><p>
+		<?php
+		printf(
+			/* translators: %d = antal raderade cookies */
+			esc_html( _n( '%d cookie raderad.', '%d cookies raderade.', $msg_n, 'cocookie' ) ),
+			intval( $msg_n )
+		);
+		?>
+	</p></div>
 <?php elseif ( 'cleaned' === $msg ) : ?>
 	<div class="notice notice-success is-dismissible"><p>
 		<?php
@@ -223,60 +233,116 @@ $msg_n           = isset( $_GET['n'] ) ? intval( $_GET['n'] ) : 0;
 			<?php endif; ?>
 
 			<?php if ( ! empty( $cookies ) ) : ?>
-				<div class="cocookie-card" style="padding:0; overflow:hidden;">
-					<table class="cocookie-table">
-						<thead>
-							<tr>
-								<th><?php esc_html_e( 'Namn', 'cocookie' ); ?></th>
-								<th><?php esc_html_e( 'Leverantör', 'cocookie' ); ?></th>
-								<th><?php esc_html_e( 'Syfte', 'cocookie' ); ?></th>
-								<th><?php esc_html_e( 'Livslängd', 'cocookie' ); ?></th>
-								<th><?php esc_html_e( 'Åtgärder', 'cocookie' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach ( $cookies as $c ) :
-								$role_hint = class_exists( 'CoCookie_Cookie_Heuristics' )
-									? CoCookie_Cookie_Heuristics::suggest( $c['name'] )
-									: null;
-							?>
+				<form method="post" id="cocookie-bulk-form"
+					onsubmit="return cocookieConfirmBulkDelete(this);">
+					<?php wp_nonce_field( 'cocookie_bulk_delete_cookies' ); ?>
+					<input type="hidden" name="cocookie_bulk_cat" value="<?php echo esc_attr( $selected_cat_id ); ?>">
+
+					<div class="cocookie-bulk-toolbar">
+						<label class="cocookie-bulk-toolbar__select-all">
+							<input type="checkbox" id="cocookie-bulk-select-all">
+							<span><?php esc_html_e( 'Markera alla', 'cocookie' ); ?></span>
+						</label>
+						<button type="submit" name="cocookie_bulk_delete_cookies" value="1"
+							class="button cocookie-link--danger"
+							id="cocookie-bulk-delete-btn"
+							disabled>
+							<?php esc_html_e( 'Radera markerade', 'cocookie' ); ?>
+							<span id="cocookie-bulk-count"></span>
+						</button>
+					</div>
+
+					<div class="cocookie-card" style="padding:0; overflow:hidden;">
+						<table class="cocookie-table">
+							<thead>
 								<tr>
-									<td>
-										<code><?php echo esc_html( $c['name'] ); ?></code>
-										<?php if ( $role_hint ) : ?>
-											<div class="cocookie-role-hint">⚠ <?php echo esc_html( $role_hint ); ?></div>
-										<?php endif; ?>
-									</td>
-									<td>
-										<?php if ( ! empty( $c['provider'] ) ) : ?>
-											<?php echo esc_html( $c['provider'] ); ?>
-										<?php else : ?>
-											<span style="color:var(--cocookie-neutral-400);">—</span>
-										<?php endif; ?>
-									</td>
-									<td style="max-width:220px;">
-										<span style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-											<?php echo esc_html( $c['purpose'] ); ?>
-										</span>
-									</td>
-									<td>
-										<?php if ( ! empty( $c['expiry'] ) ) : ?>
-											<span class="cocookie-badge cocookie-badge--muted"><?php echo esc_html( $c['expiry'] ); ?></span>
-										<?php else : ?>
-											<span style="color:var(--cocookie-neutral-400);">—</span>
-										<?php endif; ?>
-									</td>
-									<td class="cocookie-actions">
-										<a href="<?php echo esc_url( admin_url( 'admin.php?page=cocookie-cookies&cat=' . $selected_cat_id . '&edit_cookie=' . $c['id'] ) ); ?>"><?php esc_html_e( 'Redigera', 'cocookie' ); ?></a>
-										<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=cocookie-cookies&delete_cookie=' . $c['id'] ), 'cocookie_delete_cookie' ) ); ?>"
-										   onclick="return confirm('<?php esc_attr_e( 'Radera cookie?', 'cocookie' ); ?>');"
-										   class="cocookie-link--danger"><?php esc_html_e( 'Radera', 'cocookie' ); ?></a>
-									</td>
+									<th style="width:32px;"></th>
+									<th><?php esc_html_e( 'Namn', 'cocookie' ); ?></th>
+									<th><?php esc_html_e( 'Leverantör', 'cocookie' ); ?></th>
+									<th><?php esc_html_e( 'Syfte', 'cocookie' ); ?></th>
+									<th><?php esc_html_e( 'Livslängd', 'cocookie' ); ?></th>
+									<th><?php esc_html_e( 'Åtgärder', 'cocookie' ); ?></th>
 								</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
-				</div><!-- .cocookie-card -->
+							</thead>
+							<tbody>
+								<?php foreach ( $cookies as $c ) :
+									$role_hint = class_exists( 'CoCookie_Cookie_Heuristics' )
+										? CoCookie_Cookie_Heuristics::suggest( $c['name'] )
+										: null;
+								?>
+									<tr>
+										<td>
+											<input type="checkbox" name="cookie_ids[]" value="<?php echo esc_attr( $c['id'] ); ?>"
+												class="cocookie-bulk-checkbox">
+										</td>
+										<td>
+											<code><?php echo esc_html( $c['name'] ); ?></code>
+											<?php if ( $role_hint ) : ?>
+												<div class="cocookie-role-hint">⚠ <?php echo esc_html( $role_hint ); ?></div>
+											<?php endif; ?>
+										</td>
+										<td>
+											<?php if ( ! empty( $c['provider'] ) ) : ?>
+												<?php echo esc_html( $c['provider'] ); ?>
+											<?php else : ?>
+												<span style="color:var(--cocookie-neutral-400);">—</span>
+											<?php endif; ?>
+										</td>
+										<td style="max-width:220px;">
+											<span style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+												<?php echo esc_html( $c['purpose'] ); ?>
+											</span>
+										</td>
+										<td>
+											<?php if ( ! empty( $c['expiry'] ) ) : ?>
+												<span class="cocookie-badge cocookie-badge--muted"><?php echo esc_html( $c['expiry'] ); ?></span>
+											<?php else : ?>
+												<span style="color:var(--cocookie-neutral-400);">—</span>
+											<?php endif; ?>
+										</td>
+										<td class="cocookie-actions">
+											<a href="<?php echo esc_url( admin_url( 'admin.php?page=cocookie-cookies&cat=' . $selected_cat_id . '&edit_cookie=' . $c['id'] ) ); ?>"><?php esc_html_e( 'Redigera', 'cocookie' ); ?></a>
+											<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=cocookie-cookies&delete_cookie=' . $c['id'] ), 'cocookie_delete_cookie' ) ); ?>"
+											   onclick="return confirm('<?php esc_attr_e( 'Radera cookie?', 'cocookie' ); ?>');"
+											   class="cocookie-link--danger"><?php esc_html_e( 'Radera', 'cocookie' ); ?></a>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div><!-- .cocookie-card -->
+				</form>
+
+				<script>
+				(function () {
+					var form      = document.getElementById('cocookie-bulk-form');
+					if (!form) return;
+					var selectAll = document.getElementById('cocookie-bulk-select-all');
+					var btn       = document.getElementById('cocookie-bulk-delete-btn');
+					var countEl   = document.getElementById('cocookie-bulk-count');
+					var boxes     = form.querySelectorAll('.cocookie-bulk-checkbox');
+
+					function updateState() {
+						var selected = 0;
+						boxes.forEach(function (b) { if (b.checked) selected++; });
+						btn.disabled = selected === 0;
+						countEl.textContent = selected > 0 ? ' (' + selected + ')' : '';
+						selectAll.checked = selected === boxes.length && boxes.length > 0;
+					}
+
+					selectAll.addEventListener('change', function () {
+						boxes.forEach(function (b) { b.checked = selectAll.checked; });
+						updateState();
+					});
+					boxes.forEach(function (b) { b.addEventListener('change', updateState); });
+
+					window.cocookieConfirmBulkDelete = function (f) {
+						var n = f.querySelectorAll('.cocookie-bulk-checkbox:checked').length;
+						if (n === 0) return false;
+						return confirm(n + ' cookies kommer raderas permanent. Fortsätta?');
+					};
+				})();
+				</script>
 
 			<?php else : ?>
 

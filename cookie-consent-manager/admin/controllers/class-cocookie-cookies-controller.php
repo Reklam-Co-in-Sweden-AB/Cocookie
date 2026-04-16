@@ -253,6 +253,25 @@ class CoCookie_Cookies_Controller {
 			exit;
 		}
 
+		// Bulk-radera markerade cookies
+		if ( isset( $_POST['cocookie_bulk_delete_cookies'] ) && check_admin_referer( 'cocookie_bulk_delete_cookies' ) ) {
+			$ids = isset( $_POST['cookie_ids'] ) && is_array( $_POST['cookie_ids'] )
+				? array_map( 'intval', wp_unslash( $_POST['cookie_ids'] ) )
+				: array();
+			$ids = array_filter( $ids );
+
+			$deleted = 0;
+			foreach ( $ids as $id ) {
+				if ( CoCookie_Categories::delete_cookie( $id ) ) {
+					$deleted++;
+				}
+			}
+
+			$cat = isset( $_POST['cocookie_bulk_cat'] ) ? intval( $_POST['cocookie_bulk_cat'] ) : '';
+			wp_redirect( admin_url( "admin.php?page=cocookie-cookies&cat={$cat}&msg=bulk_deleted&n=" . $deleted ) );
+			exit;
+		}
+
 		// Städa bort cookies som inte finns i senaste scan
 		if ( isset( $_POST['cocookie_cleanup_missing'] ) && check_admin_referer( 'cocookie_cleanup_missing' ) ) {
 			global $wpdb;
