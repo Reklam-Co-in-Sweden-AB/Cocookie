@@ -2,9 +2,9 @@
 Contributors: cookie-consent-manager
 Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 2.1.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,15 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.1.0 =
+* GDPR-fix: Okända cookies klassificeras nu som "Okategoriserade" istället för "Nödvändiga".
+* Ny kategori "Okategoriserade" läggs till automatiskt via migrering.
+* Befintliga okända cookies i scan-resultat flyttas till rätt kategori.
+* Nya patterns: Stripe (__stripe_mid, __stripe_sid, stripe.csrf), i18next (i18next, i18nextLng).
+* Admin-only cookies från Beaver Builder filtreras bort från publika scans.
+* Nytt filter: cocookie_admin_only_cookies för utökning av admin-only-listan.
+* Deprekerar CCM_Cookie_Scanner::classify_cookie() — använd CoCookie_Cookie_Patterns::match().
 
 = 1.0.0 =
 * Initial release
