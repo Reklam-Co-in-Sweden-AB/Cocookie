@@ -78,6 +78,28 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 						<p class="description"><?php esc_html_e( 'Länk som öppnar den detaljerade inställnings-panelen.', 'cocookie' ); ?></p>
 					</td>
 				</tr>
+				<tr>
+					<th><label for="google_consent_enabled"><?php esc_html_e( 'Googles samtyckeslänk', 'cocookie' ); ?></label></th>
+					<td>
+						<label>
+							<input type="checkbox" id="google_consent_enabled" name="google_consent_enabled" value="1" <?php checked( ! empty( $s['google_consent_enabled'] ) ); ?>>
+							<?php esc_html_e( 'Visa länk till Googles hantering av personuppgifter i bannern', 'cocookie' ); ?>
+						</label>
+						<p class="description"><?php esc_html_e( 'Aktivera om sajten använder Googles annonstjänster (Google Ads, AdSense). Länken pekar på business.safety.google/privacy och krävs av Googles EU-policy för användarsamtycke.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr class="cocookie-google-field">
+					<th><label for="google_consent_intro"><?php esc_html_e( 'Google – inledande text', 'cocookie' ); ?></label></th>
+					<td>
+						<input type="text" id="google_consent_intro" name="google_consent_intro" value="<?php echo esc_attr( $s['google_consent_intro'] ); ?>" class="regular-text">
+					</td>
+				</tr>
+				<tr class="cocookie-google-field">
+					<th><label for="google_consent_link_text"><?php esc_html_e( 'Google – länktext', 'cocookie' ); ?></label></th>
+					<td>
+						<input type="text" id="google_consent_link_text" name="google_consent_link_text" value="<?php echo esc_attr( $s['google_consent_link_text'] ); ?>" class="regular-text">
+					</td>
+				</tr>
 			</table>
 		</div>
 	</div>
@@ -196,6 +218,24 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 			</table>
 		</div>
 	</div>
+
+	<script>
+		( function () {
+			// Visa/dölj Google-textfälten beroende på kryssrutans läge
+			var toggle = document.getElementById( 'google_consent_enabled' );
+			var rows   = document.querySelectorAll( '.cocookie-google-field' );
+			if ( ! toggle ) {
+				return;
+			}
+			function sync() {
+				rows.forEach( function ( row ) {
+					row.style.display = toggle.checked ? '' : 'none';
+				} );
+			}
+			toggle.addEventListener( 'change', sync );
+			sync();
+		} )();
+	</script>
 
 	<?php submit_button( __( 'Spara inställningar', 'cocookie' ), 'primary', 'cocookie_save_banner' ); ?>
 
