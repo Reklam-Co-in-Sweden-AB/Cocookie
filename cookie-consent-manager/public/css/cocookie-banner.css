@@ -104,6 +104,22 @@
 	text-decoration: underline;
 }
 
+.cocookie-banner__google {
+	margin: -12px 0 20px;
+	font-size: 13px;
+	color: #888;
+	line-height: 1.5;
+}
+
+.cocookie-banner__google-link {
+	color: var(--cocookie-accent);
+	text-decoration: none;
+}
+
+.cocookie-banner__google-link:hover {
+	text-decoration: underline;
+}
+
 /* Consent info */
 .cocookie-banner__consent-info {
 	margin: 4px 0 16px;

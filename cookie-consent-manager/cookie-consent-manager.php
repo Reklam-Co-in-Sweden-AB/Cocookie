@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'COCOOKIE_VERSION', '2.1.0' );
 define( 'COCOOKIE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COCOOKIE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'COCOOKIE_GOOGLE_PRIVACY_URL', 'https://business.safety.google/privacy/' );
 
 // Backward compatibility constants
 define( 'CCM_VERSION', COCOOKIE_VERSION );

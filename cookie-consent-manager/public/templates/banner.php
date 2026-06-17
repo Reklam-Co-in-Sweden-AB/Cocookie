@@ -70,6 +70,15 @@ $position   = $s['position'] ?? 'bottom';
 				<?php endif; ?>
 			</p>
 
+			<?php if ( ! empty( $s['google_consent_enabled'] ) ) : ?>
+				<p class="cocookie-banner__google">
+					<?php echo esc_html( $s['google_consent_intro'] ); ?>
+					<a href="<?php echo esc_url( COCOOKIE_GOOGLE_PRIVACY_URL ); ?>" class="cocookie-banner__google-link" target="_blank" rel="noopener">
+						<?php echo esc_html( $s['google_consent_link_text'] ); ?>
+					</a>
+				</p>
+			<?php endif; ?>
+
 			<!-- Consent info (visas vid återöppning) -->
 			<div class="cocookie-banner__consent-info" id="cocookie-consent-info" style="display:none;">
 				<p><strong><?php echo esc_html( $s['consent_date_label'] ); ?></strong> <span id="cocookie-consent-date"></span></p>
