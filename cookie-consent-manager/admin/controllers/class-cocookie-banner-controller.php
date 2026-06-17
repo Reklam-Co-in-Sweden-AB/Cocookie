@@ -35,7 +35,10 @@ class CoCookie_Banner_Controller {
 			'reject_text_color'  => '#333333',
 			'logo_url'           => '',
 			'cookie_lifetime'    => 365,
-			'cookie_icon'        => '',
+			'cookie_icon'              => '',
+			'google_consent_enabled'   => false,
+			'google_consent_intro'     => __( 'Vi använder Googles annonstjänster.', 'cocookie' ),
+			'google_consent_link_text' => __( 'Läs hur Google hanterar dina personuppgifter.', 'cocookie' ),
 		);
 	}
 
@@ -84,7 +87,10 @@ class CoCookie_Banner_Controller {
 			'reject_text_color'  => sanitize_hex_color( $_POST['reject_text_color'] ?? '#333333' ),
 			'logo_url'           => esc_url_raw( $_POST['logo_url'] ?? '' ),
 			'cookie_lifetime'    => min( intval( $_POST['cookie_lifetime'] ?? 365 ), 395 ),
-			'cookie_icon'        => esc_url_raw( $_POST['cookie_icon'] ?? '' ),
+			'cookie_icon'              => esc_url_raw( $_POST['cookie_icon'] ?? '' ),
+			'google_consent_enabled'   => ! empty( $_POST['google_consent_enabled'] ),
+			'google_consent_intro'     => sanitize_text_field( $_POST['google_consent_intro'] ?? '' ),
+			'google_consent_link_text' => sanitize_text_field( $_POST['google_consent_link_text'] ?? '' ),
 		);
 
 		update_option( 'cocookie_settings', $settings );
