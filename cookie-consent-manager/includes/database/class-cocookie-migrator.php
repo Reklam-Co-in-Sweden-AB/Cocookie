@@ -41,6 +41,11 @@ class CoCookie_Migrator {
 			self::migrate_to_2_1_0();
 		}
 
+		// Migration: nolla lagrade cookie-värden
+		if ( version_compare( $current, '2.2.1', '<' ) ) {
+			self::migrate_to_2_2_1();
+		}
+
 		update_option( 'cocookie_db_version', COCOOKIE_VERSION );
 	}
 
@@ -142,5 +147,20 @@ class CoCookie_Migrator {
 
 		// 4. Flagga för admin-notis
 		set_transient( 'cocookie_show_rescan_notice', 1, DAY_IN_SECONDS );
+	}
+
+	/**
+	 * v2.2.1: Nolla lagrade cookie-värden i scan-resultaten.
+	 *
+	 * Tidigare versioner sparade de 50 första tecknen av varje cookie- och
+	 * localStorage-värde. Scanningen körs i en inloggad admins webbläsare, så
+	 * värdena kunde innehålla sessionstokens från andra plugins. Kolumnen
+	 * behålls (schemat är oförändrat) men töms och fylls inte längre.
+	 */
+	private static function migrate_to_2_2_1() {
+		global $wpdb;
+		$table = $wpdb->prefix . 'cc_scan_results';
+
+		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET value_sample = %s WHERE value_sample != %s", '', '' ) );
 	}
 }

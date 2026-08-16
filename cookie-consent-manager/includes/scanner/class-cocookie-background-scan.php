@@ -44,10 +44,11 @@ class CoCookie_Background_Scan {
 	public static function run() {
 		$url = home_url( '/' );
 
+		// TLS-verifiering ska alltid vara på — annars kan en MITM mata scannern
+		// med godtycklig HTML och styra vilka cookies som registreras.
 		$response = wp_remote_get( $url, array(
 			'timeout'    => 30,
 			'user-agent' => 'CoCookie Background Scanner/' . COCOOKIE_VERSION,
-			'sslverify'  => false,
 		) );
 
 		if ( is_wp_error( $response ) ) {

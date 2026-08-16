@@ -24,7 +24,22 @@ class CCM_Central_Reporter {
 
     public static function is_enabled() {
         $settings = get_option( 'ccm_central_settings', array() );
-        return ! empty( $settings['enabled'] ) && ! empty( $settings['api_url'] ) && ! empty( $settings['api_key'] );
+        return ! empty( $settings['enabled'] )
+            && ! empty( $settings['api_key'] )
+            && self::is_valid_endpoint( $settings['api_url'] ?? '' );
+    }
+
+    /**
+     * API-nyckeln skickas som header — endast https accepteras.
+     *
+     * Kontrolleras vid användning, inte bara vid sparande, så att URL:er
+     * som sparats med en äldre version inte skickar nyckeln i klartext.
+     *
+     * @param string $url Sparad API-URL.
+     * @return bool
+     */
+    private static function is_valid_endpoint( $url ) {
+        return ! empty( $url ) && 'https' === strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
     }
 
     public static function build_report() {
@@ -190,6 +205,9 @@ class CCM_Central_Reporter {
         $settings = get_option( 'ccm_central_settings', array() );
         if ( empty( $settings['api_url'] ) || empty( $settings['api_key'] ) ) {
             return array( 'success' => false, 'message' => 'API-URL och API-nyckel krävs.' );
+        }
+        if ( ! self::is_valid_endpoint( $settings['api_url'] ) ) {
+            return array( 'success' => false, 'message' => 'API-URL måste använda https — nyckeln får inte skickas i klartext. Spara om URL:en.' );
         }
 
         $api_key  = CCM_Admin::decrypt_api_key( $settings['api_key'] ?? '' );

@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,16 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.2.1 =
+* Säkerhet: cookie- och localStorage-värden samlas inte längre in vid scanning. Endast namnet sparas. Tidigare lagrade värden nollställs automatiskt via migrering.
+* Säkerhet: TLS-verifiering är alltid på i bakgrundsscannern (sslverify var avstängd).
+* Säkerhet: API-nyckeln för central rapportering visas inte längre i klartext i admin-formuläret. Lämna fältet tomt för att behålla sparad nyckel.
+* Säkerhet: API-URL för central rapportering måste vara https — nyckeln skickas som header och får inte gå i klartext.
+* Fix: JSON-import av cookies kraschade på PHP 8 (felstavad PATHINFO-konstant). Importen fungerar nu igen i både nya och gamla adminvyn.
+* Fix: samtycken tappades tyst när sidan serverades från full page cache med utgången nonce. Bannern hämtar nu en färsk nonce och gör om anropet, och loggar en varning om det ändå misslyckas.
+* Fix: policygenerering skriver bara över befintlig sida om ID:t faktiskt pekar på en sida.
+* Fix: avinstallation städar nu även bort optioner med cocookie_-prefix.
 
 = 2.2.0 =
 * Ny funktion: opt-in samtyckeslänk till Google i cookiebannern. Aktiveras per sajt under CoCookie → Banner och visar en länk till Googles hantering av personuppgifter (business.safety.google/privacy) i samtyckesfliken.

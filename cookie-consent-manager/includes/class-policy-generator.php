@@ -266,9 +266,11 @@ if ( $privacy_page_id ) {
             return new WP_Error( 'invalid_type', 'Ogiltig sidtyp.' );
         }
 
-        $existing_id = $info[ $key ];
+        $existing_id = intval( $info[ $key ] );
 
-        if ( $existing_id && get_post_status( $existing_id ) ) {
+        // Skriv bara över om ID:t faktiskt pekar på en sida — annars riskerar
+        // ett felaktigt sparat ID att skriva över ett inlägg eller en produkt.
+        if ( $existing_id && 'page' === get_post_type( $existing_id ) && get_post_status( $existing_id ) ) {
             wp_update_post( array(
                 'ID'           => $existing_id,
                 'post_content' => $content,

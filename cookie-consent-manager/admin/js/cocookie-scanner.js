@@ -64,15 +64,16 @@
 			}
 		}
 
+		// Endast namnet samlas in — aldrig värdet. Scanningen körs i en inloggad
+		// admins webbläsare och värden kan innehålla sessionstokens från andra
+		// plugins. Klassificeringen behöver bara namnet.
 		function parseCookies(str) {
 			if (!str) return;
 			str.split(';').forEach(function (c) {
-				var parts = c.trim().split('=');
-				var name = parts[0];
+				var name = c.trim().split('=')[0];
 				if (name && !allCookies[name]) {
 					allCookies[name] = {
 						name: name,
-						value: parts.slice(1).join('=').substring(0, 50),
 						domain: location.hostname,
 						storage_type: 'cookie'
 					};
@@ -88,7 +89,6 @@
 					if (!allCookies[key]) {
 						allCookies[key] = {
 							name: key,
-							value: (storage.getItem(key) || '').substring(0, 50),
 							domain: location.hostname,
 							storage_type: type
 						};

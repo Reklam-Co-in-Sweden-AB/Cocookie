@@ -280,8 +280,10 @@ class CCM_Cookie_Scanner {
 
         foreach ( $cookies as $cookie ) {
             $name         = sanitize_text_field( $cookie['name'] ?? '' );
-            $value        = sanitize_text_field( substr( $cookie['value'] ?? '', 0, 50 ) );
             $storage_type = sanitize_text_field( $cookie['storage_type'] ?? 'cookie' );
+
+            // Cookie-värden lagras aldrig — de kan innehålla sessionstokens.
+            $value        = '';
 
             if ( ! in_array( $storage_type, array( 'cookie', 'localStorage', 'sessionStorage' ), true ) ) {
                 $storage_type = 'cookie';

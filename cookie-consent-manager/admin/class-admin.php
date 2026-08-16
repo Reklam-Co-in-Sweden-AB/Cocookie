@@ -178,7 +178,7 @@ class CCM_Admin {
                     exit;
                 }
                 // Validate file extension
-                $ext = strtolower( pathinfo( $_FILES['ccm_import_file']['name'], PATHINFO_EXT ) );
+                $ext = strtolower( pathinfo( $_FILES['ccm_import_file']['name'], PATHINFO_EXTENSION ) );
                 if ( $ext !== 'json' ) {
                     wp_redirect( admin_url( 'options-general.php?page=cookie-consent&tab=cookies&msg=import_error' ) );
                     exit;
@@ -260,12 +260,22 @@ class CCM_Admin {
 
         // Central reporting
         if ( isset( $_POST['ccm_save_central'] ) && check_admin_referer( 'ccm_central_action' ) ) {
+            $existing = get_option( 'ccm_central_settings', array() );
             $enabled  = isset( $_POST['ccm_central_enabled'] ) ? 1 : 0;
-            $api_key  = sanitize_text_field( $_POST['ccm_central_api_key'] ?? '' );
-            $central  = array(
+
+            // API-nyckeln visas aldrig i formuläret. Tomt fält = behåll sparad nyckel.
+            $api_key      = sanitize_text_field( $_POST['ccm_central_api_key'] ?? '' );
+            $stored_key   = $existing['api_key'] ?? '';
+            $api_key_enc  = '' !== $api_key ? self::encrypt_api_key( $api_key ) : $stored_key;
+
+            // Rapporten innehåller sajtdata och nyckeln skickas som header —
+            // därför tillåts endast https.
+            $api_url = esc_url_raw( $_POST['ccm_central_api_url'] ?? '', array( 'https' ) );
+
+            $central = array(
                 'enabled' => $enabled,
-                'api_url' => esc_url_raw( $_POST['ccm_central_api_url'] ?? '' ),
-                'api_key' => self::encrypt_api_key( $api_key ),
+                'api_url' => $api_url,
+                'api_key' => $api_key_enc,
             );
             update_option( 'ccm_central_settings', $central );
 
@@ -275,7 +285,11 @@ class CCM_Admin {
                 CCM_Central_Reporter::clear_cron();
             }
 
-            wp_redirect( admin_url( 'options-general.php?page=cookie-consent&tab=settings&msg=saved' ) );
+            // En icke-tom URL som föll bort betyder att den inte var https.
+            $submitted_url = trim( $_POST['ccm_central_api_url'] ?? '' );
+            $msg           = ( '' !== $submitted_url && '' === $api_url ) ? 'central_url_error' : 'saved';
+
+            wp_redirect( admin_url( 'options-general.php?page=cookie-consent&tab=settings&msg=' . $msg ) );
             exit;
         }
 
@@ -364,8 +378,12 @@ class CCM_Admin {
         );
         $s = wp_parse_args( $settings, $defaults );
 
-        if ( isset( $_GET['msg'] ) ) {
+        $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
+
+        if ( 'saved' === $msg ) {
             echo '<div class="notice notice-success is-dismissible"><p>Inställningar sparade.</p></div>';
+        } elseif ( 'central_url_error' === $msg ) {
+            echo '<div class="notice notice-error is-dismissible"><p>API-URL:en sparades inte — den måste börja med https://.</p></div>';
         }
         ?>
         <form method="post">
@@ -547,7 +565,8 @@ class CCM_Admin {
         $central   = get_option( 'ccm_central_settings', array() );
         $c_enabled = ! empty( $central['enabled'] );
         $c_url     = $central['api_url'] ?? '';
-        $c_key     = self::decrypt_api_key( $central['api_key'] ?? '' );
+        // Nyckeln dekrypteras aldrig till formuläret — vi visar bara om den finns.
+        $has_key   = ! empty( $central['api_key'] );
         $last_rep  = get_option( 'ccm_central_last_report', '' );
         $last_err  = get_option( 'ccm_central_last_error', '' );
         $conn_test = get_transient( 'ccm_connection_test' );
@@ -582,20 +601,25 @@ class CCM_Admin {
                     <th><label for="ccm_central_api_url">API-URL</label></th>
                     <td>
                         <input type="url" id="ccm_central_api_url" name="ccm_central_api_url" value="<?php echo esc_attr( $c_url ); ?>" class="regular-text" placeholder="https://central.example.com/wp-json/">
-                        <p class="description">REST API-URL till din CCM Central-installation.</p>
+                        <p class="description">REST API-URL till din CCM Central-installation. Måste vara https.</p>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="ccm_central_api_key">API-nyckel</label></th>
                     <td>
-                        <input type="password" id="ccm_central_api_key" name="ccm_central_api_key" value="<?php echo esc_attr( $c_key ); ?>" class="regular-text" placeholder="ccm_ak_..." autocomplete="off">
-                        <p class="description">Genereras i CCM Central Dashboard vid registrering av sajt.</p>
+                        <input type="password" id="ccm_central_api_key" name="ccm_central_api_key" value="" class="regular-text" placeholder="<?php echo esc_attr( $has_key ? '•••••••• (sparad)' : 'ccm_ak_...' ); ?>" autocomplete="off">
+                        <p class="description">
+                            Genereras i CCM Central Dashboard vid registrering av sajt.
+                            <?php if ( $has_key ) : ?>
+                                <br>En nyckel är sparad. Lämna fältet tomt för att behålla den, eller klistra in en ny för att ersätta den.
+                            <?php endif; ?>
+                        </p>
                     </td>
                 </tr>
                 <tr>
                     <th>Status</th>
                     <td>
-                        <?php if ( $c_enabled && $c_url && $c_key ) : ?>
+                        <?php if ( $c_enabled && $c_url && $has_key ) : ?>
                             <?php if ( $last_rep ) : ?>
                                 <span style="color:#46b450;">&#10003;</span> Ansluten — Senaste rapport: <?php echo esc_html( $last_rep ); ?>
                             <?php else : ?>

@@ -160,7 +160,7 @@ class CoCookie_Cookies_Controller {
 					wp_redirect( admin_url( 'admin.php?page=cocookie-cookies&msg=import_error' ) );
 					exit;
 				}
-				$ext = strtolower( pathinfo( $_FILES['cocookie_import_file']['name'], PATHINFO_EXT ) );
+				$ext = strtolower( pathinfo( $_FILES['cocookie_import_file']['name'], PATHINFO_EXTENSION ) );
 				if ( 'json' !== $ext ) {
 					wp_redirect( admin_url( 'admin.php?page=cocookie-cookies&msg=import_error' ) );
 					exit;

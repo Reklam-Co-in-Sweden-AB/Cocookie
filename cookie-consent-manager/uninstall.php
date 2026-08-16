@@ -37,6 +37,14 @@ $options = array(
 	'ccm_central_last_error',
 	'cocookie_db_version',
 	'cocookie_needs_wizard',
+	'cocookie_settings',
+	'cocookie_company_info',
+	'cocookie_blocked_cookies',
+	'cocookie_last_scan',
+	'cocookie_scan_error',
+	'cocookie_central_settings',
+	'cocookie_central_last_report',
+	'cocookie_central_last_error',
 );
 
 foreach ( $options as $option ) {

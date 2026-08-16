@@ -206,6 +206,15 @@
 	}
 
 	// --- Save consent ---
+	function postConsent(data, nonce) {
+		return fetch(config.restUrl + '/consent', {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
+			body: JSON.stringify({ categories: data })
+		}).then(function (r) { return r.json(); });
+	}
+
 	function saveConsent(categories) {
 		var data = {};
 		config.categories.forEach(function (cat) {
@@ -230,25 +239,41 @@
 		var cookieVal = JSON.stringify(Object.assign({}, data, { timestamp: timestamp }));
 		setCookie(COOKIE_NAME, cookieVal, config.settings.cookie_lifetime);
 
-		fetch(config.restUrl + '/consent', {
-			method: 'POST',
-			credentials: 'same-origin',
-			headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': config.nonce },
-			body: JSON.stringify({ categories: data })
-		}).then(function (r) { return r.json(); }).then(function (resp) {
-			if (resp.uuid) {
-				var val = JSON.stringify(Object.assign({}, data, { uuid: resp.uuid, timestamp: timestamp }));
-				setCookie(COOKIE_NAME, val, config.settings.cookie_lifetime);
-			}
-			if (isReopen) {
-				window.location.reload();
-			}
-		}).catch(function () {
-			// REST-anropet misslyckades — cookien är redan satt ovan
-			if (isReopen) {
-				window.location.reload();
-			}
-		});
+		postConsent(data, config.nonce)
+			.then(function (resp) {
+				// 403 = utgången nonce (vanligt med full page cache). Hämta en
+				// färsk nonce från /config och gör om anropet en gång, annars
+				// tappas samtyckesloggen tyst.
+				if (resp && resp.code === 'invalid_nonce') {
+					return fetch(config.restUrl + '/config', { credentials: 'same-origin' })
+						.then(function (r) { return r.json(); })
+						.then(function (cfg) {
+							if (!cfg || !cfg.nonce) return resp;
+							config.nonce = cfg.nonce;
+							return postConsent(data, cfg.nonce);
+						});
+				}
+				return resp;
+			})
+			.then(function (resp) {
+				if (resp && resp.uuid) {
+					var val = JSON.stringify(Object.assign({}, data, { uuid: resp.uuid, timestamp: timestamp }));
+					setCookie(COOKIE_NAME, val, config.settings.cookie_lifetime);
+				} else {
+					// Cookien är satt lokalt, men serverloggen saknar posten.
+					console.warn('CoCookie: samtycket kunde inte loggas på servern.', resp);
+				}
+				if (isReopen) {
+					window.location.reload();
+				}
+			})
+			.catch(function (err) {
+				// Nätverksfel — cookien är redan satt ovan, men inget loggades.
+				console.warn('CoCookie: samtycket kunde inte loggas på servern.', err);
+				if (isReopen) {
+					window.location.reload();
+				}
+			});
 
 		if (!isReopen) {
 			activateScripts(data);

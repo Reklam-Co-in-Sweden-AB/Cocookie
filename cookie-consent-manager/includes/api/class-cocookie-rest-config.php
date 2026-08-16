@@ -42,7 +42,19 @@ class CoCookie_REST_Config {
 	 */
 	public static function get_config( WP_REST_Request $request ) {
 		$config = self::build_config();
-		return new WP_REST_Response( $config, 200 );
+
+		// Färsk nonce. Bannerns inbäddade nonce kan vara utgången när sidan
+		// serverats från en full page cache — då hämtar JS:en en ny härifrån
+		// och gör om samtyckesanropet, så loggningen inte tappas tyst.
+		$config['nonce'] = wp_create_nonce( 'wp_rest' );
+
+		$response = new WP_REST_Response( $config, 200 );
+
+		// Svaret innehåller en nonce och får aldrig cachas av CDN eller
+		// sidcache — då skulle en utgången nonce serveras till alla besökare.
+		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0' );
+
+		return $response;
 	}
 
 	/**

@@ -149,9 +149,13 @@ class CoCookie_REST_Scanner {
 		$results = array();
 		foreach ( $cookies as $cookie ) {
 			$name         = sanitize_text_field( $cookie['name'] ?? '' );
-			$value_sample = sanitize_text_field( substr( $cookie['value'] ?? '', 0, 50 ) );
 			$domain       = sanitize_text_field( $cookie['domain'] ?? '' );
 			$storage_type = sanitize_text_field( $cookie['storage_type'] ?? 'cookie' );
+
+			// Cookie-värden lagras aldrig. Scanningen körs i en inloggad admins
+			// webbläsare och värden kan innehålla sessionstokens från andra plugins.
+			// Ett eventuellt inskickat värde ignoreras här.
+			$value_sample = '';
 
 			if ( empty( $name ) ) {
 				continue;
