@@ -542,6 +542,33 @@
 	vertical-align: middle;
 }
 
+/* === Settings button (shortcode [cocookie_settings]) === */
+.cocookie-settings-link {
+	display: inline-block;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 6px;
+	background: var(--cocookie-accent, #29A166);
+	color: var(--cocookie-accent-text, #fff);
+	font: inherit;
+	font-weight: 600;
+	line-height: 1.4;
+	text-align: center;
+	cursor: pointer;
+	transition: opacity 0.2s;
+}
+
+.cocookie-settings-link:hover,
+.cocookie-settings-link:focus {
+	opacity: 0.85;
+	color: var(--cocookie-accent-text, #fff);
+}
+
+.cocookie-settings-link:focus-visible {
+	outline: 2px solid var(--cocookie-accent, #29A166);
+	outline-offset: 2px;
+}
+
 /* === Iframe placeholder === */
 .cocookie-iframe-placeholder {
 	display: flex;

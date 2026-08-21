@@ -79,6 +79,21 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 					</td>
 				</tr>
 				<tr>
+					<th><label for="float_button_enabled"><?php esc_html_e( 'Flytande cookie-knapp', 'cocookie' ); ?></label></th>
+					<td>
+						<label>
+							<input type="checkbox" id="float_button_enabled" name="float_button_enabled" value="1" <?php checked( ! empty( $s['float_button_enabled'] ) ); ?>>
+							<?php esc_html_e( 'Visa den flytande cookie-knappen i sidans hörn', 'cocookie' ); ?>
+						</label>
+						<p class="description">
+							<?php esc_html_e( 'Besökare måste alltid kunna ändra sitt samtycke i efterhand. Stänger du av den flytande knappen ansvarar du för att i stället lägga in knappen med kortkoden [cocookie_settings] på en sida som nås från hela webbplatsen, till exempel cookie-policyn länkad i sidfoten.', 'cocookie' ); ?>
+						</p>
+						<p class="description">
+							<?php esc_html_e( 'Du kan också sätta klassen cocookie-open-settings på en egen knapp, eller låta en meny- eller knapplänk peka på #cookie-installningar.', 'cocookie' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
 					<th><label for="google_consent_enabled"><?php esc_html_e( 'Googles samtyckeslänk', 'cocookie' ); ?></label></th>
 					<td>
 						<label>

@@ -20,6 +20,8 @@ class CoCookie_Public {
 	public static function init() {
 		add_shortcode( 'cocookie_cookie_list', array( __CLASS__, 'render_cookie_list' ) );
 		add_shortcode( 'ccm_cookie_list', array( __CLASS__, 'render_cookie_list' ) );
+		add_shortcode( 'cocookie_settings', array( __CLASS__, 'render_settings_button' ) );
+		add_shortcode( 'ccm_settings', array( __CLASS__, 'render_settings_button' ) );
 
 		// These hooks only fire on the frontend, so no is_admin() check needed
 		add_action( 'wp_head', array( __CLASS__, 'maybe_output_gcm_default' ), 1 );
@@ -107,6 +109,47 @@ class CoCookie_Public {
 
 		$html .= '</div>';
 		return $html;
+	}
+
+	/**
+	 * Render the settings button shortcode.
+	 *
+	 * Ger sajter ett alternativ till den flytande knappen: en vanlig knapp
+	 * som öppnar samtyckespanelen, till exempel på cookie-policy-sidan.
+	 *
+	 * @param array $atts Shortcode-attribut: text och class.
+	 * @return string Knapp-HTML.
+	 */
+	public static function render_settings_button( $atts ) {
+		$settings = get_option( 'cocookie_settings', get_option( 'ccm_settings', array() ) );
+
+		$default_text = ! empty( $settings['settings_text'] )
+			? $settings['settings_text']
+			: __( 'Cookie-inställningar', 'cocookie' );
+
+		$atts = shortcode_atts(
+			array(
+				'text'  => $default_text,
+				'class' => '',
+			),
+			$atts,
+			'cocookie_settings'
+		);
+
+		// Bannerns färgvariabler sitter på #cocookie-banner och ärvs inte hit,
+		// därför sätts de om inline så att knappen matchar bannerns primärfärg.
+		$accent      = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#29A166';
+		$accent_text = ! empty( $settings['primary_text_color'] ) ? $settings['primary_text_color'] : '#ffffff';
+
+		$classes = trim( 'cocookie-settings-link cocookie-open-settings ' . $atts['class'] );
+
+		return sprintf(
+			'<button type="button" class="%1$s" style="--cocookie-accent: %2$s; --cocookie-accent-text: %3$s;">%4$s</button>',
+			esc_attr( $classes ),
+			esc_attr( $accent ),
+			esc_attr( $accent_text ),
+			esc_html( $atts['text'] )
+		);
 	}
 
 	/**

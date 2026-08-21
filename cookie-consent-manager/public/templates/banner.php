@@ -210,11 +210,18 @@ $position   = $s['position'] ?? 'bottom';
 	</div>
 </div>
 
-<!-- Floating settings button -->
-<button type="button" id="cocookie-float-btn" class="cocookie-float" style="display:none;" aria-label="<?php esc_attr_e( 'Cookie-inställningar', 'cocookie' ); ?>">
-	<?php if ( ! empty( $s['cookie_icon'] ) ) : ?>
-		<img src="<?php echo esc_url( $s['cookie_icon'] ); ?>" alt="" width="24" height="24">
-	<?php else : ?>
-		&#127850;
-	<?php endif; ?>
-</button>
+<?php
+// Den flytande knappen kan stängas av i bannerinställningarna. Saknas
+// nyckeln helt (äldre installationer) visas knappen som tidigare.
+$show_float = ! isset( $s['float_button_enabled'] ) || ! empty( $s['float_button_enabled'] );
+?>
+<?php if ( $show_float ) : ?>
+	<!-- Floating settings button -->
+	<button type="button" id="cocookie-float-btn" class="cocookie-float" style="display:none;" aria-label="<?php esc_attr_e( 'Cookie-inställningar', 'cocookie' ); ?>">
+		<?php if ( ! empty( $s['cookie_icon'] ) ) : ?>
+			<img src="<?php echo esc_url( $s['cookie_icon'] ); ?>" alt="" width="24" height="24">
+		<?php else : ?>
+			&#127850;
+		<?php endif; ?>
+	</button>
+<?php endif; ?>

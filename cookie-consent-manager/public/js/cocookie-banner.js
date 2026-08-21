@@ -408,6 +408,17 @@
 			});
 		}
 
+		// Egna knappar och länkar som öppnar samtyckespanelen. Träffar både
+		// shortcoden [cocookie_settings], egna element med klassen
+		// cocookie-open-settings och meny-/knapplänkar mot #cookie-installningar.
+		document.addEventListener('click', function (e) {
+			var trigger = e.target.closest('.cocookie-open-settings, a[href$="#cookie-installningar"]');
+			if (!trigger) return;
+			e.preventDefault();
+			if (banner.style.visibility !== 'hidden') return;
+			showBanner(getConsent());
+		});
+
 		// Category accordion toggles
 		banner.addEventListener('click', function (e) {
 			var expandBtn = e.target.closest('.cocookie-category__expand');
