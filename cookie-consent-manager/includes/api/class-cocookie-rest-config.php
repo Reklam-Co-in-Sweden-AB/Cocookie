@@ -193,6 +193,8 @@ class CoCookie_REST_Config {
 				'logo_url'           => $settings['logo_url'] ?? '',
 				'cookie_lifetime'    => intval( $settings['cookie_lifetime'] ?? 365 ),
 				'cookie_icon'        => $settings['cookie_icon'] ?? '',
+				// Saknas nyckeln (äldre installationer) ska knappen visas som tidigare.
+				'float_button_enabled' => ! isset( $settings['float_button_enabled'] ) || ! empty( $settings['float_button_enabled'] ),
 				'privacy_policy_url' => function_exists( 'get_privacy_policy_url' ) ? get_privacy_policy_url() : '',
 				'manage_title'       => $settings['manage_title'] ?? __( 'Hantera cookie-inställningar', 'cocookie' ),
 				'manage_text'        => $settings['manage_text'] ?? __( 'Här kan du ändra eller återkalla ditt samtycke.', 'cocookie' ),
