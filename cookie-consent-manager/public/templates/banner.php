@@ -57,9 +57,9 @@ $position   = $s['position'] ?? 'bottom';
 		<!-- FLIK: Samtycke -->
 		<div class="cocookie-banner__panel cocookie-banner__panel--active" id="cocookie-panel-consent" data-cocookie-panel="consent">
 
-			<h2 class="cocookie-banner__title" id="cocookie-banner-title">
+			<p class="cocookie-banner__title" id="cocookie-banner-title">
 				<?php echo esc_html( $s['banner_title'] ); ?>
-			</h2>
+			</p>
 
 			<p class="cocookie-banner__text" id="cocookie-banner-text">
 				<?php echo esc_html( $s['banner_text'] ); ?>
@@ -154,14 +154,14 @@ $position   = $s['position'] ?? 'bottom';
 		<!-- FLIK: Om cookies -->
 		<div class="cocookie-banner__panel" id="cocookie-panel-about" data-cocookie-panel="about" style="display:none;">
 			<div class="cocookie-banner__about">
-				<h3 class="cocookie-banner__about-title">
+				<div class="cocookie-banner__about-title">
 					<?php echo esc_html( $s['about_title'] ?? __( 'Vad är cookies?', 'cocookie' ) ); ?>
-				</h3>
+				</div>
 				<p><?php echo esc_html( $s['about_what'] ?? __( 'Cookies är små textfiler som lagras på din enhet (dator, telefon eller surfplatta) när du besöker en webbplats. De används för att webbplatsen ska fungera korrekt, för att analysera trafik och för att anpassa innehåll och annonser.', 'cocookie' ) ); ?></p>
 
-				<h3 class="cocookie-banner__about-title">
+				<div class="cocookie-banner__about-title">
 					<?php echo esc_html( $s['about_types_title'] ?? __( 'Typer av cookies', 'cocookie' ) ); ?>
-				</h3>
+				</div>
 				<div class="cocookie-banner__about-types">
 					<div class="cocookie-banner__about-type">
 						<strong><?php echo esc_html( $s['about_type_necessary'] ?? __( 'Nödvändiga cookies', 'cocookie' ) ); ?></strong>
@@ -177,14 +177,14 @@ $position   = $s['position'] ?? 'bottom';
 					</div>
 				</div>
 
-				<h3 class="cocookie-banner__about-title">
+				<div class="cocookie-banner__about-title">
 					<?php echo esc_html( $s['about_manage_title'] ?? __( 'Hantera dina cookies', 'cocookie' ) ); ?>
-				</h3>
+				</div>
 				<p><?php echo esc_html( $s['about_manage_desc'] ?? __( 'Du kan när som helst ändra eller återkalla ditt samtycke genom att klicka på cookie-ikonen i nedre vänstra hörnet. Du kan också radera cookies i din webbläsares inställningar.', 'cocookie' ) ); ?></p>
 
-				<h3 class="cocookie-banner__about-title">
+				<div class="cocookie-banner__about-title">
 					<?php echo esc_html( $s['about_rights_title'] ?? __( 'Dina rättigheter', 'cocookie' ) ); ?>
-				</h3>
+				</div>
 				<p><?php echo esc_html( $s['about_rights_desc'] ?? __( 'Enligt GDPR har du rätt att få tillgång till, korrigera eller radera dina personuppgifter. Du har också rätt att invända mot behandling och att begära dataportabilitet. Läs mer i vår integritetspolicy.', 'cocookie' ) ); ?></p>
 			</div>
 		</div>
