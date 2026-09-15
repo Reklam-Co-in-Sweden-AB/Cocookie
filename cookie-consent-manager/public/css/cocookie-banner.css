@@ -615,28 +615,72 @@
 }
 
 /* === Responsive === */
+/* Kompakt mobil-layout. Bannern får inte täcka en stor del av skärmen:
+   den skymmer sidans egna CTA-knappar och blir dessutom sidans LCP-element
+   i Lighthouse (stort textblock som målas sent). Därför döljs loggan,
+   ytorna krymps och huvudknapparna ligger sida vid sida i stället för
+   staplade. */
 @media (max-width: 480px) {
 	.cocookie-banner__inner {
-		padding: 20px 18px;
+		padding: 14px 16px 12px;
+	}
+
+	.cocookie-banner__logo {
+		display: none;
+	}
+
+	.cocookie-banner__tabs {
+		margin-bottom: 10px;
+	}
+
+	.cocookie-banner__tab {
+		padding: 8px 12px;
+		font-size: 12px;
 	}
 
 	.cocookie-banner__title {
-		font-size: 18px;
+		font-size: 16px;
+		margin-bottom: 4px;
+	}
+
+	.cocookie-banner__text {
+		font-size: 13px;
+		line-height: 1.5;
+		margin-bottom: 10px;
+	}
+
+	.cocookie-banner__google {
+		margin: -6px 0 10px;
+		font-size: 12px;
+	}
+
+	.cocookie-banner__panel {
+		min-height: 0;
 	}
 
 	.cocookie-banner__buttons {
-		flex-direction: column;
+		margin-top: 10px;
 		gap: 8px;
 	}
 
+	/* Acceptera/Avvisa sida vid sida – padding ger ~44px höjd (tap target). */
 	.cocookie-btn {
-		width: 100%;
+		flex: 1 1 calc(50% - 4px);
+		padding: 13px 10px;
 		text-align: center;
 	}
 
 	.cocookie-btn--settings {
+		flex: 1 1 100%;
 		width: auto;
+		padding: 8px;
 		text-align: center;
+	}
+
+	/* Detaljer/kategorier (öppnas på begäran) får aldrig trycka upp bannern
+	   över hela skärmen. */
+	.cocookie-banner__details {
+		max-height: 45vh;
 	}
 
 	.cocookie-category__header {
