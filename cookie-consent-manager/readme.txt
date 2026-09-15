@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,10 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.3.2 =
+* Förbättring: kompakt mobil-layout för bannern (under 480px). Loggan döljs, ytorna krymps och Acceptera/Avvisa ligger sida vid sida. Bannern täckte tidigare nästan halva mobilskärmen — den skymde sajtens egna CTA-knappar och blev sidans LCP-element i Lighthouse/PageSpeed.
+* Förbättring (SEO): bannern innehåller inte längre några rubriktaggar. Bannerns rubrik och rubrikerna i fliken "Om cookies" var h2/h3, och eftersom bannern skrivs ut direkt efter body hamnade de överst i sidans rubrikstruktur, före sajtens egen h1. De är nu vanliga element med samma klasser, så utseendet är oförändrat.
 
 = 2.3.1 =
 * Fix: inställningen för den flytande cookie-knappen nådde aldrig frontend, så knappen visades även när den var avstängd. Nu döljs den korrekt när kryssrutan är urkryssad.
