@@ -43,6 +43,7 @@ The plugin will automatically activate the script when the visitor consents to t
 * Nytt: kortkoden `[cocookie_cookie_list]` visar nu även besökarens eget val — vilka kategorier som är tillåtna, när samtycket sparades och samtyckes-ID, med knappar för att ändra eller dra tillbaka. Rutan fylls i med JavaScript, så den fungerar även när sidan är cachad. Stäng av den med `consent="no"`.
 * Nytt: antal cookies visas per kategori i listan, och datum för senaste skanningen visas under listan.
 * Nytt: attributet `heading` styr rubriknivån i listan (h2–h6, standard h3), så att den kan läggas under en befintlig rubrik utan att hoppa över nivåer.
+* Fix (tillgänglighet): gråa texter i bannern hade för låg kontrast mot vit bakgrund (3,5:1 eller lägre). Knappen "Inställningar", Google-noteringen, kategoribeskrivningar, "Krävs"-etiketten, expandera-knappen och DNT-rutan är nu mörkare och klarar WCAG AA (4,5:1).
 * Förbättring: policygeneratorn lägger in kortkoden i stället för en fast tabell i cookiepolicyn. Listan blir därmed aldrig inaktuell. Redan skapade sidor ändras inte — generera om sidan för att få kortkoden.
 
 = 2.3.2 =

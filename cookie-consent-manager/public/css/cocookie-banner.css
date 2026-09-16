@@ -107,7 +107,7 @@
 .cocookie-banner__google {
 	margin: -12px 0 20px;
 	font-size: 13px;
-	color: #888;
+	color: #6b6b6b;
 	line-height: 1.5;
 }
 
@@ -140,7 +140,7 @@
 	margin: 0 0 16px;
 	padding: 10px 14px;
 	background: #fffbeb;
-	color: #92730c;
+	color: #856608;
 	border-radius: 8px;
 	font-size: 13px;
 	border: 1px solid #fde68a;
@@ -303,10 +303,12 @@
 	color: var(--cocookie-reject-text) !important;
 }
 
+/* Gråa texter i bannern använder #6b6b6b (5,3:1 mot vitt). Ljusare grått
+   (#888/#999) underkänns av tillgänglighetsgranskning (WCAG AA, 4,5:1). */
 .cocookie-btn--settings,
 .cocookie-btn--settings:focus {
 	background: transparent !important;
-	color: #888 !important;
+	color: #6b6b6b !important;
 	text-decoration: underline;
 	text-underline-offset: 3px;
 	padding: 12px 14px;
@@ -428,7 +430,7 @@
 
 .cocookie-category__required {
 	font-size: 11px;
-	color: #999;
+	color: #6b6b6b;
 	font-weight: 400;
 }
 
@@ -440,7 +442,7 @@
 	border: none;
 	cursor: pointer;
 	padding: 4px;
-	color: #999;
+	color: #6b6b6b;
 	font-size: 12px;
 }
 
@@ -466,7 +468,7 @@
 .cocookie-category__desc {
 	margin: 12px 0 10px;
 	font-size: 13px;
-	color: #777;
+	color: #6b6b6b;
 	line-height: 1.5;
 }
 
