@@ -64,9 +64,32 @@ class CoCookie_Public {
 	/**
 	 * Render the cookie list shortcode.
 	 *
+	 * @param array $atts Shortcode-attribut: consent och heading.
 	 * @return string HTML table of cookies grouped by category.
 	 */
-	public static function render_cookie_list() {
+	public static function render_cookie_list( $atts = array() ) {
+		$atts = shortcode_atts(
+			array(
+				'consent' => 'yes',
+				'heading' => 'h3',
+			),
+			$atts,
+			'cocookie_cookie_list'
+		);
+
+		// Rubriknivån är valbar så att listan kan läggas in under en befintlig
+		// rubrik utan att hoppa över nivåer (policygeneratorn använder h4).
+		$heading = strtolower( $atts['heading'] );
+		if ( ! in_array( $heading, array( 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ) {
+			$heading = 'h3';
+		}
+
+		$show_consent = ! in_array(
+			strtolower( (string) $atts['consent'] ),
+			array( 'no', 'nej', 'false', '0', '' ),
+			true
+		);
+
 		$categories = CoCookie_Categories::get_all();
 		if ( empty( $categories ) ) {
 			return '<p>' . esc_html__( 'Inga cookies registrerade.', 'cocookie' ) . '</p>';
@@ -75,17 +98,30 @@ class CoCookie_Public {
 		$cookies_grouped = CoCookie_Categories::get_cookies_grouped();
 		$html = '<div class="cocookie-declaration">';
 
+		if ( $show_consent ) {
+			$html .= self::render_consent_status( $categories );
+		}
+
 		foreach ( $categories as $cat ) {
 			$cookies = isset( $cookies_grouped[ $cat['id'] ] ) ? $cookies_grouped[ $cat['id'] ] : array();
 			if ( empty( $cookies ) ) {
 				continue;
 			}
 
-			$html .= '<h3>' . esc_html( $cat['title'] );
+			$count = count( $cookies );
+
+			$html .= '<' . $heading . ' class="cocookie-declaration__title">' . esc_html( $cat['title'] );
 			if ( $cat['is_required'] ) {
 				$html .= ' <small>(' . esc_html__( 'krävs alltid', 'cocookie' ) . ')</small>';
 			}
-			$html .= '</h3>';
+			$html .= ' <small class="cocookie-declaration__count">' . esc_html(
+				sprintf(
+					/* translators: %d: antal cookies i kategorin. */
+					_n( '%d cookie', '%d cookies', $count, 'cocookie' ),
+					$count
+				)
+			) . '</small>';
+			$html .= '</' . $heading . '>';
 			$html .= '<p>' . esc_html( $cat['description'] ) . '</p>';
 			$html .= '<table class="cocookie-declaration-table">';
 			$html .= '<thead><tr>';
@@ -107,7 +143,90 @@ class CoCookie_Public {
 			$html .= '</tbody></table>';
 		}
 
+		$last_scan = get_option( 'cocookie_last_scan', get_option( 'ccm_last_scan', '' ) );
+		if ( ! empty( $last_scan ) ) {
+			$timestamp = strtotime( $last_scan );
+			if ( $timestamp ) {
+				$html .= '<p class="cocookie-declaration__scan">' . esc_html(
+					sprintf(
+						/* translators: %s: datum för senaste cookie-skanningen. */
+						__( 'Listan uppdaterades senast vid skanning av webbplatsen %s.', 'cocookie' ),
+						date_i18n( get_option( 'date_format' ), $timestamp )
+					)
+				) . '</p>';
+			}
+		}
+
 		$html .= '</div>';
+		return $html;
+	}
+
+	/**
+	 * Render the visitor's own consent status.
+	 *
+	 * Samtycket ligger bara i besökarens cookie, och sidan kan vara cachad,
+	 * så servern kan inte veta vad just den besökaren har valt. Här skrivs
+	 * därför bara stommen ut — bannerns JS fyller i värdena. Texterna skickas
+	 * med som data-attribut så att de går att översätta i PHP.
+	 *
+	 * @param array $categories Alla kategorier.
+	 * @return string HTML.
+	 */
+	private static function render_consent_status( $categories ) {
+		$settings     = get_option( 'cocookie_settings', get_option( 'ccm_settings', array() ) );
+		$accent       = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#29A166';
+		$accent_text  = ! empty( $settings['primary_text_color'] ) ? $settings['primary_text_color'] : '#ffffff';
+		$button_label = ! empty( $settings['settings_text'] ) ? $settings['settings_text'] : __( 'Cookie-inställningar', 'cocookie' );
+
+		$html = sprintf(
+			'<div class="cocookie-status" data-cocookie-status hidden
+				data-allowed="%1$s" data-denied="%2$s"
+				data-has-consent="%3$s" data-no-consent="%4$s"
+				data-date="%5$s" data-id="%6$s">',
+			esc_attr__( 'Tillåten', 'cocookie' ),
+			esc_attr__( 'Inte tillåten', 'cocookie' ),
+			esc_attr__( 'Ditt nuvarande val:', 'cocookie' ),
+			esc_attr__( 'Du har inte gjort något val ännu. Cookie-bannern visas nästa gång du laddar om sidan.', 'cocookie' ),
+			/* translators: %s: datum och tid då samtycket sparades. */
+			esc_attr__( 'Sparat %s', 'cocookie' ),
+			/* translators: %s: samtyckes-ID. */
+			esc_attr__( 'Samtyckes-ID: %s', 'cocookie' )
+		);
+
+		$html .= '<p class="cocookie-status__intro" data-cocookie-status-intro></p>';
+
+		$html .= '<ul class="cocookie-status__list" data-cocookie-status-list hidden>';
+		foreach ( $categories as $cat ) {
+			$html .= sprintf(
+				'<li class="cocookie-status__item" data-cocookie-status-category="%1$s">
+					<span class="cocookie-status__name">%2$s</span>
+					<span class="cocookie-status__value" data-cocookie-status-value></span>
+				</li>',
+				esc_attr( $cat['slug'] ),
+				esc_html( $cat['title'] )
+			);
+		}
+		$html .= '</ul>';
+
+		$html .= '<p class="cocookie-status__meta" data-cocookie-status-meta hidden></p>';
+
+		$html .= sprintf(
+			'<p class="cocookie-status__actions">
+				<button type="button" class="cocookie-settings-link cocookie-open-settings" style="--cocookie-accent: %1$s; --cocookie-accent-text: %2$s;">%3$s</button>
+				<button type="button" class="cocookie-status__withdraw" data-cocookie-withdraw hidden>%4$s</button>
+			</p>',
+			esc_attr( $accent ),
+			esc_attr( $accent_text ),
+			esc_html( $button_label ),
+			esc_html__( 'Dra tillbaka samtycke', 'cocookie' )
+		);
+
+		$html .= '<noscript><p class="cocookie-status__intro">'
+			. esc_html__( 'Ditt val av cookies visas bara om JavaScript är aktiverat.', 'cocookie' )
+			. '</p></noscript>';
+
+		$html .= '</div>';
+
 		return $html;
 	}
 

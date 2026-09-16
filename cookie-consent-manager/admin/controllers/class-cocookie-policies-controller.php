@@ -21,7 +21,7 @@ class CoCookie_Policies_Controller {
 
 		$company_info    = CCM_Policy_Generator::get_company_info();
 		$privacy_content = CCM_Policy_Generator::generate_privacy_policy();
-		$cookie_content  = CCM_Policy_Generator::generate_cookie_policy();
+		$cookie_content  = CCM_Policy_Generator::preview_cookie_policy();
 
 		$data = array(
 			'company_info'    => $company_info,

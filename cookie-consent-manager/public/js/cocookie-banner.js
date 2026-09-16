@@ -144,6 +144,70 @@
 		}
 	}
 
+	// --- Samtyckesruta i kortkoden [cocookie_cookie_list] ---
+	// Samtycket ligger bara i besökarens cookie och sidan kan vara cachad,
+	// därför fylls rutan i här i stället för på servern.
+	function renderConsentStatus() {
+		var blocks = document.querySelectorAll('[data-cocookie-status]');
+		if (!blocks.length) return;
+
+		var consent = getConsent();
+		var valid   = consent && !isExpired(consent);
+
+		for (var i = 0; i < blocks.length; i++) {
+			var block    = blocks[i];
+			var intro    = block.querySelector('[data-cocookie-status-intro]');
+			var list     = block.querySelector('[data-cocookie-status-list]');
+			var meta     = block.querySelector('[data-cocookie-status-meta]');
+			var withdraw = block.querySelector('[data-cocookie-withdraw]');
+
+			if (!valid) {
+				if (intro) intro.textContent = block.getAttribute('data-no-consent');
+				if (list) list.hidden = true;
+				if (meta) meta.hidden = true;
+				if (withdraw) withdraw.hidden = true;
+				block.hidden = false;
+				continue;
+			}
+
+			if (intro) intro.textContent = block.getAttribute('data-has-consent');
+
+			var items = block.querySelectorAll('[data-cocookie-status-category]');
+			for (var j = 0; j < items.length; j++) {
+				var slug    = items[j].getAttribute('data-cocookie-status-category');
+				var allowed = !!consent[slug];
+				var value   = items[j].querySelector('[data-cocookie-status-value]');
+				if (value) {
+					value.textContent = block.getAttribute(allowed ? 'data-allowed' : 'data-denied');
+				}
+				items[j].classList.add(allowed ? 'cocookie-status__item--allowed' : 'cocookie-status__item--denied');
+			}
+			if (list) list.hidden = false;
+
+			if (meta) {
+				var parts = [];
+				if (consent.timestamp) {
+					var d = new Date(consent.timestamp);
+					var locale = document.documentElement.lang || 'sv';
+					parts.push(
+						block.getAttribute('data-date').replace(
+							'%s',
+							d.toLocaleDateString(locale) + ' ' + d.toLocaleTimeString(locale)
+						)
+					);
+				}
+				if (consent.uuid) {
+					parts.push(block.getAttribute('data-id').replace('%s', consent.uuid));
+				}
+				meta.textContent = parts.join(' · ');
+				meta.hidden = parts.length === 0;
+			}
+
+			if (withdraw) withdraw.hidden = false;
+			block.hidden = false;
+		}
+	}
+
 	// --- Show/hide banner ---
 	function showBanner(existingConsent) {
 		isReopen = !!existingConsent;
@@ -301,6 +365,8 @@
 		bannerTitle = document.getElementById('cocookie-banner-title');
 		bannerText  = document.getElementById('cocookie-banner-text');
 
+		renderConsentStatus();
+
 		if (!banner) {
 			// console.log('[CoCookie] init() called but banner still not found');
 			return;
@@ -419,6 +485,19 @@
 			showBanner(getConsent());
 		});
 
+		// Dra tillbaka samtycket från kortkodens samtyckesruta. Sidan laddas om
+		// efteråt (isReopen) eftersom skript som redan har startat inte kan
+		// stoppas i efterhand.
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest('[data-cocookie-withdraw]');
+			if (!btn) return;
+			e.preventDefault();
+			var req = {};
+			config.categories.forEach(function (c) { req[c.slug] = c.is_required; });
+			isReopen = true;
+			saveConsent(req);
+		});
+
 		// Category accordion toggles
 		banner.addEventListener('click', function (e) {
 			var expandBtn = e.target.closest('.cocookie-category__expand');
@@ -446,6 +525,10 @@
 	if (document.getElementById('cocookie-banner')) {
 		// console.log('[CoCookie] Banner found immediately, initializing');
 		init();
+		// Kortkodens samtyckesruta kan ligga senare i dokumentet än bannern.
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', renderConsentStatus);
+		}
 	} else {
 		// console.log('[CoCookie] Banner not in DOM yet, waiting...');
 		// Banner not in DOM yet — wait for it

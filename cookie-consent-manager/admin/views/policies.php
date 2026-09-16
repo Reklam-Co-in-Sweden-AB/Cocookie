@@ -118,7 +118,7 @@ $cookie_page  = $info['cookie_page_id'] ? get_post( $info['cookie_page_id'] ) : 
                 <button type="button" class="button ccm-toggle-preview" data-target="ccm-cookie-preview">Visa/dölj</button>
             </div>
             <div id="ccm-cookie-preview" class="ccm-policy-preview-content" style="display:none;">
-                <?php echo CCM_Policy_Generator::generate_cookie_policy(); ?>
+                <?php echo CCM_Policy_Generator::preview_cookie_policy(); ?>
             </div>
         </div>
 

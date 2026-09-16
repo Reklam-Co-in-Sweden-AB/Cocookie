@@ -693,15 +693,103 @@
 }
 
 /* === Shortcode cookie declaration === */
-.cocookie-declaration h3 {
+.cocookie-declaration h3,
+.cocookie-declaration__title {
 	margin-top: 24px;
 	margin-bottom: 4px;
 }
 
-.cocookie-declaration h3 small {
+.cocookie-declaration h3 small,
+.cocookie-declaration__title small {
 	font-weight: normal;
 	font-size: 12px;
 	color: #888;
+}
+
+.cocookie-declaration__scan {
+	font-size: 13px;
+	color: #888;
+}
+
+/* Samtyckesruta i kortkoden. [hidden] sätts av JS och behöver !important
+   eftersom temastilar på ul/p annars kan sätta display igen. */
+.cocookie-status[hidden],
+.cocookie-status [hidden] {
+	display: none !important;
+}
+
+.cocookie-status {
+	margin: 0 0 24px;
+	padding: 16px 20px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background: #fafafa;
+	font-size: 14px;
+}
+
+.cocookie-status__intro {
+	margin: 0;
+	font-weight: 600;
+}
+
+.cocookie-status__list {
+	margin: 12px 0 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 24px;
+}
+
+.cocookie-status__item {
+	margin: 0;
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+}
+
+.cocookie-status__name {
+	font-weight: 600;
+}
+
+.cocookie-status__value {
+	font-size: 13px;
+}
+
+.cocookie-status__item--allowed .cocookie-status__value {
+	color: #1c7c4a;
+}
+
+.cocookie-status__item--denied .cocookie-status__value {
+	color: #8a8a8a;
+}
+
+.cocookie-status__meta {
+	margin: 12px 0 0;
+	font-size: 12px;
+	color: #888;
+	word-break: break-all;
+}
+
+.cocookie-status__actions {
+	margin: 16px 0 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.cocookie-status__withdraw {
+	padding: 8px 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.cocookie-status__withdraw:hover {
+	border-color: #999;
 }
 
 .cocookie-declaration-table {

@@ -201,30 +201,8 @@ echo $cookie_page_id ? esc_url( get_permalink( $cookie_page_id ) ) : '#';
 
 <?php if ( ! empty( $grouped ) ) : ?>
 <h3>Cookies vi använder</h3>
-<?php foreach ( $grouped as $group ) : ?>
-<h4><?php echo esc_html( $group['title'] ); ?><?php echo $group['is_required'] ? ' (krävs alltid)' : ''; ?></h4>
-<p><?php echo esc_html( $group['description'] ); ?></p>
-<table>
-<thead>
-<tr>
-<th>Cookie</th>
-<th>Leverantör</th>
-<th>Syfte</th>
-<th>Livslängd</th>
-</tr>
-</thead>
-<tbody>
-<?php foreach ( $group['cookies'] as $cookie ) : ?>
-<tr>
-<td><code><?php echo esc_html( $cookie['name'] ); ?></code></td>
-<td><?php echo esc_html( $cookie['provider'] ); ?></td>
-<td><?php echo esc_html( $cookie['purpose'] ); ?></td>
-<td><?php echo esc_html( $cookie['expiry'] ?: '—' ); ?></td>
-</tr>
-<?php endforeach; ?>
-</tbody>
-</table>
-<?php endforeach; ?>
+<?php // Kortkod i stället för en fast tabell, så att listan följer med när cookies läggs till eller tas bort. ?>
+[cocookie_cookie_list heading="h4"]
 <?php else : ?>
 <p><em>Inga cookies har registrerats ännu. Använd cookie-skannern för att identifiera och importera cookies.</em></p>
 <?php endif; ?>
@@ -249,6 +227,22 @@ if ( $privacy_page_id ) {
 <p>Denna cookiepolicy kan komma att uppdateras när vi ändrar vilka cookies som används. Kontrollera denna sida regelbundet för den senaste versionen.</p>
         <?php
         return trim( ob_get_clean() );
+    }
+
+    /**
+     * Cookiepolicyn för förhandsvisning i admin.
+     *
+     * Kortkoden körs inte i adminvyn, så den byts mot en förklarande rad.
+     * Sidans riktiga innehåll är alltid det som generate_cookie_policy() ger.
+     *
+     * @return string
+     */
+    public static function preview_cookie_policy() {
+        return str_replace(
+            '[cocookie_cookie_list heading="h4"]',
+            '<p><em>Här listas alla registrerade cookies automatiskt, grupperade per kategori, tillsammans med besökarens eget cookieval. Listan uppdateras när cookies läggs till eller tas bort.</em></p>',
+            self::generate_cookie_policy()
+        );
     }
 
     public static function create_page( $type ) {
