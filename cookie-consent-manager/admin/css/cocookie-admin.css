@@ -1209,6 +1209,15 @@ p.cocookie-empty {
 	border-bottom: none;
 }
 
+/* Knappar i skannerns åtgärdskolumn (Importera / Ignorera) */
+.cocookie-scan-actions {
+	white-space: nowrap;
+}
+
+.cocookie-scan-actions .button + .button {
+	margin-left: 6px;
+}
+
 /* === Paginering === */
 .cocookie-pagination {
 	margin-top: 16px;

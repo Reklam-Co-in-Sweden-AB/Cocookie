@@ -37,6 +37,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="cocookie-wizard-scan-done" style="display:none;" class="cocookie-wizard__result">
 			<span class="dashicons dashicons-yes-alt cocookie-icon--success" style="font-size:52px;width:52px;height:52px;display:block;margin:0 auto 12px;"></span>
 			<p id="cocookie-wizard-scan-summary" style="font-size:15px;font-weight:600;color:var(--cocookie-neutral-800);margin-bottom:20px;"></p>
+
+			<?php // Varningar när analytics-cookies saknas — dolda tills JavaScript avgjort vilken som gäller. ?>
+			<div id="cocookie-wizard-hint-ga_logged_in" class="cocookie-notice cocookie-notice--warning" style="display:none;text-align:left;">
+				<span class="dashicons dashicons-warning"></span>
+				<p>
+					<strong><?php esc_html_e( 'Google Analytics hittades inte, men finns på sajten.', 'cocookie' ); ?></strong><br>
+					<?php esc_html_e( 'Ditt analytics-plugin laddar inte spårningen för inloggade administratörer, och skanningen körs i din inloggade webbläsare. Besökare får cookien ändå. Lägg till _ga och _ga_* manuellt under Cookies när du är klar med guiden.', 'cocookie' ); ?>
+				</p>
+			</div>
+			<div id="cocookie-wizard-hint-ga_blocked" class="cocookie-notice cocookie-notice--warning" style="display:none;text-align:left;">
+				<span class="dashicons dashicons-warning"></span>
+				<p>
+					<strong><?php esc_html_e( 'Google Analytics laddades men satte inga cookies.', 'cocookie' ); ?></strong><br>
+					<?php esc_html_e( 'Troligen blockerar en adblocker skriptet, eller så har du tidigare avvisat analytics på sajten. Stäng av adblockern, rensa sajtens cookies och skanna igen.', 'cocookie' ); ?>
+				</p>
+			</div>
+			<div id="cocookie-wizard-hint-cross_origin" class="cocookie-notice cocookie-notice--error" style="display:none;text-align:left;">
+				<span class="dashicons dashicons-dismiss"></span>
+				<p>
+					<strong><?php esc_html_e( 'Skannern kunde inte läsa webbplatsen.', 'cocookie' ); ?></strong><br>
+					<?php esc_html_e( 'Webbplatsadressen och adminadressen skiljer sig åt (www/utan www eller http/https). Kontrollera Inställningar → Allmänt och skanna igen.', 'cocookie' ); ?>
+				</p>
+			</div>
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=cocookie-wizard&step=2' ) ); ?>" class="button button-primary button-hero">
 				<?php esc_html_e( 'Granska resultat', 'cocookie' ); ?> &rarr;
 			</a>

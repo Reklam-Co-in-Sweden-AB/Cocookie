@@ -27,7 +27,7 @@ $not_imported = $total_found - count( $imported );
 	<p class="cocookie-wizard__desc">
 		<?php
 		printf(
-			esc_html__( 'Vi hittade %d cookies på din webbplats. De har automatiskt kategoriserats baserat på kända mönster. Granska och importera dem till ditt register.', 'cocookie' ),
+			esc_html__( 'Vi hittade %d cookies på din webbplats. De har automatiskt kategoriserats baserat på kända mönster. Kryssa ur de som bara sätts för dig som inloggad, eller ignorera dem så att de inte dyker upp igen.', 'cocookie' ),
 			$total_found
 		);
 		?>
@@ -53,17 +53,37 @@ $not_imported = $total_found - count( $imported );
 			<table class="cocookie-table" style="width:100%;">
 				<thead>
 					<tr>
+						<th style="width:32px;">
+							<input type="checkbox" id="cocookie-wizard-check-all" <?php echo $not_imported > 0 ? '' : 'disabled'; ?> aria-label="<?php esc_attr_e( 'Markera alla', 'cocookie' ); ?>">
+						</th>
 						<th><?php esc_html_e( 'Cookie', 'cocookie' ); ?></th>
 						<th><?php esc_html_e( 'Kategori', 'cocookie' ); ?></th>
 						<th><?php esc_html_e( 'Leverantör', 'cocookie' ); ?></th>
 						<th><?php esc_html_e( 'Syfte', 'cocookie' ); ?></th>
 						<th><?php esc_html_e( 'Status', 'cocookie' ); ?></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php foreach ( $scan_results as $sr ) : ?>
-						<tr>
-							<td><code><?php echo esc_html( $sr['name'] ); ?></code></td>
+						<?php
+						// Heuristiken varnar för cookies som troligen bara sätts för inloggade
+						// admins. De är avmarkerade som standard så att de inte importeras av misstag.
+						$role_hint = class_exists( 'CoCookie_Cookie_Heuristics' ) ? CoCookie_Cookie_Heuristics::suggest( $sr['name'] ) : null;
+						$checked   = ! $sr['is_imported'] && empty( $role_hint );
+						?>
+						<tr data-name="<?php echo esc_attr( $sr['name'] ); ?>">
+							<td>
+								<?php if ( ! $sr['is_imported'] ) : ?>
+									<input type="checkbox" class="cocookie-wizard-check" value="<?php echo esc_attr( $sr['id'] ); ?>" <?php checked( $checked ); ?> aria-label="<?php esc_attr_e( 'Importera', 'cocookie' ); ?>">
+								<?php endif; ?>
+							</td>
+							<td>
+								<code><?php echo esc_html( $sr['name'] ); ?></code>
+								<?php if ( $role_hint ) : ?>
+									<div class="cocookie-role-hint">⚠ <?php echo esc_html( $role_hint ); ?></div>
+								<?php endif; ?>
+							</td>
 							<td>
 								<span class="cocookie-badge cocookie-badge--<?php echo esc_attr( $sr['suggested_category'] ); ?>">
 									<?php echo esc_html( $sr['suggested_category'] ); ?>
@@ -83,6 +103,11 @@ $not_imported = $total_found - count( $imported );
 									<span class="cocookie-badge cocookie-badge--muted"><?php esc_html_e( 'Ej importerad', 'cocookie' ); ?></span>
 								<?php endif; ?>
 							</td>
+							<td>
+								<button type="button" class="button button-small button-link-delete cocookie-wizard-ignore" data-name="<?php echo esc_attr( $sr['name'] ); ?>" title="<?php esc_attr_e( 'Ignorera — visas inte i kommande skanningar', 'cocookie' ); ?>">
+									<?php esc_html_e( 'Ignorera', 'cocookie' ); ?>
+								</button>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -93,7 +118,7 @@ $not_imported = $total_found - count( $imported );
 			<div style="margin-bottom:20px;">
 				<button type="button" id="cocookie-wizard-import-all" class="button button-secondary">
 					<span class="dashicons dashicons-download" style="font-size:15px;width:15px;height:15px;vertical-align:middle;margin-right:4px;"></span>
-					<?php esc_html_e( 'Importera alla till registret', 'cocookie' ); ?>
+					<?php esc_html_e( 'Importera markerade till registret', 'cocookie' ); ?>
 				</button>
 			</div>
 		<?php endif; ?>

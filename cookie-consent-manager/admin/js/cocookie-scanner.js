@@ -25,6 +25,8 @@
 		importAllBtn.addEventListener('click', importAll);
 	}
 
+	bindUnignoreButtons();
+
 	function startScan() {
 		scanBtn.disabled = true;
 		ui.show('#cocookie-scan-status');
@@ -38,6 +40,13 @@
 		var allCookies = {};
 		var round = 0;
 		var maxRounds = 5;
+		var iframeHadTracking = false;
+		var crossOrigin = false;
+
+		// Dölj varningar från förra skanningen
+		ui.hide('#cocookie-scan-hint-ga_logged_in');
+		ui.hide('#cocookie-scan-hint-ga_blocked');
+		ui.hide('#cocookie-scan-hint-cross_origin');
 
 		iframe.addEventListener('load', function () {
 			collect();
@@ -48,7 +57,12 @@
 				parseCookies(iframe.contentDocument.cookie);
 				collectStorage(iframe.contentWindow.localStorage, 'localStorage');
 				collectStorage(iframe.contentWindow.sessionStorage, 'sessionStorage');
+				if (!iframeHadTracking) {
+					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument, iframe.contentWindow);
+				}
 			} catch (e) {
+				// Annan origin (t.ex. www mot icke-www) — vi ser bara adminsidans cookies.
+				crossOrigin = true;
 				parseCookies(document.cookie);
 			}
 
@@ -110,8 +124,20 @@
 				ui.hide('#cocookie-scan-status');
 				scanBtn.disabled = false;
 				renderResults(data.results || []);
+
+				var names = arr.map(function (c) { return c.name; });
+				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin).then(function (hints) {
+					ui.showScanHints(hints, 'cocookie-scan-hint');
+				});
 			});
 		}
+	}
+
+	function updateCount() {
+		var tbody = document.getElementById('cocookie-scan-tbody');
+		if (!tbody) return;
+		ui.setText(document.getElementById('cocookie-scan-count'),
+			tbody.querySelectorAll('tr').length + ' cookies hittade');
 	}
 
 	function renderResults(results) {
@@ -172,6 +198,7 @@
 
 			// Actions
 			var tdActions = document.createElement('td');
+			tdActions.className = 'cocookie-scan-actions';
 			if (!r.is_imported) {
 				var btn = ui.createElement('button', {
 					className: 'button button-small',
@@ -182,6 +209,15 @@
 				});
 				tdActions.appendChild(btn);
 			}
+			var ignoreBtn = ui.createElement('button', {
+				className: 'button button-small button-link-delete',
+				'data-name': r.name,
+				title: 'Ignorera — visas inte i kommande skanningar'
+			}, 'Ignorera');
+			ignoreBtn.addEventListener('click', function () {
+				ignoreCookie(r.name, tr, ignoreBtn);
+			});
+			tdActions.appendChild(ignoreBtn);
 			tr.appendChild(tdActions);
 
 			tbody.appendChild(tr);
@@ -199,6 +235,78 @@
 		}).then(function () {
 			btn.textContent = 'OK';
 			btn.className = 'button button-small disabled';
+		});
+	}
+
+	/**
+	 * Ignorera en cookie: ta bort raden och lägg den i listan över ignorerade.
+	 */
+	function ignoreCookie(name, tr, btn) {
+		btn.disabled = true;
+		btn.textContent = '...';
+
+		ui.ignoreCookie(config.restUrl, config.nonce, name).then(function (data) {
+			if (!data || !data.success) {
+				btn.disabled = false;
+				btn.textContent = 'Ignorera';
+				return;
+			}
+			if (tr && tr.parentNode) {
+				tr.parentNode.removeChild(tr);
+			}
+			updateCount();
+			addToIgnoredList(name);
+		});
+	}
+
+	/**
+	 * Lägg till en rad i listan över ignorerade cookies och visa kortet.
+	 */
+	function addToIgnoredList(name) {
+		var list = document.getElementById('cocookie-ignored-list');
+		if (!list) return;
+
+		var li = document.createElement('li');
+		var icon = ui.createElement('span', { className: 'dashicons dashicons-hidden' });
+		var code = ui.createElement('code', null, name);
+		var btn = ui.createElement('button', {
+			className: 'button button-small cocookie-unignore-btn',
+			'data-name': name
+		}, 'Återställ');
+		li.appendChild(icon);
+		li.appendChild(code);
+		li.appendChild(btn);
+		list.appendChild(li);
+
+		bindUnignoreButton(btn);
+		ui.show('#cocookie-ignored-card');
+		ui.setText(document.getElementById('cocookie-ignored-count'),
+			String(list.querySelectorAll('li').length));
+	}
+
+	function bindUnignoreButtons() {
+		var btns = document.querySelectorAll('.cocookie-unignore-btn');
+		for (var i = 0; i < btns.length; i++) {
+			bindUnignoreButton(btns[i]);
+		}
+	}
+
+	function bindUnignoreButton(btn) {
+		btn.addEventListener('click', function () {
+			var name = btn.getAttribute('data-name');
+			btn.disabled = true;
+			ui.unignoreCookie(config.restUrl, config.nonce, name).then(function () {
+				var li = btn.closest('li');
+				var list = li ? li.parentNode : null;
+				if (li && list) {
+					list.removeChild(li);
+					var left = list.querySelectorAll('li').length;
+					ui.setText(document.getElementById('cocookie-ignored-count'), String(left));
+					if (left === 0) {
+						ui.hide('#cocookie-ignored-card');
+					}
+				}
+			});
 		});
 	}
 

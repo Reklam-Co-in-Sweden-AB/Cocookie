@@ -143,6 +143,109 @@
 			return fetch(endpoint, merged).then(function (r) {
 				return r.json();
 			});
+		},
+
+		/**
+		 * Lägg en cookie i ignoreringslistan via REST.
+		 *
+		 * @param {string} restUrl REST-rot.
+		 * @param {string} nonce   wp_rest-nonce.
+		 * @param {string} name    Cookie-namn.
+		 * @return {Promise}
+		 */
+		ignoreCookie: function (restUrl, nonce, name) {
+			return this.api(restUrl + 'cocookie/v1/scan/ignore', {
+				method: 'POST',
+				headers: { 'X-WP-Nonce': nonce },
+				body: JSON.stringify({ name: name })
+			});
+		},
+
+		/**
+		 * Ta bort en cookie ur ignoreringslistan via REST.
+		 *
+		 * @param {string} restUrl REST-rot.
+		 * @param {string} nonce   wp_rest-nonce.
+		 * @param {string} name    Cookie-namn.
+		 * @return {Promise}
+		 */
+		unignoreCookie: function (restUrl, nonce, name) {
+			return this.api(restUrl + 'cocookie/v1/scan/unignore', {
+				method: 'POST',
+				headers: { 'X-WP-Nonce': nonce },
+				body: JSON.stringify({ name: name })
+			});
+		},
+
+		/**
+		 * Kontrollera om ett dokument (skannerns iframe) innehåller
+		 * Google Analytics eller Tag Manager.
+		 *
+		 * @param {Document} doc Iframe-dokumentet.
+		 * @param {Window}   win Iframe-fönstret.
+		 * @return {boolean}
+		 */
+		hasGoogleTracking: function (doc, win) {
+			try {
+				if (doc && doc.querySelector('script[src*="googletagmanager.com"], script[src*="google-analytics.com"]')) {
+					return true;
+				}
+				return !!(win && typeof win.gtag === 'function');
+			} catch (e) {
+				return false;
+			}
+		},
+
+		/**
+		 * Ta reda på varför analytics-cookies kan saknas i skanningen.
+		 *
+		 * Skanningen körs i en inloggad admins webbläsare. Många GA-plugins
+		 * (Site Kit, MonsterInsights m.fl.) laddar inte spårningen för
+		 * inloggade administratörer. Här hämtas startsidan anonymt (utan
+		 * cookies) och jämförs med det som fanns i skannerns iframe.
+		 *
+		 * @param {string}   siteUrl          Webbplatsens startsida.
+		 * @param {boolean}  iframeHadTracking GA/GTM fanns i iframen.
+		 * @param {string[]} cookieNames      Hittade cookienamn.
+		 * @param {boolean}  crossOrigin      Iframen kunde inte läsas (annan origin).
+		 * @return {Promise<string[]>} Hint-nycklar: ga_logged_in, ga_blocked, cross_origin.
+		 */
+		scanHints: function (siteUrl, iframeHadTracking, cookieNames, crossOrigin) {
+			var hints = crossOrigin ? ['cross_origin'] : [];
+			var hasGa = cookieNames.some(function (n) { return /^_ga/.test(n); });
+
+			if (hasGa) {
+				return Promise.resolve(hints);
+			}
+
+			return fetch(siteUrl, { credentials: 'omit', cache: 'no-store' })
+				.then(function (r) { return r.text(); })
+				.then(function (html) {
+					var anonHasTracking = /googletagmanager\.com|google-analytics\.com|gtag\s*\(/i.test(html);
+					if (anonHasTracking && !iframeHadTracking) {
+						hints.push('ga_logged_in');
+					} else if (iframeHadTracking) {
+						hints.push('ga_blocked');
+					}
+					return hints;
+				})
+				.catch(function () {
+					return hints;
+				});
+		},
+
+		/**
+		 * Visa de varningsrutor som matchar hint-nycklarna.
+		 * Rutorna renderas dolda av PHP med id "<prefix>-<nyckel>".
+		 *
+		 * @param {string[]} hints  Hint-nycklar.
+		 * @param {string}   prefix Element-id-prefix.
+		 */
+		showScanHints: function (hints, prefix) {
+			var self = this;
+			(hints || []).forEach(function (key) {
+				self.show('#' + prefix + '-' + key);
+			});
 		}
 	};
 })();

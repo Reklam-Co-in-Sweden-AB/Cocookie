@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,13 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.5.0 =
+* Nytt: cookies kan ignoreras direkt i skannern och i installationsguiden. Ignorerade cookies tas bort ur registret och visas inte i kommande skanningar. Listan finns under Compliance → Scanner och varje cookie kan återställas. Praktiskt för inloggnings- och adminverktygscookies som bara du får eftersom skanningen körs i din inloggade webbläsare.
+* Nytt: installationsguidens granskning har kryssrutor. Cookies som troligen bara sätts för inloggade admins är avmarkerade som standard, och "Importera markerade" tar bara med de markerade.
+* Nytt: skannern förklarar varför Google Analytics saknas. Om GA finns på sajten för anonyma besökare men inte laddades i din inloggade skanning (Site Kit, MonsterInsights m.fl. undantar administratörer) visas en varning med råd. Likaså om GA laddades men inte satte några cookies (adblocker eller tidigare avvisat samtycke), och om skannern inte kunde läsa sajten på grund av olika domän eller protokoll mellan webbplats- och adminadress.
+* Fix: bannern laddades även i skannerns "ren skanning"-läge. Hade du tidigare avvisat analytics på sajten skickade bannern det valet vidare till Google Analytics inne i skannern, som då aldrig satte sina cookies. Bannern och dess skript hoppas nu över helt vid ren skanning.
+* Förbättring: bakgrundsskannern respekterar ignoreringslistan.
 
 = 2.4.0 =
 * Nytt: kortkoden `[cocookie_cookie_list]` visar nu även besökarens eget val — vilka kategorier som är tillåtna, när samtycket sparades och samtyckes-ID, med knappar för att ändra eller dra tillbaka. Rutan fylls i med JavaScript, så den fungerar även när sidan är cachad. Stäng av den med `consent="no"`.

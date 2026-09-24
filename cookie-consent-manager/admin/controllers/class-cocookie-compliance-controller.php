@@ -35,6 +35,7 @@ class CoCookie_Compliance_Controller {
 			case 'scanner':
 				$data['last_scan']    = get_option( 'cocookie_last_scan', get_option( 'ccm_last_scan', '' ) );
 				$data['scan_results'] = CoCookie_REST_Scanner::get_scan_results();
+				$data['ignored']      = CoCookie_REST_Scanner::get_ignored_cookies();
 
 				wp_enqueue_style( 'dashicons' );
 				wp_enqueue_script( 'cocookie-scanner', COCOOKIE_PLUGIN_URL . 'admin/js/cocookie-scanner.js', array(), COCOOKIE_VERSION, true );

@@ -37,12 +37,25 @@ class CoCookie_Public {
 	}
 
 	/**
+	 * Avgör om sidan laddas av cookie-skannern i "ren skanning"-läge.
+	 *
+	 * I det läget ska CoCookie inte påverka sidan alls: ingen blockering,
+	 * ingen Consent Mode-default och ingen banner. Annars kan bannerns JS
+	 * skicka ett tidigare "avvisa"-val vidare till gtag inne i skannerns
+	 * iframe, och då sätter Google Analytics aldrig sina cookies.
+	 *
+	 * @return bool
+	 */
+	private static function is_clean_scan() {
+		return isset( $_GET['ccm_clean_scan'] ) && wp_verify_nonce( $_GET['ccm_clean_scan'], 'ccm_clean_scan' );
+	}
+
+	/**
 	 * Start output buffering for script/iframe blocking.
 	 * Runs on template_redirect which is frontend-only.
 	 */
 	public static function start_output_buffering() {
-		$is_clean_scan = isset( $_GET['ccm_clean_scan'] ) && wp_verify_nonce( $_GET['ccm_clean_scan'], 'ccm_clean_scan' );
-		if ( $is_clean_scan ) {
+		if ( self::is_clean_scan() ) {
 			return;
 		}
 
@@ -54,8 +67,7 @@ class CoCookie_Public {
 	 * Output GCM default only on frontend (not clean scan).
 	 */
 	public static function maybe_output_gcm_default() {
-		$is_clean_scan = isset( $_GET['ccm_clean_scan'] ) && wp_verify_nonce( $_GET['ccm_clean_scan'], 'ccm_clean_scan' );
-		if ( $is_clean_scan ) {
+		if ( self::is_clean_scan() ) {
 			return;
 		}
 		self::output_gcm_default();
@@ -360,6 +372,10 @@ gtag('set','ads_data_redaction',false);
 	 * Enqueue frontend assets.
 	 */
 	public static function enqueue_assets() {
+		if ( self::is_clean_scan() ) {
+			return;
+		}
+
 		wp_enqueue_style( 'cocookie-banner', COCOOKIE_PLUGIN_URL . 'public/css/cocookie-banner.css', array(), COCOOKIE_VERSION );
 		wp_enqueue_script( 'cocookie-banner', COCOOKIE_PLUGIN_URL . 'public/js/cocookie-banner.js', array(), COCOOKIE_VERSION, true );
 
@@ -377,7 +393,7 @@ gtag('set','ads_data_redaction',false);
 	private static $banner_rendered = false;
 
 	public static function render_banner_template() {
-		if ( self::$banner_rendered ) {
+		if ( self::$banner_rendered || self::is_clean_scan() ) {
 			return;
 		}
 		self::$banner_rendered = true;

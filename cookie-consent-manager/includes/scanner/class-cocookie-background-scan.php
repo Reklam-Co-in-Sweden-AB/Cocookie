@@ -77,6 +77,11 @@ class CoCookie_Background_Scan {
 
 		$results = array();
 		foreach ( $found_items as $item ) {
+			// Respektera admins ignoreringslista, precis som iframe-skannern.
+			if ( CoCookie_REST_Scanner::is_ignored_cookie( $item['name'] ) ) {
+				continue;
+			}
+
 			$match = CoCookie_Cookie_Patterns::match( $item['name'] );
 
 			$wpdb->insert( $table, array(

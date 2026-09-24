@@ -21,26 +21,77 @@
 		});
 	}
 
-	// Step 2: Import all
+	// Step 2: Importera markerade rader (en i taget via /scan/import)
 	var importAllBtn = document.getElementById('cocookie-wizard-import-all');
 	if (importAllBtn) {
 		importAllBtn.addEventListener('click', function () {
+			var checked = document.querySelectorAll('.cocookie-wizard-check:checked');
+			var ids = Array.prototype.map.call(checked, function (cb) { return cb.value; });
+
+			if (!ids.length) {
+				importAllBtn.textContent = 'Inga cookies markerade';
+				return;
+			}
+
 			importAllBtn.disabled = true;
 			importAllBtn.textContent = 'Importerar...';
 
-			ui.api(config.restUrl + 'cocookie/v1/scan/import-all', {
-				method: 'POST',
-				headers: { 'X-WP-Nonce': config.nonce },
-				body: JSON.stringify({})
-			}).then(function (data) {
-				importAllBtn.textContent = 'Importerat ' + (data.imported || 0) + ' cookies';
-				// Reload to show updated status
+			var imported = 0;
+			var chain = Promise.resolve();
+			ids.forEach(function (id) {
+				chain = chain.then(function () {
+					return ui.api(config.restUrl + 'cocookie/v1/scan/import', {
+						method: 'POST',
+						headers: { 'X-WP-Nonce': config.nonce },
+						body: JSON.stringify({ scan_id: id })
+					}).then(function (data) {
+						if (data && data.success) imported++;
+					}).catch(function () { /* fortsätt med nästa */ });
+				});
+			});
+
+			chain.then(function () {
+				importAllBtn.textContent = 'Importerat ' + imported + ' cookies';
+				// Ladda om så statusen uppdateras
 				setTimeout(function () {
 					window.location.reload();
 				}, 1000);
 			});
 		});
 	}
+
+	// Step 2: Markera alla / avmarkera alla
+	var checkAll = document.getElementById('cocookie-wizard-check-all');
+	if (checkAll) {
+		checkAll.addEventListener('change', function () {
+			var boxes = document.querySelectorAll('.cocookie-wizard-check');
+			for (var i = 0; i < boxes.length; i++) {
+				boxes[i].checked = checkAll.checked;
+			}
+		});
+	}
+
+	// Step 2: Ignorera en cookie — raden försvinner och cookien döljs i kommande skanningar
+	var ignoreBtns = document.querySelectorAll('.cocookie-wizard-ignore');
+	Array.prototype.forEach.call(ignoreBtns, function (btn) {
+		btn.addEventListener('click', function () {
+			var name = btn.getAttribute('data-name');
+			btn.disabled = true;
+			btn.textContent = '...';
+
+			ui.ignoreCookie(config.restUrl, config.nonce, name).then(function (data) {
+				if (!data || !data.success) {
+					btn.disabled = false;
+					btn.textContent = 'Ignorera';
+					return;
+				}
+				var tr = btn.closest('tr');
+				if (tr && tr.parentNode) {
+					tr.parentNode.removeChild(tr);
+				}
+			});
+		});
+	});
 
 	/**
 	 * Start the cookie scan process.
@@ -55,6 +106,8 @@
 		var allCookies = {};
 		var round = 0;
 		var maxRounds = 5;
+		var iframeHadTracking = false;
+		var crossOrigin = false;
 
 		iframe.addEventListener('load', function () {
 			collectCookies();
@@ -65,8 +118,12 @@
 			try {
 				var iframeCookies = iframe.contentDocument.cookie;
 				parseCookies(iframeCookies);
+				if (!iframeHadTracking) {
+					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument, iframe.contentWindow);
+				}
 			} catch (e) {
-				// Cross-origin — fall back to main document
+				// Annan origin — vi ser bara adminsidans cookies
+				crossOrigin = true;
 				parseCookies(document.cookie);
 			}
 
@@ -145,6 +202,12 @@
 					document.getElementById('cocookie-wizard-scan-summary'),
 					count + ' cookies hittade och klassificerade.'
 				);
+
+				// Förklara varför analytics-cookies kan saknas
+				var names = cookieArray.map(function (c) { return c.name; });
+				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin).then(function (hints) {
+					ui.showScanHints(hints, 'cocookie-wizard-hint');
+				});
 			});
 		}
 	}

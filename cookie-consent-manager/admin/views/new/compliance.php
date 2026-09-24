@@ -85,6 +85,32 @@ switch ( $tab ) :
 			</div>
 		</div>
 
+		<?php
+		// Varningar som skannern visar när analytics-cookies saknas.
+		// Rutorna är dolda tills JavaScript avgjort vilken som gäller.
+		?>
+		<div id="cocookie-scan-hint-ga_logged_in" class="cocookie-notice cocookie-notice--warning" style="display:none;">
+			<span class="dashicons dashicons-warning"></span>
+			<p>
+				<strong><?php esc_html_e( 'Google Analytics hittades inte, men finns på sajten.', 'cocookie' ); ?></strong><br>
+				<?php esc_html_e( 'Skanningen körs i din inloggade webbläsare, och ditt analytics-plugin (t.ex. Site Kit eller MonsterInsights) laddar inte spårningen för inloggade administratörer. Besökare får cookien ändå. Lägg till _ga och _ga_* manuellt under Cookies, eller stäng tillfälligt av undantaget för administratörer i pluginens inställningar och skanna igen.', 'cocookie' ); ?>
+			</p>
+		</div>
+		<div id="cocookie-scan-hint-ga_blocked" class="cocookie-notice cocookie-notice--warning" style="display:none;">
+			<span class="dashicons dashicons-warning"></span>
+			<p>
+				<strong><?php esc_html_e( 'Google Analytics laddades men satte inga cookies.', 'cocookie' ); ?></strong><br>
+				<?php esc_html_e( 'Troligen blockerar en adblocker i din webbläsare skriptet, eller så har du tidigare avvisat analytics på sajten. Stäng av adblockern för den här sajten, rensa sajtens cookies och skanna igen.', 'cocookie' ); ?>
+			</p>
+		</div>
+		<div id="cocookie-scan-hint-cross_origin" class="cocookie-notice cocookie-notice--error" style="display:none;">
+			<span class="dashicons dashicons-dismiss"></span>
+			<p>
+				<strong><?php esc_html_e( 'Skannern kunde inte läsa webbplatsen.', 'cocookie' ); ?></strong><br>
+				<?php esc_html_e( 'Webbplatsadressen och adminadressen skiljer sig åt (t.ex. www mot utan www, eller http mot https), så endast adminsidans egna cookies kunde läsas. Kontrollera att Webbplatsadress och WordPress-adress under Inställningar → Allmänt har samma domän och protokoll.', 'cocookie' ); ?>
+			</p>
+		</div>
+
 		<div id="cocookie-scan-results"></div>
 
 		<div id="cocookie-scan-toolbar" style="display:none;">
@@ -110,6 +136,35 @@ switch ( $tab ) :
 				</thead>
 				<tbody id="cocookie-scan-tbody"></tbody>
 			</table>
+		</div>
+
+		<?php
+		// Ignorerade cookies — sådana som bara sätts för inloggade admins
+		// och som inte ska dyka upp vid nästa skanning.
+		$ignored = $data['ignored'];
+		?>
+		<div class="cocookie-card" id="cocookie-ignored-card" style="margin-top:20px;<?php echo empty( $ignored ) ? 'display:none;' : ''; ?>">
+			<div class="cocookie-card__header">
+				<h3 class="cocookie-card__title">
+					<span class="dashicons dashicons-hidden"></span>
+					<?php esc_html_e( 'Ignorerade cookies', 'cocookie' ); ?>
+				</h3>
+				<span class="cocookie-badge cocookie-badge--muted" id="cocookie-ignored-count"><?php echo count( $ignored ); ?></span>
+			</div>
+			<p style="font-size:13px;color:var(--cocookie-neutral-500);margin-bottom:16px;">
+				<?php esc_html_e( 'Dessa cookies visas inte i skanningar och finns inte i registret. Vanligtvis inloggnings- eller adminverktygscookies som bara du får. Klicka "Återställ" för att ta med dem igen.', 'cocookie' ); ?>
+			</p>
+			<ul class="cocookie-blocked-list" id="cocookie-ignored-list">
+				<?php foreach ( $ignored as $name ) : ?>
+					<li>
+						<span class="dashicons dashicons-hidden"></span>
+						<code><?php echo esc_html( $name ); ?></code>
+						<button type="button" class="button button-small cocookie-unignore-btn" data-name="<?php echo esc_attr( $name ); ?>">
+							<?php esc_html_e( 'Återställ', 'cocookie' ); ?>
+						</button>
+					</li>
+				<?php endforeach; ?>
+			</ul>
 		</div>
 		<?php
 		break;

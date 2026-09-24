@@ -50,6 +50,18 @@ class CoCookie_REST_Scanner {
 			'permission_callback' => $admin_permission,
 		) );
 
+		register_rest_route( $namespace, '/scan/ignore', array(
+			'methods'             => 'POST',
+			'callback'            => array( __CLASS__, 'handle_ignore_cookie' ),
+			'permission_callback' => $admin_permission,
+		) );
+
+		register_rest_route( $namespace, '/scan/unignore', array(
+			'methods'             => 'POST',
+			'callback'            => array( __CLASS__, 'handle_unignore_cookie' ),
+			'permission_callback' => $admin_permission,
+		) );
+
 		register_rest_route( $namespace, '/audit', array(
 			'methods'             => 'POST',
 			'callback'            => array( __CLASS__, 'handle_audit' ),
@@ -67,6 +79,87 @@ class CoCookie_REST_Scanner {
 			'callback'            => array( __CLASS__, 'handle_unblock_cookie' ),
 			'permission_callback' => $admin_permission,
 		) );
+	}
+
+	/**
+	 * Option-nyckel för listan med cookies som admin valt att ignorera.
+	 */
+	const IGNORED_OPTION = 'cocookie_ignored_cookies';
+
+	/**
+	 * Hämtar listan med ignorerade cookienamn.
+	 *
+	 * Skanningen körs i en inloggad admins webbläsare och hittar därför
+	 * cookies som vanliga besökare aldrig får (inloggning, sidbyggare,
+	 * admin-verktyg). Admin kan ignorera dem så att de inte dyker upp igen
+	 * vid nästa skanning.
+	 *
+	 * @return string[] Lista med cookienamn.
+	 */
+	public static function get_ignored_cookies() {
+		$list = get_option( self::IGNORED_OPTION, array() );
+		return is_array( $list ) ? array_values( array_unique( array_filter( $list, 'is_string' ) ) ) : array();
+	}
+
+	/**
+	 * Kontrollerar om en cookie finns i ignoreringslistan.
+	 *
+	 * @param string $name Cookie-namn.
+	 * @return bool
+	 */
+	public static function is_ignored_cookie( $name ) {
+		return in_array( $name, self::get_ignored_cookies(), true );
+	}
+
+	/**
+	 * Lägger till en cookie i ignoreringslistan och tar bort den ur
+	 * skanningsresultatet och cookie-registret.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function handle_ignore_cookie( WP_REST_Request $request ) {
+		$name = sanitize_text_field( $request->get_param( 'name' ) );
+		if ( '' === $name ) {
+			return new WP_Error( 'invalid_data', __( 'Ogiltig data.', 'cocookie' ), array( 'status' => 400 ) );
+		}
+
+		$ignored = self::get_ignored_cookies();
+		if ( ! in_array( $name, $ignored, true ) ) {
+			$ignored[] = $name;
+			update_option( self::IGNORED_OPTION, $ignored );
+		}
+
+		global $wpdb;
+		$wpdb->delete( $wpdb->prefix . 'cc_scan_results', array( 'name' => $name ) );
+		$removed_from_registry = (int) $wpdb->delete( $wpdb->prefix . 'cc_cookies', array( 'name' => $name ) );
+
+		return new WP_REST_Response( array(
+			'success'               => true,
+			'ignored'               => $ignored,
+			'removed_from_registry' => $removed_from_registry,
+		), 200 );
+	}
+
+	/**
+	 * Tar bort en cookie ur ignoreringslistan så att den syns vid nästa skanning.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function handle_unignore_cookie( WP_REST_Request $request ) {
+		$name = sanitize_text_field( $request->get_param( 'name' ) );
+		if ( '' === $name ) {
+			return new WP_Error( 'invalid_data', __( 'Ogiltig data.', 'cocookie' ), array( 'status' => 400 ) );
+		}
+
+		$ignored = array_values( array_diff( self::get_ignored_cookies(), array( $name ) ) );
+		update_option( self::IGNORED_OPTION, $ignored );
+
+		return new WP_REST_Response( array(
+			'success' => true,
+			'ignored' => $ignored,
+		), 200 );
 	}
 
 	/**
@@ -163,6 +256,11 @@ class CoCookie_REST_Scanner {
 
 			// Hoppa över admin-only cookies — de läcker inte till publika besökare.
 			if ( self::is_admin_only_cookie( $name ) ) {
+				continue;
+			}
+
+			// Hoppa över cookies som admin uttryckligen valt att ignorera.
+			if ( self::is_ignored_cookie( $name ) ) {
 				continue;
 			}
 
