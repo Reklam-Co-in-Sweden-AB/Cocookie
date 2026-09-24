@@ -43,14 +43,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="dashicons dashicons-warning"></span>
 				<p>
 					<strong><?php esc_html_e( 'Google Analytics hittades inte, men finns på sajten.', 'cocookie' ); ?></strong><br>
-					<?php esc_html_e( 'Ditt analytics-plugin laddar inte spårningen för inloggade administratörer, och skanningen körs i din inloggade webbläsare. Besökare får cookien ändå. Lägg till _ga och _ga_* manuellt under Cookies när du är klar med guiden.', 'cocookie' ); ?>
+					<?php esc_html_e( 'Ditt analytics-plugin undantar inloggade administratörer, och skanningen körs i din inloggade webbläsare. Besökare får cookien ändå. Stäng tillfälligt av undantaget i pluginens inställningar och skanna igen, eller lägg till _ga och _ga_* manuellt under Cookies när du är klar med guiden.', 'cocookie' ); ?>
 				</p>
 			</div>
 			<div id="cocookie-wizard-hint-ga_blocked" class="cocookie-notice cocookie-notice--warning" style="display:none;text-align:left;">
 				<span class="dashicons dashicons-warning"></span>
 				<p>
 					<strong><?php esc_html_e( 'Google Analytics laddades men satte inga cookies.', 'cocookie' ); ?></strong><br>
-					<?php esc_html_e( 'Troligen blockerar en adblocker skriptet, eller så har du tidigare avvisat analytics på sajten. Stäng av adblockern, rensa sajtens cookies och skanna igen.', 'cocookie' ); ?>
+					<?php esc_html_e( 'Vanliga orsaker: ett cache-plugin fördröjer JavaScript tills besökaren rör musen (WP Rocket, Perfmatters, FlyingPress), en GTM-container väntar på samtycke, eller en adblocker. Stäng tillfälligt av fördröjningen respektive adblockern och skanna igen.', 'cocookie' ); ?>
 				</p>
 			</div>
 			<div id="cocookie-wizard-hint-cross_origin" class="cocookie-notice cocookie-notice--error" style="display:none;text-align:left;">

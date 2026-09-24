@@ -41,6 +41,7 @@
 		var round = 0;
 		var maxRounds = 5;
 		var iframeHadTracking = false;
+		var iframeOptOut = false;
 		var crossOrigin = false;
 
 		// Dölj varningar från förra skanningen
@@ -58,7 +59,10 @@
 				collectStorage(iframe.contentWindow.localStorage, 'localStorage');
 				collectStorage(iframe.contentWindow.sessionStorage, 'sessionStorage');
 				if (!iframeHadTracking) {
-					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument, iframe.contentWindow);
+					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument);
+				}
+				if (!iframeOptOut) {
+					iframeOptOut = ui.hasGoogleOptOut(iframe.contentWindow);
 				}
 			} catch (e) {
 				// Annan origin (t.ex. www mot icke-www) — vi ser bara adminsidans cookies.
@@ -126,7 +130,7 @@
 				renderResults(data.results || []);
 
 				var names = arr.map(function (c) { return c.name; });
-				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin).then(function (hints) {
+				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin, iframeOptOut).then(function (hints) {
 					ui.showScanHints(hints, 'cocookie-scan-hint');
 				});
 			});

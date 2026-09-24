@@ -107,6 +107,7 @@
 		var round = 0;
 		var maxRounds = 5;
 		var iframeHadTracking = false;
+		var iframeOptOut = false;
 		var crossOrigin = false;
 
 		iframe.addEventListener('load', function () {
@@ -119,7 +120,10 @@
 				var iframeCookies = iframe.contentDocument.cookie;
 				parseCookies(iframeCookies);
 				if (!iframeHadTracking) {
-					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument, iframe.contentWindow);
+					iframeHadTracking = ui.hasGoogleTracking(iframe.contentDocument);
+				}
+				if (!iframeOptOut) {
+					iframeOptOut = ui.hasGoogleOptOut(iframe.contentWindow);
 				}
 			} catch (e) {
 				// Annan origin — vi ser bara adminsidans cookies
@@ -205,7 +209,7 @@
 
 				// Förklara varför analytics-cookies kan saknas
 				var names = cookieArray.map(function (c) { return c.name; });
-				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin).then(function (hints) {
+				ui.scanHints(config.siteUrl, iframeHadTracking, names, crossOrigin, iframeOptOut).then(function (hints) {
 					ui.showScanHints(hints, 'cocookie-wizard-hint');
 				});
 			});

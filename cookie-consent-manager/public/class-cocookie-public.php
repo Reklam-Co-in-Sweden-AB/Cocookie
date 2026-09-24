@@ -34,6 +34,68 @@ class CoCookie_Public {
 
 		// Output buffering for script/iframe blocking (only on frontend)
 		add_action( 'template_redirect', array( __CLASS__, 'start_output_buffering' ) );
+
+		// Ren skanning: sidan ska bete sig som för en besökare som accepterat allt,
+		// så att skannern hittar alla cookies som faktiskt kan sättas.
+		// Filtren kontrollerar själva om det är en ren skanning (nonce kräver
+		// inloggad användare, så det går inte att avgöra redan här).
+		add_filter( 'googlesitekit_analytics_tracking_disabled', array( __CLASS__, 'clean_scan_enable_sitekit_tracking' ) );
+		add_filter( 'googlesitekit_consent_defaults', array( __CLASS__, 'clean_scan_grant_sitekit_consent' ) );
+		add_action( 'wp_head', array( __CLASS__, 'maybe_output_clean_scan_consent' ), PHP_INT_MAX );
+		add_action( 'wp_footer', array( __CLASS__, 'maybe_output_clean_scan_consent' ), 1 );
+	}
+
+	/**
+	 * Site Kit undantar inloggade användare från Analytics som standard, men
+	 * laddar ändå gtag.js och sätter window["ga-disable-G-XXXX"] = true. Då
+	 * finns skriptet i skannern utan att några cookies sätts. Under ren
+	 * skanning slås undantaget av så att skannern ser samma cookies som en
+	 * besökare får.
+	 *
+	 * @param bool $disabled Site Kits beslut.
+	 * @return bool
+	 */
+	public static function clean_scan_enable_sitekit_tracking( $disabled ) {
+		return self::is_clean_scan() ? false : $disabled;
+	}
+
+	/**
+	 * Site Kit skriver gtag('consent','default', denied) i head när Consent
+	 * Mode är på. Under ren skanning byts alla "denied" till "granted" så
+	 * att Analytics sätter sina cookies.
+	 *
+	 * @param array $defaults Site Kits consent-default.
+	 * @return array
+	 */
+	public static function clean_scan_grant_sitekit_consent( $defaults ) {
+		if ( ! self::is_clean_scan() || ! is_array( $defaults ) ) {
+			return $defaults;
+		}
+		foreach ( $defaults as $key => $value ) {
+			if ( 'denied' === $value ) {
+				$defaults[ $key ] = 'granted';
+			}
+		}
+		return $defaults;
+	}
+
+	/**
+	 * Skriver ut gtag('consent','update', allt granted) under ren skanning.
+	 *
+	 * Täcker consent mode-defaults som andra plugins eller GTM-containrar
+	 * sätter. Skrivs ut sist i head (efter deras default) och först i footer
+	 * (för containrar som laddat under tiden).
+	 */
+	public static function maybe_output_clean_scan_consent() {
+		if ( ! self::is_clean_scan() ) {
+			return;
+		}
+		?>
+<script data-cfasync="false">
+window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){dataLayer.push(arguments);};
+gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted',functionality_storage:'granted',personalization_storage:'granted',security_storage:'granted'});
+</script>
+		<?php
 	}
 
 	/**

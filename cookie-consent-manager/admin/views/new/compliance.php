@@ -93,14 +93,14 @@ switch ( $tab ) :
 			<span class="dashicons dashicons-warning"></span>
 			<p>
 				<strong><?php esc_html_e( 'Google Analytics hittades inte, men finns på sajten.', 'cocookie' ); ?></strong><br>
-				<?php esc_html_e( 'Skanningen körs i din inloggade webbläsare, och ditt analytics-plugin (t.ex. Site Kit eller MonsterInsights) laddar inte spårningen för inloggade administratörer. Besökare får cookien ändå. Lägg till _ga och _ga_* manuellt under Cookies, eller stäng tillfälligt av undantaget för administratörer i pluginens inställningar och skanna igen.', 'cocookie' ); ?>
+				<?php esc_html_e( 'Skanningen körs i din inloggade webbläsare, och ditt analytics-plugin undantar inloggade administratörer från spårning. Besökare får cookien ändå. Site Kit hanteras automatiskt av CoCookie; för andra plugins (MonsterInsights, GA4WP m.fl.) stänger du tillfälligt av undantaget i pluginens inställningar och skannar igen, eller lägger till _ga och _ga_* manuellt under Cookies.', 'cocookie' ); ?>
 			</p>
 		</div>
 		<div id="cocookie-scan-hint-ga_blocked" class="cocookie-notice cocookie-notice--warning" style="display:none;">
 			<span class="dashicons dashicons-warning"></span>
 			<p>
 				<strong><?php esc_html_e( 'Google Analytics laddades men satte inga cookies.', 'cocookie' ); ?></strong><br>
-				<?php esc_html_e( 'Troligen blockerar en adblocker i din webbläsare skriptet, eller så har du tidigare avvisat analytics på sajten. Stäng av adblockern för den här sajten, rensa sajtens cookies och skanna igen.', 'cocookie' ); ?>
+				<?php esc_html_e( 'Vanliga orsaker: ett cache-plugin fördröjer JavaScript tills besökaren rör musen (WP Rocket, Perfmatters, FlyingPress), en GTM-container väntar på samtycke via en egen consent-mall, eller en adblocker i din webbläsare. Stäng tillfälligt av fördröjningen respektive adblockern och skanna igen. Du kan också lägga till _ga och _ga_* manuellt under Cookies.', 'cocookie' ); ?>
 			</p>
 		</div>
 		<div id="cocookie-scan-hint-cross_origin" class="cocookie-notice cocookie-notice--error" style="display:none;">

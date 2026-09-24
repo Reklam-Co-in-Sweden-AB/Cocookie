@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,11 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.5.1 =
+* Fix: skannern hittar nu Google Analytics på sajter med Site Kit. Site Kit undantar inloggade användare som standard men laddar ändå gtag.js med opt-out-flaggan satt, och skriver en Consent Mode-default med "denied". Under ren skanning slår CoCookie av undantaget via Site Kits filter, byter defaulten till "granted" och skickar en samtyckesuppdatering med allt tillåtet, så att sidan beter sig som för en besökare som accepterat. Det ersätter det tidigare beroendet av att bannern råkade köra inne i skannern.
+* Fix: varningen "Google Analytics laddades men satte inga cookies" visades felaktigt när ett consent mode-snutt definierat funktionen gtag utan att GA laddats. Detektionen kräver nu en riktig skript-tagg, och känner igen opt-out-flaggan ga-disable-*.
+* Förbättring: varningstexterna nämner nu fördröjd JavaScript från cache-plugins och GTM-containrar med egen consent-mall, inte bara adblocker.
 
 = 2.5.0 =
 * Nytt: cookies kan ignoreras direkt i skannern och i installationsguiden. Ignorerade cookies tas bort ur registret och visas inte i kommande skanningar. Listan finns under Compliance → Scanner och varje cookie kan återställas. Praktiskt för inloggnings- och adminverktygscookies som bara du får eftersom skanningen körs i din inloggade webbläsare.

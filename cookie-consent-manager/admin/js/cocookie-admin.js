@@ -178,19 +178,37 @@
 		},
 
 		/**
-		 * Kontrollera om ett dokument (skannerns iframe) innehåller
+		 * Kontrollera om ett dokument (skannerns iframe) laddar
 		 * Google Analytics eller Tag Manager.
 		 *
+		 * Bara riktiga skript-taggar räknas. Att funktionen gtag finns räcker
+		 * inte: consent mode-snuttar (Site Kit m.fl.) definierar den utan att
+		 * ladda GA.
+		 *
 		 * @param {Document} doc Iframe-dokumentet.
-		 * @param {Window}   win Iframe-fönstret.
 		 * @return {boolean}
 		 */
-		hasGoogleTracking: function (doc, win) {
+		hasGoogleTracking: function (doc) {
 			try {
-				if (doc && doc.querySelector('script[src*="googletagmanager.com"], script[src*="google-analytics.com"]')) {
-					return true;
-				}
-				return !!(win && typeof win.gtag === 'function');
+				return !!(doc && doc.querySelector('script[src*="googletagmanager.com"], script[src*="google-analytics.com"]'));
+			} catch (e) {
+				return false;
+			}
+		},
+
+		/**
+		 * Kontrollera om Google Analytics är avstängt via opt-out-flaggan
+		 * window["ga-disable-G-XXXX"]. Site Kit och andra plugins sätter
+		 * den för inloggade användare som undantas från spårning.
+		 *
+		 * @param {Window} win Iframe-fönstret.
+		 * @return {boolean}
+		 */
+		hasGoogleOptOut: function (win) {
+			try {
+				return Object.keys(win).some(function (key) {
+					return key.indexOf('ga-disable-') === 0 && win[key];
+				});
 			} catch (e) {
 				return false;
 			}
@@ -205,12 +223,13 @@
 		 * cookies) och jämförs med det som fanns i skannerns iframe.
 		 *
 		 * @param {string}   siteUrl          Webbplatsens startsida.
-		 * @param {boolean}  iframeHadTracking GA/GTM fanns i iframen.
+		 * @param {boolean}  iframeHadTracking GA/GTM-skript fanns i iframen.
 		 * @param {string[]} cookieNames      Hittade cookienamn.
 		 * @param {boolean}  crossOrigin      Iframen kunde inte läsas (annan origin).
+		 * @param {boolean}  iframeOptOut     GA var avstängt via ga-disable-flaggan i iframen.
 		 * @return {Promise<string[]>} Hint-nycklar: ga_logged_in, ga_blocked, cross_origin.
 		 */
-		scanHints: function (siteUrl, iframeHadTracking, cookieNames, crossOrigin) {
+		scanHints: function (siteUrl, iframeHadTracking, cookieNames, crossOrigin, iframeOptOut) {
 			var hints = crossOrigin ? ['cross_origin'] : [];
 			var hasGa = cookieNames.some(function (n) { return /^_ga/.test(n); });
 
@@ -218,10 +237,17 @@
 				return Promise.resolve(hints);
 			}
 
+			// Opt-out-flaggan betyder att sajten undantar dig som inloggad —
+			// ingen anonym hämtning behövs för att veta det.
+			if (iframeOptOut) {
+				hints.push('ga_logged_in');
+				return Promise.resolve(hints);
+			}
+
 			return fetch(siteUrl, { credentials: 'omit', cache: 'no-store' })
 				.then(function (r) { return r.text(); })
 				.then(function (html) {
-					var anonHasTracking = /googletagmanager\.com|google-analytics\.com|gtag\s*\(/i.test(html);
+					var anonHasTracking = /googletagmanager\.com\/(gtag\/js|gtm\.js)|google-analytics\.com/i.test(html);
 					if (anonHasTracking && !iframeHadTracking) {
 						hints.push('ga_logged_in');
 					} else if (iframeHadTracking) {
