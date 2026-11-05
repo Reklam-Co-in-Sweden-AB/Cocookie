@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.6.0
+Stable tag: 2.7.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,9 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.7.0 =
+* Nytt: bannern finns på danska och norska (bokmål). Välj Dansk eller Norsk under Bannerns språk, eller låt bannern följa sidans språk. Norska sidor känns igen både som nb, nn och no.
 
 = 2.6.0 =
 * Nytt: inställningen "Bannerns språk" under Banner → Texter. Välj "Följ sidans språk" (standard), Svenska eller English. Ett fast språk gäller oavsett vilket språk sidan har, till exempel engelsk banner på en dansk sajt.

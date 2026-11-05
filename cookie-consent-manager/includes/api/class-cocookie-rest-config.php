@@ -114,6 +114,100 @@ class CoCookie_REST_Config {
 				'desc_analytics'     => 'These cookies help us understand how visitors use the website.',
 				'desc_marketing'     => 'These cookies are used to display relevant advertisements.',
 			),
+			// Danska
+			'da' => array(
+				'banner_title' => 'Vi bruger cookies',
+				'banner_text' => 'Dette websted bruger cookies for at forbedre din oplevelse.',
+				'accept_all_text' => 'Accepter alle',
+				'reject_all_text' => 'Afvis alle',
+				'save_text' => 'Gem indstillinger',
+				'settings_text' => 'Indstillinger',
+				'manage_title' => 'Administrer cookieindstillinger',
+				'manage_text' => 'Her kan du ændre eller trække dit samtykke tilbage.',
+				'consent_date_label' => 'Samtykkedato:',
+				'consent_id_label' => 'Dit samtykke-ID:',
+				'required_label' => '(altid påkrævet)',
+				'withdraw_text' => 'Træk samtykke tilbage',
+				'hide_details_text' => 'Skjul detaljer',
+				'show_details_text' => 'Vis detaljer',
+				'policy_link_text' => 'Læs vores privatlivspolitik.',
+				'google_consent_intro' => 'Vi bruger Googles annoncetjenester.',
+				'google_consent_link_text' => 'Læs, hvordan Google bruger dine data.',
+				'dnt_notice' => 'Din browser har Do Not Track aktiveret. Statistik- og marketingcookies er automatisk deaktiveret.',
+				'table_cookie' => 'Cookie',
+				'table_provider' => 'Udbyder',
+				'table_purpose' => 'Formål',
+				'table_expiry' => 'Udløb',
+				'tab_consent' => 'Samtykke',
+				'tab_details' => 'Detaljer',
+				'tab_about' => 'Om cookies',
+				'about_title' => 'Hvad er cookies?',
+				'about_what' => 'Cookies er små tekstfiler, der gemmes på din enhed (computer, telefon eller tablet), når du besøger et websted. De bruges til at få webstedet til at fungere korrekt, til at analysere trafik og til at tilpasse indhold og annoncer.',
+				'about_types_title' => 'Typer af cookies',
+				'about_type_necessary' => 'Nødvendige cookies',
+				'about_type_necessary_desc' => 'Disse cookies er nødvendige for, at webstedet kan fungere, og kan ikke slås fra. De sættes normalt som svar på handlinger, du foretager, f.eks. når du logger ind eller udfylder formularer.',
+				'about_type_analytics' => 'Statistikcookies',
+				'about_type_analytics_desc' => 'Disse cookies giver os mulighed for at tælle besøg og trafikkilder, så vi kan måle og forbedre webstedets ydeevne. De hjælper os med at se, hvilke sider der er mest og mindst populære.',
+				'about_type_marketing' => 'Marketingcookies',
+				'about_type_marketing_desc' => 'Disse cookies kan sættes via vores websted af vores annoncepartnere. De kan bruges til at opbygge en profil over dine interesser og vise dig relevante annoncer på andre websteder.',
+				'about_manage_title' => 'Administrer dine cookies',
+				'about_manage_desc' => 'Du kan til enhver tid ændre eller trække dit samtykke tilbage ved at klikke på cookieikonet nederst i venstre hjørne. Du kan også slette cookies i din browsers indstillinger.',
+				'about_rights_title' => 'Dine rettigheder',
+				'about_rights_desc' => 'I henhold til GDPR har du ret til at få indsigt i, berigtige eller slette dine personoplysninger. Du har også ret til at gøre indsigelse mod behandling og til at anmode om dataportabilitet. Læs mere i vores privatlivspolitik.',
+				'cat_necessary' => 'Nødvendige',
+				'cat_analytics' => 'Statistik',
+				'cat_marketing' => 'Marketing',
+				'desc_necessary' => 'Disse cookies er nødvendige for, at webstedet kan fungere, og kan ikke slås fra.',
+				'desc_analytics' => 'Disse cookies hjælper os med at forstå, hvordan besøgende bruger webstedet.',
+				'desc_marketing' => 'Disse cookies bruges til at vise relevante annoncer.',
+			),
+			// Norska (bokmål)
+			'no' => array(
+				'banner_title' => 'Vi bruker cookies',
+				'banner_text' => 'Dette nettstedet bruker cookies for å forbedre opplevelsen din.',
+				'accept_all_text' => 'Godta alle',
+				'reject_all_text' => 'Avvis alle',
+				'save_text' => 'Lagre innstillinger',
+				'settings_text' => 'Innstillinger',
+				'manage_title' => 'Administrer cookie-innstillinger',
+				'manage_text' => 'Her kan du endre eller trekke tilbake samtykket ditt.',
+				'consent_date_label' => 'Samtykkedato:',
+				'consent_id_label' => 'Din samtykke-ID:',
+				'required_label' => '(alltid påkrevd)',
+				'withdraw_text' => 'Trekk tilbake samtykke',
+				'hide_details_text' => 'Skjul detaljer',
+				'show_details_text' => 'Vis detaljer',
+				'policy_link_text' => 'Les personvernerklæringen vår.',
+				'google_consent_intro' => 'Vi bruker Googles annonsetjenester.',
+				'google_consent_link_text' => 'Les hvordan Google bruker dataene dine.',
+				'dnt_notice' => 'Nettleseren din har Do Not Track aktivert. Statistikk- og markedsføringscookies er automatisk deaktivert.',
+				'table_cookie' => 'Cookie',
+				'table_provider' => 'Leverandør',
+				'table_purpose' => 'Formål',
+				'table_expiry' => 'Utløper',
+				'tab_consent' => 'Samtykke',
+				'tab_details' => 'Detaljer',
+				'tab_about' => 'Om cookies',
+				'about_title' => 'Hva er cookies?',
+				'about_what' => 'Cookies er små tekstfiler som lagres på enheten din (datamaskin, telefon eller nettbrett) når du besøker et nettsted. De brukes for at nettstedet skal fungere riktig, for å analysere trafikk og for å tilpasse innhold og annonser.',
+				'about_types_title' => 'Typer cookies',
+				'about_type_necessary' => 'Nødvendige cookies',
+				'about_type_necessary_desc' => 'Disse cookiene er nødvendige for at nettstedet skal fungere, og kan ikke slås av. De settes vanligvis som svar på handlinger du gjør, for eksempel når du logger inn eller fyller ut skjemaer.',
+				'about_type_analytics' => 'Statistikkcookies',
+				'about_type_analytics_desc' => 'Disse cookiene lar oss telle besøk og trafikkilder slik at vi kan måle og forbedre nettstedets ytelse. De hjelper oss å se hvilke sider som er mest og minst populære.',
+				'about_type_marketing' => 'Markedsføringscookies',
+				'about_type_marketing_desc' => 'Disse cookiene kan settes via nettstedet vårt av annonsepartnerne våre. De kan brukes til å bygge en profil av interessene dine og vise deg relevante annonser på andre nettsteder.',
+				'about_manage_title' => 'Administrer cookiene dine',
+				'about_manage_desc' => 'Du kan når som helst endre eller trekke tilbake samtykket ditt ved å klikke på cookie-ikonet nederst i venstre hjørne. Du kan også slette cookies i innstillingene i nettleseren din.',
+				'about_rights_title' => 'Dine rettigheter',
+				'about_rights_desc' => 'I henhold til GDPR har du rett til innsyn i, retting av og sletting av personopplysningene dine. Du har også rett til å protestere mot behandling og til å be om dataportabilitet. Les mer i personvernerklæringen vår.',
+				'cat_necessary' => 'Nødvendige',
+				'cat_analytics' => 'Statistikk',
+				'cat_marketing' => 'Markedsføring',
+				'desc_necessary' => 'Disse cookiene er nødvendige for at nettstedet skal fungere, og kan ikke slås av.',
+				'desc_analytics' => 'Disse cookiene hjelper oss å forstå hvordan besøkende bruker nettstedet.',
+				'desc_marketing' => 'Disse cookiene brukes til å vise relevante annonser.',
+			),
 		);
 	}
 
@@ -164,6 +258,8 @@ class CoCookie_REST_Config {
 		$names = array(
 			'sv' => 'Svenska',
 			'en' => 'English',
+			'da' => 'Dansk',
+			'no' => 'Norsk',
 		);
 
 		$options = array( 'sv' => $names['sv'] );
@@ -188,6 +284,12 @@ class CoCookie_REST_Config {
 	private static function resolve_banner_language( $settings, $page_lang ) {
 		$options = self::get_language_options();
 		$chosen  = $settings['banner_language'] ?? 'auto';
+
+		// Norska har flera koder: nb/nn i WordPress-locale, no i en del
+		// översättningsplugin. Alla visas med den norska översättningen.
+		if ( in_array( $page_lang, array( 'nb', 'nn' ), true ) ) {
+			$page_lang = 'no';
+		}
 
 		if ( 'auto' !== $chosen && isset( $options[ $chosen ] ) ) {
 			return $chosen;
