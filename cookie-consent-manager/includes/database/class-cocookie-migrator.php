@@ -46,6 +46,11 @@ class CoCookie_Migrator {
 			self::migrate_to_2_2_1();
 		}
 
+		// Migration: ta bort snedstreck som sparats framför citattecken
+		if ( version_compare( $current, '2.6.0', '<' ) ) {
+			self::migrate_to_2_6_0();
+		}
+
 		update_option( 'cocookie_db_version', COCOOKIE_VERSION );
 	}
 
@@ -162,5 +167,63 @@ class CoCookie_Migrator {
 		$table = $wpdb->prefix . 'cc_scan_results';
 
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET value_sample = %s WHERE value_sample != %s", '', '' ) );
+	}
+
+	/**
+	 * v2.6.0: Ta bort snedstreck som sparats framför citattecken.
+	 *
+	 * Formulären sparade $_POST utan wp_unslash(), så "you've" lagrades som
+	 * "you\'ve". Varje ny sparning lade till fler snedstreck. Här tas alla
+	 * snedstreck direkt framför ' och " bort i bannerinställningar,
+	 * företagsuppgifter, kategorier och cookies.
+	 */
+	private static function migrate_to_2_6_0() {
+		global $wpdb;
+
+		foreach ( array( 'cocookie_settings', 'ccm_settings', 'ccm_company_info', 'cocookie_company_info' ) as $option ) {
+			$value = get_option( $option );
+			if ( ! is_array( $value ) ) {
+				continue;
+			}
+			$clean = array_map( array( __CLASS__, 'strip_quote_slashes' ), $value );
+			if ( $clean !== $value ) {
+				update_option( $option, $clean );
+			}
+		}
+
+		$columns = array(
+			$wpdb->prefix . 'cc_categories' => array( 'title', 'description' ),
+			$wpdb->prefix . 'cc_cookies'    => array( 'name', 'provider', 'purpose', 'expiry' ),
+		);
+
+		foreach ( $columns as $table => $fields ) {
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+				continue;
+			}
+			// Tabellerna är små, så raderna kontrolleras i PHP i stället för med LIKE.
+			$rows = $wpdb->get_results( 'SELECT id, ' . implode( ', ', $fields ) . " FROM {$table}", ARRAY_A );
+
+			foreach ( (array) $rows as $row ) {
+				$id = (int) $row['id'];
+				unset( $row['id'] );
+				$clean = array_map( array( __CLASS__, 'strip_quote_slashes' ), $row );
+				if ( $clean !== $row ) {
+					$wpdb->update( $table, $clean, array( 'id' => $id ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Ta bort alla snedstreck direkt framför ' och ".
+	 *
+	 * @param mixed $value Värde.
+	 * @return mixed Värdet utan snedstreck framför citattecken.
+	 */
+	private static function strip_quote_slashes( $value ) {
+		if ( ! is_string( $value ) ) {
+			return $value;
+		}
+		return preg_replace( '/\\\\+(?=[\'"])/', '', $value );
 	}
 }

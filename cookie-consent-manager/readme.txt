@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.5.1
+Stable tag: 2.6.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,12 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.6.0 =
+* Nytt: inställningen "Bannerns språk" under Banner → Texter. Välj "Följ sidans språk" (standard), Svenska eller English. Ett fast språk gäller oavsett vilket språk sidan har, till exempel engelsk banner på en dansk sajt.
+* Förbättring: när bannern följer sidans språk och det saknas översättning för språket (till exempel danska, norska eller tyska) visas bannern nu på engelska i stället för svenska.
+* Förbättring: bannern får ett lang-attribut med det språk den visas på, så att skärmläsare läser upp den med rätt uttal (WCAG 3.1.2).
+* Fix: citattecken i texter sparades med snedstreck framför, så att "you've" visades som "you\'ve". Det gällde bannertexter, installationsguiden, kategorier, cookies och företagsuppgifter. Redan sparade snedstreck tas bort automatiskt vid uppdateringen.
 
 = 2.5.1 =
 * Fix: skannern hittar nu Google Analytics på sajter med Site Kit. Site Kit undantar inloggade användare som standard men laddar ändå gtag.js med opt-out-flaggan satt, och skriver en Consent Mode-default med "denied". Under ren skanning slår CoCookie av undantaget via Site Kits filter, byter defaulten till "granted" och skickar en samtyckesuppdatering med allt tillåtet, så att sidan beter sig som för en besökare som accepterat. Det ersätter det tidigare beroendet av att bannern råkade köra inne i skannern.

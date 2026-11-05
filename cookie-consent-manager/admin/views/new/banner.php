@@ -43,6 +43,18 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 		<div class="cocookie-settings-section__body">
 			<table class="form-table">
 				<tr>
+					<th><label for="banner_language"><?php esc_html_e( 'Bannerns språk', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="banner_language" name="banner_language">
+							<option value="auto" <?php selected( $s['banner_language'], 'auto' ); ?>><?php esc_html_e( 'Följ sidans språk', 'cocookie' ); ?></option>
+							<?php foreach ( CoCookie_REST_Config::get_language_options() as $code => $name ) : ?>
+								<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $s['banner_language'], $code ); ?>><?php echo esc_html( $name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Styr flikar, kategorier, detaljvyn och "Om cookies". "Följ sidans språk" använder sidans språk från WordPress, Polylang, WPML eller Coscribe, och visar engelska när det saknas översättning för språket. Egna texter i fälten nedan visas alltid som de är skrivna.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
 					<th><label for="banner_title"><?php esc_html_e( 'Titel', 'cocookie' ); ?></label></th>
 					<td>
 						<input type="text" id="banner_title" name="banner_title" value="<?php echo esc_attr( $s['banner_title'] ); ?>" class="regular-text">

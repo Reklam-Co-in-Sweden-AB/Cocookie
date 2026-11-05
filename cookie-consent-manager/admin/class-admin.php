@@ -219,7 +219,7 @@ class CCM_Admin {
 
         // Policy - company info
         if ( isset( $_POST['ccm_save_company'] ) && check_admin_referer( 'ccm_policy_company' ) ) {
-            CCM_Policy_Generator::save_company_info( $_POST );
+            CCM_Policy_Generator::save_company_info( wp_unslash( $_POST ) );
             wp_redirect( admin_url( 'options-general.php?page=cookie-consent&tab=policies&msg=saved' ) );
             exit;
         }
@@ -235,23 +235,27 @@ class CCM_Admin {
 
         // Settings
         if ( isset( $_POST['ccm_save_settings'] ) && check_admin_referer( 'ccm_settings_action' ) ) {
+            // wp_unslash: annars sparas citattecken med snedstreck framför.
+            $post     = wp_unslash( $_POST );
+            $existing = get_option( 'ccm_settings', array() );
             $settings = array(
-                'banner_title'       => sanitize_text_field( $_POST['banner_title'] ?? '' ),
-                'banner_text'        => sanitize_textarea_field( $_POST['banner_text'] ?? '' ),
-                'accept_all_text'    => sanitize_text_field( $_POST['accept_all_text'] ?? '' ),
-                'reject_all_text'    => sanitize_text_field( $_POST['reject_all_text'] ?? '' ),
-                'save_text'          => sanitize_text_field( $_POST['save_text'] ?? '' ),
-                'settings_text'      => sanitize_text_field( $_POST['settings_text'] ?? '' ),
-                'position'           => sanitize_text_field( $_POST['position'] ?? 'bottom' ),
-                'primary_color'      => sanitize_hex_color( $_POST['primary_color'] ?? '#2271b1' ),
-                'primary_text_color' => sanitize_hex_color( $_POST['primary_text_color'] ?? '#ffffff' ),
-                'banner_bg_color'    => sanitize_hex_color( $_POST['banner_bg_color'] ?? '#ffffff' ),
-                'banner_text_color'  => sanitize_hex_color( $_POST['banner_text_color'] ?? '#333333' ),
-                'reject_bg_color'    => sanitize_hex_color( $_POST['reject_bg_color'] ?? '#f0f0f0' ),
-                'reject_text_color'  => sanitize_hex_color( $_POST['reject_text_color'] ?? '#333333' ),
-                'logo_url'           => esc_url_raw( $_POST['logo_url'] ?? '' ),
-                'cookie_lifetime'    => min( intval( $_POST['cookie_lifetime'] ?? 365 ), 395 ),
-                'cookie_icon'        => esc_url_raw( $_POST['cookie_icon'] ?? '' ),
+                'banner_language'    => $existing['banner_language'] ?? 'auto',
+                'banner_title'       => sanitize_text_field( $post['banner_title'] ?? '' ),
+                'banner_text'        => sanitize_textarea_field( $post['banner_text'] ?? '' ),
+                'accept_all_text'    => sanitize_text_field( $post['accept_all_text'] ?? '' ),
+                'reject_all_text'    => sanitize_text_field( $post['reject_all_text'] ?? '' ),
+                'save_text'          => sanitize_text_field( $post['save_text'] ?? '' ),
+                'settings_text'      => sanitize_text_field( $post['settings_text'] ?? '' ),
+                'position'           => sanitize_text_field( $post['position'] ?? 'bottom' ),
+                'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#2271b1' ),
+                'primary_text_color' => sanitize_hex_color( $post['primary_text_color'] ?? '#ffffff' ),
+                'banner_bg_color'    => sanitize_hex_color( $post['banner_bg_color'] ?? '#ffffff' ),
+                'banner_text_color'  => sanitize_hex_color( $post['banner_text_color'] ?? '#333333' ),
+                'reject_bg_color'    => sanitize_hex_color( $post['reject_bg_color'] ?? '#f0f0f0' ),
+                'reject_text_color'  => sanitize_hex_color( $post['reject_text_color'] ?? '#333333' ),
+                'logo_url'           => esc_url_raw( $post['logo_url'] ?? '' ),
+                'cookie_lifetime'    => min( intval( $post['cookie_lifetime'] ?? 365 ), 395 ),
+                'cookie_icon'        => esc_url_raw( $post['cookie_icon'] ?? '' ),
             );
             update_option( 'ccm_settings', $settings );
             wp_redirect( admin_url( 'options-general.php?page=cookie-consent&tab=settings&msg=saved' ) );

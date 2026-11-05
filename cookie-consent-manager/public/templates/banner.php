@@ -20,6 +20,7 @@ $position   = $s['position'] ?? 'bottom';
 
 <div id="cocookie-banner"
 	class="cocookie-banner cocookie-banner--<?php echo esc_attr( $position ); ?>"
+	<?php if ( ! empty( $config['lang'] ) ) : ?>lang="<?php echo esc_attr( $config['lang'] ); ?>"<?php endif; ?>
 	role="dialog"
 	aria-label="<?php echo esc_attr( $s['banner_title'] ); ?>"
 	aria-modal="<?php echo 'center' === $position ? 'true' : 'false'; ?>"

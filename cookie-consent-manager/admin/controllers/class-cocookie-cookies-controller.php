@@ -98,9 +98,9 @@ class CoCookie_Cookies_Controller {
 		// Save category
 		if ( isset( $_POST['cocookie_save_category'] ) && check_admin_referer( 'cocookie_category_action' ) ) {
 			$data = array(
-				'slug'        => $_POST['slug'] ?? '',
-				'title'       => $_POST['title'] ?? '',
-				'description' => $_POST['description'] ?? '',
+				'slug'        => wp_unslash( $_POST['slug'] ?? '' ),
+				'title'       => wp_unslash( $_POST['title'] ?? '' ),
+				'description' => wp_unslash( $_POST['description'] ?? '' ),
 				'is_required' => isset( $_POST['is_required'] ) ? 1 : 0,
 				'sort_order'  => $_POST['sort_order'] ?? 0,
 			);
@@ -126,10 +126,10 @@ class CoCookie_Cookies_Controller {
 		if ( isset( $_POST['cocookie_save_cookie'] ) && check_admin_referer( 'cocookie_cookie_action' ) ) {
 			$data = array(
 				'category_id' => $_POST['category_id'] ?? 0,
-				'name'        => $_POST['name'] ?? '',
-				'provider'    => $_POST['provider'] ?? '',
-				'purpose'     => $_POST['purpose'] ?? '',
-				'expiry'      => $_POST['expiry'] ?? '',
+				'name'        => wp_unslash( $_POST['name'] ?? '' ),
+				'provider'    => wp_unslash( $_POST['provider'] ?? '' ),
+				'purpose'     => wp_unslash( $_POST['purpose'] ?? '' ),
+				'expiry'      => wp_unslash( $_POST['expiry'] ?? '' ),
 			);
 
 			if ( ! empty( $_POST['cookie_id'] ) ) {

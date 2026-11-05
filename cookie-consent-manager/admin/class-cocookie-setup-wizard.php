@@ -149,17 +149,21 @@ class CoCookie_Setup_Wizard {
 
 		// Step 3: Save banner settings
 		if ( isset( $_POST['cocookie_wizard_save_banner'] ) && check_admin_referer( 'cocookie_wizard_banner' ) ) {
+			// wp_unslash: annars sparas citattecken med snedstreck framför.
+			$post     = wp_unslash( $_POST );
+			$existing = get_option( 'cocookie_settings', array() );
 			$settings = array(
-				'banner_title'       => sanitize_text_field( $_POST['banner_title'] ?? __( 'Vi använder cookies', 'cocookie' ) ),
-				'banner_text'        => sanitize_textarea_field( $_POST['banner_text'] ?? '' ),
-				'accept_all_text'    => sanitize_text_field( $_POST['accept_all_text'] ?? __( 'Acceptera alla', 'cocookie' ) ),
-				'reject_all_text'    => sanitize_text_field( $_POST['reject_all_text'] ?? __( 'Avvisa alla', 'cocookie' ) ),
-				'save_text'          => sanitize_text_field( $_POST['save_text'] ?? __( 'Spara inställningar', 'cocookie' ) ),
-				'settings_text'      => sanitize_text_field( $_POST['settings_text'] ?? __( 'Inställningar', 'cocookie' ) ),
-				'position'           => sanitize_text_field( $_POST['position'] ?? 'bottom' ),
-				'primary_color'      => sanitize_hex_color( $_POST['primary_color'] ?? '#29A166' ),
+				'banner_language'    => $existing['banner_language'] ?? 'auto',
+				'banner_title'       => sanitize_text_field( $post['banner_title'] ?? __( 'Vi använder cookies', 'cocookie' ) ),
+				'banner_text'        => sanitize_textarea_field( $post['banner_text'] ?? '' ),
+				'accept_all_text'    => sanitize_text_field( $post['accept_all_text'] ?? __( 'Acceptera alla', 'cocookie' ) ),
+				'reject_all_text'    => sanitize_text_field( $post['reject_all_text'] ?? __( 'Avvisa alla', 'cocookie' ) ),
+				'save_text'          => sanitize_text_field( $post['save_text'] ?? __( 'Spara inställningar', 'cocookie' ) ),
+				'settings_text'      => sanitize_text_field( $post['settings_text'] ?? __( 'Inställningar', 'cocookie' ) ),
+				'position'           => sanitize_text_field( $post['position'] ?? 'bottom' ),
+				'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#29A166' ),
 				'primary_text_color' => '#ffffff',
-				'logo_url'           => esc_url_raw( $_POST['logo_url'] ?? '' ),
+				'logo_url'           => esc_url_raw( $post['logo_url'] ?? '' ),
 				'banner_bg_color'    => '#ffffff',
 				'banner_text_color'  => '#333333',
 				'reject_bg_color'    => '#f0f0f0',

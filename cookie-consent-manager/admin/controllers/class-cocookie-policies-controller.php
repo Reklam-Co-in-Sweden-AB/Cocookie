@@ -42,7 +42,7 @@ class CoCookie_Policies_Controller {
 
 		// Save company info
 		if ( isset( $_POST['cocookie_save_company'] ) && check_admin_referer( 'cocookie_policy_company' ) ) {
-			CCM_Policy_Generator::save_company_info( $_POST );
+			CCM_Policy_Generator::save_company_info( wp_unslash( $_POST ) );
 			wp_redirect( admin_url( 'admin.php?page=cocookie-policies&msg=saved' ) );
 			exit;
 		}

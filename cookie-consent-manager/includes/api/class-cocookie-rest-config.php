@@ -155,6 +155,48 @@ class CoCookie_REST_Config {
 	}
 
 	/**
+	 * Språk som bannern kan visas på: svenska (källtexterna) plus de
+	 * inbyggda översättningarna.
+	 *
+	 * @return array Språkkod => namn på språket.
+	 */
+	public static function get_language_options() {
+		$names = array(
+			'sv' => 'Svenska',
+			'en' => 'English',
+		);
+
+		$options = array( 'sv' => $names['sv'] );
+		foreach ( array_keys( self::get_translations() ) as $code ) {
+			$options[ $code ] = $names[ $code ] ?? strtoupper( $code );
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Avgör vilket språk bannern ska visas på.
+	 *
+	 * Ett fast språk i inställningarna vinner alltid. Annars följer bannern
+	 * sidans språk, och saknas översättning för det visas engelska. En
+	 * besökare på en dansk eller tysk sida förstår engelska bättre än svenska.
+	 *
+	 * @param array  $settings  Sparade bannerinställningar.
+	 * @param string $page_lang Sidans språk (tvåbokstavskod).
+	 * @return string Tvåbokstavskod.
+	 */
+	private static function resolve_banner_language( $settings, $page_lang ) {
+		$options = self::get_language_options();
+		$chosen  = $settings['banner_language'] ?? 'auto';
+
+		if ( 'auto' !== $chosen && isset( $options[ $chosen ] ) ) {
+			return $chosen;
+		}
+
+		return isset( $options[ $page_lang ] ) ? $page_lang : 'en';
+	}
+
+	/**
 	 * Build the full banner configuration array.
 	 *
 	 * Used both by the REST endpoint and by wp_localize_script.
@@ -254,11 +296,17 @@ class CoCookie_REST_Config {
 			);
 		}
 
-		// Apply built-in language translations if not Swedish
-		$lang = self::get_current_language();
-		if ( 'sv' !== $lang ) {
-			$config = self::apply_translation( $config, $lang );
+		// Sidans språk skickas vidare till filtret oförändrat, så att
+		// översättningsplugin får veta vilket språk besökaren faktiskt är på.
+		$lang        = self::get_current_language();
+		$banner_lang = self::resolve_banner_language( $settings, $lang );
+
+		if ( 'sv' !== $banner_lang ) {
+			$config = self::apply_translation( $config, $banner_lang );
 		}
+
+		// Språket bannern visas på, för lang-attributet i mallen.
+		$config['lang'] = $banner_lang;
 
 		/**
 		 * Filter the banner configuration before it's sent to the frontend.
