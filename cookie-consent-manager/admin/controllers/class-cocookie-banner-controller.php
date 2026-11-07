@@ -19,7 +19,7 @@ class CoCookie_Banner_Controller {
 	 * @return array
 	 */
 	public static function get_defaults() {
-		return array(
+		$defaults = array(
 			'banner_language'    => 'auto',
 			'banner_title'       => __( 'Vi använder cookies', 'cocookie' ),
 			'banner_text'        => __( 'Denna webbplats använder cookies för att förbättra din upplevelse.', 'cocookie' ),
@@ -42,6 +42,82 @@ class CoCookie_Banner_Controller {
 			'google_consent_intro'     => __( 'Vi använder Googles annonstjänster.', 'cocookie' ),
 			'google_consent_link_text' => __( 'Läs hur Google hanterar dina personuppgifter.', 'cocookie' ),
 		);
+
+		// Layout, hörn, skugga, ram och knappform.
+		return array_merge( $defaults, CoCookie_REST_Config::get_design_defaults() );
+	}
+
+	/**
+	 * Färdiga teman. Ett tema fyller bara i formuläret i admin; det som
+	 * sparas är de enskilda färgerna och designvalen.
+	 *
+	 * Färgparen klarar WCAG AA (4,5:1) för knapptexter och brödtext.
+	 *
+	 * @return array Nyckel => array( label, values ).
+	 */
+	public static function get_theme_presets() {
+		return array(
+			'light'   => array(
+				'label'  => __( 'Ljust', 'cocookie' ),
+				'values' => array(
+					'banner_bg_color'    => '#ffffff',
+					'banner_text_color'  => '#333333',
+					'primary_color'      => '#1f7a4d',
+					'primary_text_color' => '#ffffff',
+					'reject_bg_color'    => '#f0f0f0',
+					'reject_text_color'  => '#333333',
+					'banner_radius'      => 'large',
+					'banner_shadow'      => 'soft',
+					'banner_border'      => false,
+					'button_shape'       => 'rounded',
+				),
+			),
+			'dark'    => array(
+				'label'  => __( 'Mörkt', 'cocookie' ),
+				'values' => array(
+					'banner_bg_color'    => '#1c1b1b',
+					'banner_text_color'  => '#f2f2f2',
+					'primary_color'      => '#f2ca53',
+					'primary_text_color' => '#1c1b1b',
+					'reject_bg_color'    => '#33302f',
+					'reject_text_color'  => '#f2f2f2',
+					'banner_radius'      => 'large',
+					'banner_shadow'      => 'strong',
+					'banner_border'      => false,
+					'button_shape'       => 'rounded',
+				),
+			),
+			'minimal' => array(
+				'label'  => __( 'Minimalistiskt', 'cocookie' ),
+				'values' => array(
+					'banner_bg_color'    => '#ffffff',
+					'banner_text_color'  => '#1c1b1b',
+					'primary_color'      => '#1c1b1b',
+					'primary_text_color' => '#ffffff',
+					'reject_bg_color'    => '#ffffff',
+					'reject_text_color'  => '#1c1b1b',
+					'banner_radius'      => 'none',
+					'banner_shadow'      => 'none',
+					'banner_border'      => true,
+					'button_shape'       => 'square',
+				),
+			),
+			'warm'    => array(
+				'label'  => __( 'Varmt', 'cocookie' ),
+				'values' => array(
+					'banner_bg_color'    => '#fcfaf5',
+					'banner_text_color'  => '#1c1b1b',
+					'primary_color'      => '#630902',
+					'primary_text_color' => '#fcfaf5',
+					'reject_bg_color'    => '#fadace',
+					'reject_text_color'  => '#630902',
+					'banner_radius'      => 'large',
+					'banner_shadow'      => 'soft',
+					'banner_border'      => false,
+					'button_shape'       => 'pill',
+				),
+			),
+		);
 	}
 
 	/**
@@ -55,7 +131,10 @@ class CoCookie_Banner_Controller {
 
 		wp_enqueue_media();
 
-		$data = array( 's' => $s );
+		$data = array(
+			's'      => $s,
+			'themes' => self::get_theme_presets(),
+		);
 		include COCOOKIE_PLUGIN_DIR . 'admin/views/new/banner.php';
 	}
 
@@ -91,7 +170,6 @@ class CoCookie_Banner_Controller {
 			'reject_all_text'    => sanitize_text_field( $post['reject_all_text'] ?? '' ),
 			'save_text'          => sanitize_text_field( $post['save_text'] ?? '' ),
 			'settings_text'      => sanitize_text_field( $post['settings_text'] ?? '' ),
-			'position'           => sanitize_text_field( $post['position'] ?? 'bottom' ),
 			'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#29A166' ),
 			'primary_text_color' => sanitize_hex_color( $post['primary_text_color'] ?? '#ffffff' ),
 			'banner_bg_color'    => sanitize_hex_color( $post['banner_bg_color'] ?? '#ffffff' ),
@@ -106,6 +184,9 @@ class CoCookie_Banner_Controller {
 			'google_consent_intro'     => sanitize_text_field( $post['google_consent_intro'] ?? '' ),
 			'google_consent_link_text' => sanitize_text_field( $post['google_consent_link_text'] ?? '' ),
 		);
+
+		// Designvalen saneras mot listorna med tillåtna värden.
+		$settings = array_merge( $settings, CoCookie_REST_Config::sanitize_design_settings( $post ) );
 
 		update_option( 'cocookie_settings', $settings );
 

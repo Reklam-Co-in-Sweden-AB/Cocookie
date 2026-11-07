@@ -13,11 +13,7 @@ $registered = CoCookie_Categories::get_cookies();
 $categories = CoCookie_Categories::get_all();
 $settings   = get_option( 'cocookie_settings', array() );
 
-$position_labels = array(
-	'bottom' => __( 'Botten', 'cocookie' ),
-	'top'    => __( 'Topp', 'cocookie' ),
-	'center' => __( 'Modal', 'cocookie' ),
-);
+$position_labels = wp_list_pluck( CoCookie_REST_Config::get_layout_options(), 'label' );
 $position_label = $position_labels[ $settings['position'] ?? 'bottom' ] ?? ucfirst( $settings['position'] ?? 'bottom' );
 ?>
 

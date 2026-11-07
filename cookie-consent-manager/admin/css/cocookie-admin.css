@@ -1102,6 +1102,178 @@ p.cocookie-empty {
 	border-radius: var(--cocookie-radius-sm);
 }
 
+/* === Bannerredigerare med förhandsvisning === */
+.cocookie-banner-editor {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+}
+
+/* Smala skärmar: förhandsvisningen överst. Breda: bredvid formuläret och
+   kvar i bild när man scrollar. */
+.cocookie-banner-editor__preview {
+	order: -1;
+}
+
+@media (min-width: 1400px) {
+	.cocookie-banner-editor {
+		grid-template-columns: minmax(0, 1fr) minmax(440px, 0.85fr);
+	}
+
+	.cocookie-banner-editor__preview {
+		order: 0;
+		position: sticky;
+		top: 52px;
+	}
+}
+
+.cocookie-preview {
+	background: #fff;
+	border: 1px solid var(--cocookie-neutral-200);
+	border-radius: var(--cocookie-radius-lg);
+	box-shadow: var(--cocookie-shadow-sm);
+	padding: 16px;
+}
+
+.cocookie-preview__header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+	font-size: 13px;
+	color: var(--cocookie-neutral-800);
+}
+
+.cocookie-preview__header span {
+	font-size: 12px;
+	color: var(--cocookie-neutral-500);
+}
+
+.cocookie-preview__viewport {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid var(--cocookie-neutral-200);
+	border-radius: var(--cocookie-radius-md);
+	background: var(--cocookie-neutral-100);
+}
+
+/* Stagen är en skrivbordsskärm i full storlek som JS skalar ner. */
+.cocookie-preview__stage {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: 0 0;
+	background: #f4f5f7;
+	overflow: hidden;
+}
+
+.cocookie-preview__stage .cocookie-banner {
+	position: absolute;
+}
+
+/* Påhittad webbsida bakom bannern. */
+.cocookie-preview__nav {
+	display: flex;
+	gap: 28px;
+	align-items: center;
+	height: 72px;
+	padding: 0 56px;
+	background: #fff;
+	border-bottom: 1px solid #e6e7ea;
+}
+
+.cocookie-preview__nav span {
+	display: block;
+	width: 90px;
+	height: 12px;
+	border-radius: 6px;
+	background: #d9dce1;
+}
+
+.cocookie-preview__nav span:first-child {
+	width: 140px;
+	height: 22px;
+	margin-right: auto;
+	background: #b9bec6;
+}
+
+.cocookie-preview__hero {
+	height: 300px;
+	margin: 40px 56px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #dfe3e8, #eceef1);
+}
+
+.cocookie-preview__lines {
+	display: grid;
+	gap: 16px;
+	padding: 0 56px;
+}
+
+.cocookie-preview__lines span {
+	display: block;
+	height: 14px;
+	border-radius: 7px;
+	background: #dfe2e6;
+}
+
+.cocookie-preview__lines span:nth-child(2) { width: 85%; }
+.cocookie-preview__lines span:nth-child(3) { width: 92%; }
+.cocookie-preview__lines span:nth-child(4) { width: 60%; }
+
+/* Temaväljare */
+.cocookie-theme-picker {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.cocookie-theme-picker__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 14px 8px 10px;
+	border: 1px solid var(--cocookie-neutral-300);
+	border-radius: 999px;
+	background: #fff;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--cocookie-neutral-800);
+	cursor: pointer;
+	transition: var(--cocookie-transition-fast);
+}
+
+.cocookie-theme-picker__btn:hover {
+	border-color: var(--cocookie-neutral-500);
+}
+
+.cocookie-theme-picker__btn:focus-visible {
+	outline: 2px solid var(--cocookie-green-600);
+	outline-offset: 2px;
+}
+
+.cocookie-theme-picker__btn[aria-pressed="true"] {
+	border-color: var(--cocookie-green-600);
+	background: var(--cocookie-green-50);
+}
+
+.cocookie-theme-picker__swatch {
+	display: inline-flex;
+}
+
+.cocookie-theme-picker__swatch span {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.cocookie-theme-picker__swatch span + span {
+	margin-left: -5px;
+}
+
 /* === Färgförinställningar (Wizard) === */
 .cocookie-color-presets {
 	display: flex;

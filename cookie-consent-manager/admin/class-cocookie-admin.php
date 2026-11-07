@@ -112,6 +112,12 @@ class CoCookie_Admin {
 			COCOOKIE_VERSION,
 			true
 		);
+
+		// Bannersidan visar en förhandsvisning med frontendens egen CSS.
+		if ( isset( $_GET['page'] ) && 'cocookie-banner' === $_GET['page'] ) {
+			wp_enqueue_style( 'cocookie-banner', COCOOKIE_PLUGIN_URL . 'public/css/cocookie-banner.css', array(), COCOOKIE_VERSION );
+			wp_enqueue_script( 'cocookie-banner-preview', COCOOKIE_PLUGIN_URL . 'admin/js/cocookie-banner-preview.js', array(), COCOOKIE_VERSION, true );
+		}
 	}
 
 	/**

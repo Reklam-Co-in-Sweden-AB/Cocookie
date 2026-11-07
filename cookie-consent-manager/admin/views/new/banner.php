@@ -10,8 +10,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$s   = $data['s'];
-$msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
+$s      = $data['s'];
+$msg    = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
+$design = CoCookie_REST_Config::get_banner_design( $s );
+
+// Värden som förhandsvisningens JS behöver för att räkna ut klasser och mått.
+$layout_options = CoCookie_REST_Config::get_layout_options();
+$radius_options = CoCookie_REST_Config::get_radius_options();
+$shape_options  = CoCookie_REST_Config::get_button_shape_options();
+$preview_data   = array(
+	'floating' => wp_list_pluck( $layout_options, 'floating' ),
+	'radius'   => wp_list_pluck( $radius_options, 'value' ),
+	'shape'    => wp_list_pluck( $shape_options, 'value' ),
+	'themes'   => wp_list_pluck( $data['themes'], 'values' ),
+);
 ?>
 
 <!-- Sidhuvud -->
@@ -31,7 +43,8 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 	<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Inställningar sparade.', 'cocookie' ); ?></p></div>
 <?php endif; ?>
 
-<form method="post">
+<div class="cocookie-banner-editor">
+<form method="post" id="cocookie-banner-form" class="cocookie-banner-editor__form">
 	<?php wp_nonce_field( 'cocookie_banner_action' ); ?>
 
 	<!-- Sektionen Texter -->
@@ -140,14 +153,72 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 		<div class="cocookie-settings-section__body">
 			<table class="form-table">
 				<tr>
-					<th><label for="position"><?php esc_html_e( 'Position', 'cocookie' ); ?></label></th>
+					<th><?php esc_html_e( 'Färdiga teman', 'cocookie' ); ?></th>
+					<td>
+						<div class="cocookie-theme-picker">
+							<?php foreach ( $data['themes'] as $key => $theme ) : ?>
+								<button type="button" class="cocookie-theme-picker__btn" data-cocookie-theme="<?php echo esc_attr( $key ); ?>">
+									<span class="cocookie-theme-picker__swatch" aria-hidden="true">
+										<span style="background:<?php echo esc_attr( $theme['values']['banner_bg_color'] ); ?>"></span>
+										<span style="background:<?php echo esc_attr( $theme['values']['primary_color'] ); ?>"></span>
+										<span style="background:<?php echo esc_attr( $theme['values']['reject_bg_color'] ); ?>"></span>
+									</span>
+									<?php echo esc_html( $theme['label'] ); ?>
+								</button>
+							<?php endforeach; ?>
+						</div>
+						<p class="description"><?php esc_html_e( 'Ett tema fyller i färger, hörn, skugga, ram och knappform. Du kan justera allt efteråt. Inget sparas förrän du klickar på Spara inställningar.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="position"><?php esc_html_e( 'Layout', 'cocookie' ); ?></label></th>
 					<td>
 						<select id="position" name="position">
-							<option value="bottom" <?php selected( $s['position'], 'bottom' ); ?>><?php esc_html_e( 'Botten', 'cocookie' ); ?></option>
-							<option value="top"    <?php selected( $s['position'], 'top' ); ?>><?php esc_html_e( 'Topp', 'cocookie' ); ?></option>
-							<option value="center" <?php selected( $s['position'], 'center' ); ?>><?php esc_html_e( 'Center (modal)', 'cocookie' ); ?></option>
+							<?php foreach ( $layout_options as $key => $layout ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $design['layout'], $key ); ?>><?php echo esc_html( $layout['label'] ); ?></option>
+							<?php endforeach; ?>
 						</select>
-						<p class="description"><?php esc_html_e( 'Var på skärmen bannern visas för besökaren.', 'cocookie' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Var på skärmen bannern visas och hur stor den är. På mobil visas kort och hörnrutor längs nederkanten.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="banner_radius"><?php esc_html_e( 'Hörn', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="banner_radius" name="banner_radius">
+							<?php foreach ( $radius_options as $key => $option ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['banner_radius'], $key ); ?>><?php echo esc_html( $option['label'] ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Gäller kort, hörnrutor och modal. En bar i full bredd har alltid raka hörn.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="banner_shadow"><?php esc_html_e( 'Skugga', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="banner_shadow" name="banner_shadow">
+							<?php foreach ( CoCookie_REST_Config::get_shadow_options() as $key => $label ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['banner_shadow'], $key ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="banner_border"><?php esc_html_e( 'Ram', 'cocookie' ); ?></label></th>
+					<td>
+						<label>
+							<input type="checkbox" id="banner_border" name="banner_border" value="1" <?php checked( ! empty( $s['banner_border'] ) ); ?>>
+							<?php esc_html_e( 'Visa en tunn ram runt bannern', 'cocookie' ); ?>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="button_shape"><?php esc_html_e( 'Knappform', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="button_shape" name="button_shape">
+							<?php foreach ( $shape_options as $key => $option ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['button_shape'], $key ); ?>><?php echo esc_html( $option['label'] ); ?></option>
+							<?php endforeach; ?>
+						</select>
 					</td>
 				</tr>
 				<tr>
@@ -268,7 +339,70 @@ $msg = isset( $_GET['msg'] ) ? sanitize_text_field( $_GET['msg'] ) : '';
 
 </form>
 
+<!-- Förhandsvisning. Följer formuläret live via cocookie-banner-preview.js. -->
+<aside class="cocookie-banner-editor__preview" aria-label="<?php esc_attr_e( 'Förhandsvisning', 'cocookie' ); ?>">
+	<div class="cocookie-preview">
+		<div class="cocookie-preview__header">
+			<strong><?php esc_html_e( 'Förhandsvisning', 'cocookie' ); ?></strong>
+			<span><?php esc_html_e( 'Så här ser bannern ut på en dator', 'cocookie' ); ?></span>
+		</div>
+		<div class="cocookie-preview__viewport" id="cocookie-preview-viewport">
+			<div class="cocookie-preview__stage" id="cocookie-preview-stage" aria-hidden="true" inert>
+				<div class="cocookie-preview__page">
+					<div class="cocookie-preview__nav"><span></span><span></span><span></span><span></span></div>
+					<div class="cocookie-preview__hero"></div>
+					<div class="cocookie-preview__lines"><span></span><span></span><span></span><span></span></div>
+				</div>
+				<div id="cocookie-preview-banner"
+					class="<?php echo esc_attr( $design['classes'] ); ?>"
+					data-preview="<?php echo esc_attr( wp_json_encode( $preview_data ) ); ?>"
+					style="--cocookie-bg: <?php echo esc_attr( $s['banner_bg_color'] ); ?>;
+						--cocookie-text: <?php echo esc_attr( $s['banner_text_color'] ); ?>;
+						--cocookie-accent: <?php echo esc_attr( $s['primary_color'] ); ?>;
+						--cocookie-accent-text: <?php echo esc_attr( $s['primary_text_color'] ); ?>;
+						--cocookie-reject-bg: <?php echo esc_attr( $s['reject_bg_color'] ); ?>;
+						--cocookie-reject-text: <?php echo esc_attr( $s['reject_text_color'] ); ?>;
+						--cocookie-radius: <?php echo esc_attr( $design['radius'] ); ?>;
+						--cocookie-btn-radius: <?php echo esc_attr( $design['button_radius'] ); ?>;">
+					<div class="cocookie-banner__inner">
+						<img class="cocookie-banner__logo" data-preview-logo src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" <?php echo empty( $s['logo_url'] ) ? 'hidden' : ''; ?>>
+						<div class="cocookie-banner__tabs">
+							<span class="cocookie-banner__tab cocookie-banner__tab--active"><?php esc_html_e( 'Samtycke', 'cocookie' ); ?></span>
+							<span class="cocookie-banner__tab"><?php esc_html_e( 'Detaljer', 'cocookie' ); ?></span>
+							<span class="cocookie-banner__tab"><?php esc_html_e( 'Om cookies', 'cocookie' ); ?></span>
+						</div>
+						<div class="cocookie-banner__panel">
+							<p class="cocookie-banner__title" data-preview-text="banner_title"><?php echo esc_html( $s['banner_title'] ); ?></p>
+							<p class="cocookie-banner__text">
+								<span data-preview-text="banner_text"><?php echo esc_html( $s['banner_text'] ); ?></span>
+								<span class="cocookie-banner__policy-link"><?php esc_html_e( 'Läs vår integritetspolicy.', 'cocookie' ); ?></span>
+							</p>
+							<p class="cocookie-banner__google" data-preview-google <?php echo empty( $s['google_consent_enabled'] ) ? 'hidden' : ''; ?>>
+								<span data-preview-text="google_consent_intro"><?php echo esc_html( $s['google_consent_intro'] ); ?></span>
+								<span class="cocookie-banner__google-link" data-preview-text="google_consent_link_text"><?php echo esc_html( $s['google_consent_link_text'] ); ?></span>
+							</p>
+						</div>
+						<div class="cocookie-banner__buttons">
+							<span class="cocookie-btn cocookie-btn--accept" data-preview-text="accept_all_text"><?php echo esc_html( $s['accept_all_text'] ); ?></span>
+							<span class="cocookie-btn cocookie-btn--reject" data-preview-text="reject_all_text"><?php echo esc_html( $s['reject_all_text'] ); ?></span>
+							<span class="cocookie-btn cocookie-btn--settings" data-preview-text="settings_text"><?php echo esc_html( $s['settings_text'] ); ?></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</aside>
+</div>
+
 <script>
+// jQuery .val() skickar inga händelser. Förhandsvisningen lyssnar på
+// vanliga change-händelser, så de skickas här när bildfälten ändras.
+function cocookieNotifyPreview(id) {
+	var el = document.getElementById(id);
+	if (el) { el.dispatchEvent(new Event('change', { bubbles: true })); }
+}
+
 jQuery(function($){
 	// Logotyp-uppladdning
 	var logoFrame;
@@ -279,6 +413,7 @@ jQuery(function($){
 		logoFrame.on('select', function(){
 			var a = logoFrame.state().get('selection').first().toJSON();
 			$('#logo_url').val(a.url);
+			cocookieNotifyPreview('logo_url');
 			$('#cocookie-logo-preview').html('<img src="'+a.url+'" alt="">');
 			$('#cocookie-remove-logo').show();
 		});
@@ -287,6 +422,7 @@ jQuery(function($){
 	$('#cocookie-remove-logo').on('click', function(e){
 		e.preventDefault();
 		$('#logo_url').val('');
+		cocookieNotifyPreview('logo_url');
 		$('#cocookie-logo-preview').html('');
 		$(this).hide();
 	});

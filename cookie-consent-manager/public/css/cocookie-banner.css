@@ -13,6 +13,20 @@
 	--cocookie-accent-text: #ffffff;
 	--cocookie-reject-bg: #f0f0f0;
 	--cocookie-reject-text: #333333;
+	--cocookie-radius: 16px;
+	--cocookie-btn-radius: 8px;
+	--cocookie-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+	/* Nedtonade texter och ytor. Reservvärdena är de tidigare grå tonerna;
+	   i webbläsare med color-mix() blandas de fram ur text- och
+	   bakgrundsfärgen (se @supports nedan) så att mörka teman fungerar. */
+	--cocookie-muted: #666;
+	--cocookie-subtle: #6b6b6b;
+	--cocookie-line: #eee;
+	--cocookie-line-strong: #e0e0e0;
+	--cocookie-surface: #f8f9fa;
+	--cocookie-toggle-off: #ccc;
+	--cocookie-reject-hover: #ebebeb;
 
 	position: fixed;
 	left: 0;
@@ -24,8 +38,41 @@
 	color: var(--cocookie-text);
 }
 
+/* Procentsatserna ger samma grå toner som reservvärdena med
+   standardfärgerna (#333 på vitt). En custom property med color-mix()
+   kan inte ha en vanlig reservdeklaration, därför @supports. */
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+	.cocookie-banner {
+		--cocookie-muted: color-mix(in srgb, var(--cocookie-text) 75%, var(--cocookie-bg));
+		--cocookie-subtle: color-mix(in srgb, var(--cocookie-text) 72%, var(--cocookie-bg));
+		--cocookie-line: color-mix(in srgb, var(--cocookie-text) 8%, var(--cocookie-bg));
+		--cocookie-line-strong: color-mix(in srgb, var(--cocookie-text) 15%, var(--cocookie-bg));
+		--cocookie-surface: color-mix(in srgb, var(--cocookie-text) 3%, var(--cocookie-bg));
+		--cocookie-toggle-off: color-mix(in srgb, var(--cocookie-text) 30%, var(--cocookie-bg));
+		--cocookie-reject-hover: color-mix(in srgb, var(--cocookie-reject-bg) 94%, var(--cocookie-reject-text));
+	}
+}
+
 .cocookie-banner--bottom { bottom: 0; }
-.cocookie-banner--top { top: 0; }
+.cocookie-banner--top {
+	top: 0;
+	--cocookie-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Flytande layouter: kort, hörnrutor och modal. Hörnradien gäller bara
+   dem, eftersom en bar i full bredd ligger mot skärmkanten. */
+.cocookie-banner--floating {
+	--cocookie-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+	border-radius: var(--cocookie-radius);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100vh - 40px);
+}
+
+.cocookie-banner--floating .cocookie-banner__inner {
+	border-radius: var(--cocookie-radius);
+}
 
 .cocookie-banner--center {
 	top: 50%;
@@ -35,10 +82,60 @@
 	max-width: 540px;
 	width: 92%;
 	max-height: 88vh;
-	border-radius: 16px;
-	overflow: hidden;
-	display: flex;
-	flex-direction: column;
+}
+
+.cocookie-banner--bottom-card {
+	bottom: 20px;
+	left: 50%;
+	right: auto;
+	transform: translateX(-50%);
+	width: calc(100% - 40px);
+	max-width: 760px;
+}
+
+.cocookie-banner--bottom-left,
+.cocookie-banner--bottom-right {
+	bottom: 20px;
+	width: calc(100% - 40px);
+	max-width: 400px;
+}
+
+.cocookie-banner--bottom-left { left: 20px; right: auto; }
+.cocookie-banner--bottom-right { right: 20px; left: auto; }
+
+/* Hörnrutan är smal: tätare flikar och knappar som fyller bredden. */
+.cocookie-banner--bottom-left .cocookie-banner__inner,
+.cocookie-banner--bottom-right .cocookie-banner__inner {
+	padding: 22px 24px;
+}
+
+.cocookie-banner--bottom-left .cocookie-banner__tab,
+.cocookie-banner--bottom-right .cocookie-banner__tab {
+	padding: 10px 12px;
+}
+
+.cocookie-banner--bottom-left .cocookie-btn,
+.cocookie-banner--bottom-right .cocookie-btn {
+	flex: 1 1 auto;
+	text-align: center;
+}
+
+/* Skugga och ram. Ligger efter layouterna så att de vinner. */
+.cocookie-banner--shadow-strong { --cocookie-shadow: 0 -6px 28px rgba(0, 0, 0, 0.22); }
+.cocookie-banner--shadow-strong.cocookie-banner--top { --cocookie-shadow: 0 6px 28px rgba(0, 0, 0, 0.22); }
+.cocookie-banner--shadow-strong.cocookie-banner--floating { --cocookie-shadow: 0 16px 60px rgba(0, 0, 0, 0.32); }
+.cocookie-banner--shadow-none { --cocookie-shadow: none; }
+
+.cocookie-banner--bordered.cocookie-banner--bottom .cocookie-banner__inner {
+	border-top: 1px solid var(--cocookie-line-strong);
+}
+
+.cocookie-banner--bordered.cocookie-banner--top .cocookie-banner__inner {
+	border-bottom: 1px solid var(--cocookie-line-strong);
+}
+
+.cocookie-banner--bordered.cocookie-banner--floating .cocookie-banner__inner {
+	border: 1px solid var(--cocookie-line-strong);
 }
 
 /* Overlay for center modal */
@@ -57,17 +154,8 @@
 .cocookie-banner__inner {
 	background: var(--cocookie-bg);
 	padding: 28px 32px;
-	box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--cocookie-shadow);
 	overflow-y: auto;
-}
-
-.cocookie-banner--top .cocookie-banner__inner {
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.cocookie-banner--center .cocookie-banner__inner {
-	box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
-	border-radius: 16px;
 }
 
 /* Logo */
@@ -91,7 +179,7 @@
 .cocookie-banner__text {
 	margin: 0 0 20px;
 	font-size: 14px;
-	color: #666;
+	color: var(--cocookie-muted);
 	line-height: 1.6;
 }
 
@@ -107,7 +195,7 @@
 .cocookie-banner__google {
 	margin: -12px 0 20px;
 	font-size: 13px;
-	color: #6b6b6b;
+	color: var(--cocookie-subtle);
 	line-height: 1.5;
 }
 
@@ -124,16 +212,16 @@
 .cocookie-banner__consent-info {
 	margin: 4px 0 16px;
 	padding: 12px 16px;
-	background: #f8f9fa;
+	background: var(--cocookie-surface);
 	border-radius: 8px;
 	font-size: 12px;
-	color: #666;
+	color: var(--cocookie-muted);
 	line-height: 1.7;
-	border: 1px solid #eee;
+	border: 1px solid var(--cocookie-line);
 }
 
 .cocookie-banner__consent-info p { margin: 2px 0; }
-.cocookie-banner__consent-info strong { color: #444; font-weight: 600; }
+.cocookie-banner__consent-info strong { color: var(--cocookie-text); font-weight: 600; }
 
 /* DNT notice */
 .cocookie-banner__dnt {
@@ -150,7 +238,7 @@
 .cocookie-banner__tabs {
 	display: flex;
 	gap: 0;
-	border-bottom: 2px solid #eee;
+	border-bottom: 2px solid var(--cocookie-line);
 	margin-bottom: 16px;
 }
 
@@ -162,7 +250,7 @@
 	background: none !important;
 	font-size: 13px;
 	font-weight: 600;
-	color: #4b5563;
+	color: var(--cocookie-muted);
 	cursor: pointer;
 	margin-bottom: -2px;
 	transition: color 0.2s, border-color 0.2s;
@@ -175,11 +263,11 @@
 
 .cocookie-banner__tab:hover,
 .cocookie-banner__tab:focus {
-	color: #1f2937;
+	color: var(--cocookie-text);
 	background: none !important;
 	box-shadow: none;
 	border-color: transparent;
-	border-bottom-color: #ccc;
+	border-bottom-color: var(--cocookie-line-strong);
 }
 
 .cocookie-banner__tab--active,
@@ -200,7 +288,7 @@
 .cocookie-banner__about {
 	font-size: 13px;
 	line-height: 1.7;
-	color: #555;
+	color: var(--cocookie-muted);
 	max-height: 320px;
 	overflow-y: auto;
 }
@@ -212,7 +300,7 @@
 .cocookie-banner__about-title {
 	font-size: 14px;
 	font-weight: 700;
-	color: #222;
+	color: var(--cocookie-text);
 	margin: 16px 0 6px;
 }
 
@@ -228,8 +316,8 @@
 }
 
 .cocookie-banner__about-type {
-	background: #f8f9fa;
-	border: 1px solid #eee;
+	background: var(--cocookie-surface);
+	border: 1px solid var(--cocookie-line);
 	border-radius: 8px;
 	padding: 12px 14px;
 }
@@ -237,14 +325,14 @@
 .cocookie-banner__about-type strong {
 	display: block;
 	font-size: 13px;
-	color: #333;
+	color: var(--cocookie-text);
 	margin-bottom: 4px;
 }
 
 .cocookie-banner__about-type p {
 	margin: 0;
 	font-size: 12px;
-	color: #666;
+	color: var(--cocookie-muted);
 	line-height: 1.6;
 }
 
@@ -259,7 +347,7 @@
 .cocookie-btn {
 	padding: 12px 24px;
 	border: none !important;
-	border-radius: 8px;
+	border-radius: var(--cocookie-btn-radius);
 	font-size: 14px;
 	font-weight: 600;
 	cursor: pointer;
@@ -295,20 +383,21 @@
 .cocookie-btn--reject:focus {
 	background: var(--cocookie-reject-bg) !important;
 	color: var(--cocookie-reject-text) !important;
-	border: 1px solid #e0e0e0 !important;
+	border: 1px solid var(--cocookie-line-strong) !important;
 }
 
 .cocookie-btn--reject:hover {
-	background: #ebebeb !important;
+	background: var(--cocookie-reject-hover) !important;
 	color: var(--cocookie-reject-text) !important;
 }
 
-/* Gråa texter i bannern använder #6b6b6b (5,3:1 mot vitt). Ljusare grått
-   (#888/#999) underkänns av tillgänglighetsgranskning (WCAG AA, 4,5:1). */
+/* Gråa texter i bannern blir #6b6b6b med standardfärgerna (5,3:1 mot vitt).
+   Ljusare grått (#888/#999) underkänns av tillgänglighetsgranskning
+   (WCAG AA, 4,5:1). */
 .cocookie-btn--settings,
 .cocookie-btn--settings:focus {
 	background: transparent !important;
-	color: #6b6b6b !important;
+	color: var(--cocookie-subtle) !important;
 	text-decoration: underline;
 	text-underline-offset: 3px;
 	padding: 12px 14px;
@@ -320,29 +409,29 @@
 	box-shadow: none !important;
 	transform: none;
 	background: transparent !important;
-	color: #555 !important;
+	color: var(--cocookie-text) !important;
 }
 
 /* === Details / Categories === */
 .cocookie-banner__details {
 	margin-top: 20px;
-	border-top: 1px solid #f0f0f0;
+	border-top: 1px solid var(--cocookie-line);
 	padding-top: 16px;
 	max-height: 320px;
 	overflow-y: auto;
 }
 
 .cocookie-category {
-	border: 1px solid #eaeaea;
+	border: 1px solid var(--cocookie-line);
 	border-radius: 10px;
 	margin-bottom: 8px;
-	background: #fafbfc;
+	background: var(--cocookie-surface);
 	overflow: hidden;
 	transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .cocookie-category:last-child { margin-bottom: 0; }
-.cocookie-category:hover { border-color: #ddd; }
+.cocookie-category:hover { border-color: var(--cocookie-line-strong); }
 
 .cocookie-category__header {
 	display: flex;
@@ -360,7 +449,7 @@
 	cursor: default;
 	flex: 1;
 	min-width: 0;
-	color: #222;
+	color: var(--cocookie-text);
 }
 
 /* Custom toggle switch */
@@ -386,7 +475,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: #ccc;
+	background: var(--cocookie-toggle-off);
 	border-radius: 22px;
 	transition: background 0.25s;
 }
@@ -430,7 +519,7 @@
 
 .cocookie-category__required {
 	font-size: 11px;
-	color: #6b6b6b;
+	color: var(--cocookie-subtle);
 	font-weight: 400;
 }
 
@@ -442,12 +531,12 @@
 	border: none;
 	cursor: pointer;
 	padding: 4px;
-	color: #6b6b6b;
+	color: var(--cocookie-subtle);
 	font-size: 12px;
 }
 
 .cocookie-category__expand:hover {
-	color: #666;
+	color: var(--cocookie-text);
 }
 
 .cocookie-category__arrow {
@@ -462,13 +551,13 @@
 
 .cocookie-category__body {
 	padding: 0 16px 14px;
-	border-top: 1px solid #f0f0f0;
+	border-top: 1px solid var(--cocookie-line);
 }
 
 .cocookie-category__desc {
 	margin: 12px 0 10px;
 	font-size: 13px;
-	color: #6b6b6b;
+	color: var(--cocookie-subtle);
 	line-height: 1.5;
 }
 
@@ -485,17 +574,17 @@
 .cocookie-category__table td {
 	text-align: left;
 	padding: 6px 10px;
-	border-bottom: 1px solid #f0f0f0;
-	color: #666;
+	border-bottom: 1px solid var(--cocookie-line);
+	color: var(--cocookie-muted);
 }
 
 .cocookie-category__table th {
 	font-weight: 600;
-	color: #444;
+	color: var(--cocookie-text);
 	font-size: 10px;
 	text-transform: uppercase;
 	letter-spacing: 0.4px;
-	background: #f3f4f6;
+	background: var(--cocookie-surface);
 	padding: 8px 10px;
 }
 
@@ -504,11 +593,12 @@
 .cocookie-category__table td:first-child {
 	font-family: "SFMono-Regular", "Menlo", monospace;
 	font-size: 11px;
-	color: #222;
+	color: var(--cocookie-text);
 }
 
 .cocookie-category__table code {
 	background: none;
+	color: inherit;
 	padding: 0;
 	font-size: inherit;
 }
@@ -623,8 +713,22 @@
    ytorna krymps och huvudknapparna ligger sida vid sida i stället för
    staplade. */
 @media (max-width: 480px) {
-	.cocookie-banner__inner {
+	.cocookie-banner__inner,
+	.cocookie-banner--bottom-left .cocookie-banner__inner,
+	.cocookie-banner--bottom-right .cocookie-banner__inner {
 		padding: 14px 16px 12px;
+	}
+
+	/* Kort och hörnrutor blir en flytande ruta längs nederkanten. */
+	.cocookie-banner--bottom-card,
+	.cocookie-banner--bottom-left,
+	.cocookie-banner--bottom-right {
+		left: 8px;
+		right: 8px;
+		bottom: 8px;
+		width: auto;
+		max-width: none;
+		transform: none;
 	}
 
 	.cocookie-banner__logo {

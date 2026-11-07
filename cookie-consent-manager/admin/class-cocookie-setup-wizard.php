@@ -160,7 +160,12 @@ class CoCookie_Setup_Wizard {
 				'reject_all_text'    => sanitize_text_field( $post['reject_all_text'] ?? __( 'Avvisa alla', 'cocookie' ) ),
 				'save_text'          => sanitize_text_field( $post['save_text'] ?? __( 'Spara inställningar', 'cocookie' ) ),
 				'settings_text'      => sanitize_text_field( $post['settings_text'] ?? __( 'Inställningar', 'cocookie' ) ),
-				'position'           => sanitize_text_field( $post['position'] ?? 'bottom' ),
+				'position'           => CoCookie_REST_Config::sanitize_design_settings( $post )['position'],
+				// Guiden har inga val för form och skugga – behåll det som redan är sparat.
+				'banner_radius'      => $existing['banner_radius'] ?? 'large',
+				'banner_shadow'      => $existing['banner_shadow'] ?? 'soft',
+				'banner_border'      => ! empty( $existing['banner_border'] ),
+				'button_shape'       => $existing['button_shape'] ?? 'rounded',
 				'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#29A166' ),
 				'primary_text_color' => '#ffffff',
 				'logo_url'           => esc_url_raw( $post['logo_url'] ?? '' ),

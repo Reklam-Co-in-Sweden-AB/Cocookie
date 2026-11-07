@@ -15,11 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $s          = $config['settings'];
 $categories = $config['categories'];
-$position   = $s['position'] ?? 'bottom';
+$design     = CoCookie_REST_Config::get_banner_design( $s );
+$position   = $design['layout'];
 ?>
 
 <div id="cocookie-banner"
-	class="cocookie-banner cocookie-banner--<?php echo esc_attr( $position ); ?>"
+	class="<?php echo esc_attr( $design['classes'] ); ?>"
 	<?php if ( ! empty( $config['lang'] ) ) : ?>lang="<?php echo esc_attr( $config['lang'] ); ?>"<?php endif; ?>
 	role="dialog"
 	aria-label="<?php echo esc_attr( $s['banner_title'] ); ?>"
@@ -30,7 +31,9 @@ $position   = $s['position'] ?? 'bottom';
 		--cocookie-accent: <?php echo esc_attr( $s['primary_color'] ); ?>;
 		--cocookie-accent-text: <?php echo esc_attr( $s['primary_text_color'] ); ?>;
 		--cocookie-reject-bg: <?php echo esc_attr( $s['reject_bg_color'] ); ?>;
-		--cocookie-reject-text: <?php echo esc_attr( $s['reject_text_color'] ); ?>;">
+		--cocookie-reject-text: <?php echo esc_attr( $s['reject_text_color'] ); ?>;
+		--cocookie-radius: <?php echo esc_attr( $design['radius'] ); ?>;
+		--cocookie-btn-radius: <?php echo esc_attr( $design['button_radius'] ); ?>;">
 
 	<?php if ( 'center' === $position ) : ?>
 		<div class="cocookie-banner__overlay" data-cocookie-close></div>

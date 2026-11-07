@@ -271,6 +271,134 @@ class CoCookie_REST_Config {
 	}
 
 	/**
+	 * Bannerns layouter. Nyckeln sparas i inställningen "position" så att
+	 * äldre installationer (bottom/top/center) fungerar som tidigare.
+	 *
+	 * @return array Nyckel => array( label, floating ).
+	 */
+	public static function get_layout_options() {
+		return array(
+			'bottom'       => array( 'label' => __( 'Botten, full bredd', 'cocookie' ), 'floating' => false ),
+			'top'          => array( 'label' => __( 'Topp, full bredd', 'cocookie' ), 'floating' => false ),
+			'bottom-card'  => array( 'label' => __( 'Flytande kort nere i mitten', 'cocookie' ), 'floating' => true ),
+			'bottom-left'  => array( 'label' => __( 'Ruta nere till vänster', 'cocookie' ), 'floating' => true ),
+			'bottom-right' => array( 'label' => __( 'Ruta nere till höger', 'cocookie' ), 'floating' => true ),
+			'center'       => array( 'label' => __( 'Center (modal)', 'cocookie' ), 'floating' => true ),
+		);
+	}
+
+	/**
+	 * Hörnradie för flytande layouter.
+	 *
+	 * @return array Nyckel => array( label, value ).
+	 */
+	public static function get_radius_options() {
+		return array(
+			'none'   => array( 'label' => __( 'Kantigt', 'cocookie' ), 'value' => '0px' ),
+			'small'  => array( 'label' => __( 'Lätt rundat', 'cocookie' ), 'value' => '6px' ),
+			'medium' => array( 'label' => __( 'Rundat', 'cocookie' ), 'value' => '10px' ),
+			'large'  => array( 'label' => __( 'Mycket rundat', 'cocookie' ), 'value' => '16px' ),
+		);
+	}
+
+	/**
+	 * Skuggor. "soft" är bannerns ursprungliga skugga.
+	 *
+	 * @return array Nyckel => etikett.
+	 */
+	public static function get_shadow_options() {
+		return array(
+			'none'   => __( 'Ingen', 'cocookie' ),
+			'soft'   => __( 'Mjuk', 'cocookie' ),
+			'strong' => __( 'Kraftig', 'cocookie' ),
+		);
+	}
+
+	/**
+	 * Knapparnas form.
+	 *
+	 * @return array Nyckel => array( label, value ).
+	 */
+	public static function get_button_shape_options() {
+		return array(
+			'square'  => array( 'label' => __( 'Kantiga', 'cocookie' ), 'value' => '0px' ),
+			'rounded' => array( 'label' => __( 'Rundade', 'cocookie' ), 'value' => '8px' ),
+			'pill'    => array( 'label' => __( 'Piller', 'cocookie' ), 'value' => '999px' ),
+		);
+	}
+
+	/**
+	 * Standardvärden för designvalen. Motsvarar bannerns utseende före 2.8.0.
+	 *
+	 * @return array
+	 */
+	public static function get_design_defaults() {
+		return array(
+			'position'      => 'bottom',
+			'banner_radius' => 'large',
+			'banner_shadow' => 'soft',
+			'banner_border' => false,
+			'button_shape'  => 'rounded',
+		);
+	}
+
+	/**
+	 * Sanerar designvalen mot listorna ovan. Okända värden ger standardvärdet.
+	 *
+	 * @param array $input Osanerade värden (t.ex. wp_unslash( $_POST )).
+	 * @return array
+	 */
+	public static function sanitize_design_settings( $input ) {
+		$defaults = self::get_design_defaults();
+		$lists    = array(
+			'position'      => self::get_layout_options(),
+			'banner_radius' => self::get_radius_options(),
+			'banner_shadow' => self::get_shadow_options(),
+			'button_shape'  => self::get_button_shape_options(),
+		);
+
+		$clean = array();
+		foreach ( $lists as $key => $options ) {
+			$value         = sanitize_key( $input[ $key ] ?? '' );
+			$clean[ $key ] = isset( $options[ $value ] ) ? $value : $defaults[ $key ];
+		}
+		$clean['banner_border'] = ! empty( $input['banner_border'] );
+
+		return $clean;
+	}
+
+	/**
+	 * Räknar ut bannerns klasser och mått från inställningarna. Används av
+	 * både frontend-mallen och förhandsvisningen i admin.
+	 *
+	 * @param array $s Bannerinställningar.
+	 * @return array layout, classes, radius, button_radius.
+	 */
+	public static function get_banner_design( $s ) {
+		$s        = self::sanitize_design_settings( $s );
+		$layouts  = self::get_layout_options();
+		$layout   = $s['position'];
+		$classes  = array( 'cocookie-banner', 'cocookie-banner--' . $layout );
+
+		if ( $layouts[ $layout ]['floating'] ) {
+			$classes[] = 'cocookie-banner--floating';
+		}
+		if ( 'soft' !== $s['banner_shadow'] ) {
+			$classes[] = 'cocookie-banner--shadow-' . $s['banner_shadow'];
+		}
+		if ( $s['banner_border'] ) {
+			$classes[] = 'cocookie-banner--bordered';
+		}
+
+		return array(
+			'layout'        => $layout,
+			'classes'       => implode( ' ', $classes ),
+			'radius'        => self::get_radius_options()[ $s['banner_radius'] ]['value'],
+			'button_radius' => self::get_button_shape_options()[ $s['button_shape'] ]['value'],
+		);
+	}
+
+	/**
 	 * Avgör vilket språk bannern ska visas på.
 	 *
 	 * Ett fast språk i inställningarna vinner alltid. Annars följer bannern
@@ -328,6 +456,10 @@ class CoCookie_REST_Config {
 				'save_text'          => $settings['save_text'] ?? __( 'Spara inställningar', 'cocookie' ),
 				'settings_text'      => $settings['settings_text'] ?? __( 'Inställningar', 'cocookie' ),
 				'position'           => $settings['position'] ?? 'bottom',
+				'banner_radius'      => $settings['banner_radius'] ?? 'large',
+				'banner_shadow'      => $settings['banner_shadow'] ?? 'soft',
+				'banner_border'      => ! empty( $settings['banner_border'] ),
+				'button_shape'       => $settings['button_shape'] ?? 'rounded',
 				'primary_color'      => $settings['primary_color'] ?? '#29A166',
 				'primary_text_color' => $settings['primary_text_color'] ?? '#ffffff',
 				'banner_bg_color'    => $settings['banner_bg_color'] ?? '#ffffff',
