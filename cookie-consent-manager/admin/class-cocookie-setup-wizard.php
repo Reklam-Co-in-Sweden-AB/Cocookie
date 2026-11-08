@@ -166,7 +166,7 @@ class CoCookie_Setup_Wizard {
 				'banner_shadow'      => $existing['banner_shadow'] ?? 'soft',
 				'banner_border'      => ! empty( $existing['banner_border'] ),
 				'button_shape'       => $existing['button_shape'] ?? 'rounded',
-				'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#29A166' ),
+				'primary_color'      => sanitize_hex_color( $post['primary_color'] ?? '#1f7a4d' ),
 				'primary_text_color' => '#ffffff',
 				'logo_url'           => esc_url_raw( $post['logo_url'] ?? '' ),
 				'banner_bg_color'    => '#ffffff',

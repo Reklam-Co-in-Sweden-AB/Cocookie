@@ -364,6 +364,8 @@ $preview_data   = array(
 						--cocookie-reject-text: <?php echo esc_attr( $s['reject_text_color'] ); ?>;
 						--cocookie-radius: <?php echo esc_attr( $design['radius'] ); ?>;
 						--cocookie-btn-radius: <?php echo esc_attr( $design['button_radius'] ); ?>;">
+					<?php // Visas bara i modalläget, via CSS. ?>
+					<div class="cocookie-banner__overlay"></div>
 					<div class="cocookie-banner__inner">
 						<img class="cocookie-banner__logo" data-preview-logo src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" <?php echo empty( $s['logo_url'] ) ? 'hidden' : ''; ?>>
 						<div class="cocookie-banner__tabs">

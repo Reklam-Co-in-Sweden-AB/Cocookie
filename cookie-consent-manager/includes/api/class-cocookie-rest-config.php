@@ -460,7 +460,7 @@ class CoCookie_REST_Config {
 				'banner_shadow'      => $settings['banner_shadow'] ?? 'soft',
 				'banner_border'      => ! empty( $settings['banner_border'] ),
 				'button_shape'       => $settings['button_shape'] ?? 'rounded',
-				'primary_color'      => $settings['primary_color'] ?? '#29A166',
+				'primary_color'      => $settings['primary_color'] ?? '#1f7a4d',
 				'primary_text_color' => $settings['primary_text_color'] ?? '#ffffff',
 				'banner_bg_color'    => $settings['banner_bg_color'] ?? '#ffffff',
 				'banner_text_color'  => $settings['banner_text_color'] ?? '#333333',

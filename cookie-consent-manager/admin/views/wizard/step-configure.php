@@ -77,7 +77,7 @@ $s        = wp_parse_args( $settings, $defaults );
 				<span style="font-size:12px;font-weight:400;color:var(--cocookie-neutral-500);margin-left:6px;"><?php esc_html_e( '(acceptera-knappens färg)', 'cocookie' ); ?></span>
 			</label>
 			<div class="cocookie-color-presets">
-				<button type="button" class="cocookie-color-preset <?php echo '#29A166' === $s['primary_color'] ? 'is-selected' : ''; ?>" data-color="#29A166" style="background:#29A166;" title="<?php esc_attr_e( 'CoCookie Grön', 'cocookie' ); ?>"></button>
+				<button type="button" class="cocookie-color-preset <?php echo '#1f7a4d' === $s['primary_color'] ? 'is-selected' : ''; ?>" data-color="#1f7a4d" style="background:#1f7a4d;" title="<?php esc_attr_e( 'CoCookie Grön', 'cocookie' ); ?>"></button>
 				<button type="button" class="cocookie-color-preset <?php echo '#2271b1' === $s['primary_color'] ? 'is-selected' : ''; ?>" data-color="#2271b1" style="background:#2271b1;" title="<?php esc_attr_e( 'Blå', 'cocookie' ); ?>"></button>
 				<button type="button" class="cocookie-color-preset <?php echo '#7C3AED' === $s['primary_color'] ? 'is-selected' : ''; ?>" data-color="#7C3AED" style="background:#7C3AED;" title="<?php esc_attr_e( 'Lila', 'cocookie' ); ?>"></button>
 				<button type="button" class="cocookie-color-preset <?php echo '#DC2626' === $s['primary_color'] ? 'is-selected' : ''; ?>" data-color="#DC2626" style="background:#DC2626;" title="<?php esc_attr_e( 'Röd', 'cocookie' ); ?>"></button>

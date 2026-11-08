@@ -248,7 +248,7 @@ gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personal
 	 */
 	private static function render_consent_status( $categories ) {
 		$settings     = get_option( 'cocookie_settings', get_option( 'ccm_settings', array() ) );
-		$accent       = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#29A166';
+		$accent       = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#1f7a4d';
 		$accent_text  = ! empty( $settings['primary_text_color'] ) ? $settings['primary_text_color'] : '#ffffff';
 		$button_label = ! empty( $settings['settings_text'] ) ? $settings['settings_text'] : __( 'Cookie-inställningar', 'cocookie' );
 
@@ -331,7 +331,7 @@ gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personal
 
 		// Bannerns färgvariabler sitter på #cocookie-banner och ärvs inte hit,
 		// därför sätts de om inline så att knappen matchar bannerns primärfärg.
-		$accent      = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#29A166';
+		$accent      = ! empty( $settings['primary_color'] ) ? $settings['primary_color'] : '#1f7a4d';
 		$accent_text = ! empty( $settings['primary_text_color'] ) ? $settings['primary_text_color'] : '#ffffff';
 
 		$classes = trim( 'cocookie-settings-link cocookie-open-settings ' . $atts['class'] );
