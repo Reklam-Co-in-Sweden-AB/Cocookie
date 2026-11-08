@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.7.0
+Stable tag: 2.8.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,15 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.8.0 =
+* Nytt: fler layouter för bannern. Utöver botten, topp och modal finns ett flytande kort nere i mitten och en ruta i nedre vänstra eller högra hörnet. På mobil läggs kortet och hörnrutorna längs nederkanten.
+* Nytt: färdiga teman under Banner → Utseende (Ljust, Mörkt, Minimalistiskt, Varmt). Ett tema fyller i färger och form, och du kan justera allt efteråt. Alla teman klarar WCAG AA.
+* Nytt: val för hörnradie, skugga, tunn ram och knappform (kantiga, rundade, piller).
+* Nytt: förhandsvisning på inställningssidan som ändras direkt när du ändrar något.
+* Förbättring: bannerns grå texter och linjer räknas fram ur dina färger, så att mörka teman blir läsbara.
+* Förbättring: standardfärgen för Acceptera-knappen är nu en mörkare grön (#1f7a4d) som klarar WCAG AA mot vit text. Sajter som redan sparat en egen färg påverkas inte.
+* Fix: modalens mörka bakgrund täcker nu hela sidan. Tidigare syntes den inte alls.
 
 = 2.7.0 =
 * Nytt: bannern finns på danska och norska (bokmål). Välj Dansk eller Norsk under Bannerns språk, eller låt bannern följa sidans språk. Norska sidor känns igen både som nb, nn och no.
