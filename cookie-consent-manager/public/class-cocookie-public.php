@@ -348,23 +348,27 @@ gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personal
 	/**
 	 * Output Google Consent Mode v2 default + cookie interceptor in <head>.
 	 *
-	 * This is identical to the original implementation — it must run
-	 * before any GTM/gtag.js scripts to prevent flicker.
+	 * It must run before any GTM/gtag.js scripts to prevent flicker.
+	 *
+	 * Samtycket läses i webbläsaren, aldrig på servern. Det som skrivs ut här
+	 * kan sparas av en sidcache och visas för andra besökare, så utskriften får
+	 * inte bero på vem som råkade ladda sidan. Tidigare skrevs besökarens
+	 * samtycke in av PHP, och då fick alla som såg den cachade sidan samma
+	 * samtycke som den första besökaren.
 	 */
 	public static function output_gcm_default() {
-		$consent_json = isset( $_COOKIE['cc_consent'] ) ? stripslashes( $_COOKIE['cc_consent'] ) : '';
-		$consent      = $consent_json ? json_decode( $consent_json, true ) : null;
-
-		$has_marketing = $consent && ! empty( $consent['marketing'] );
-		$has_analytics = $consent && ! empty( $consent['analytics'] );
-
 		$cookie_category_map = self::get_cookie_category_map();
 		$cookie_map_json     = wp_json_encode( $cookie_category_map );
 
 		$blocked_cookies = get_option( 'cocookie_blocked_cookies', get_option( 'ccm_blocked_cookies', array() ) );
 		$blocked_json    = wp_json_encode( array_values( $blocked_cookies ) );
 
-		$consent_state_json = $consent ? wp_json_encode( $consent ) : 'null';
+		// Samma livslängd som bannerns JS använder för att avgöra om samtycket gått ut.
+		$settings      = get_option( 'cocookie_settings', get_option( 'ccm_settings', array() ) );
+		$lifetime_days = intval( $settings['cookie_lifetime'] ?? 365 );
+		if ( $lifetime_days < 1 ) {
+			$lifetime_days = 365;
+		}
 		?>
 <script data-cfasync="false">
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
@@ -376,24 +380,39 @@ gtag('consent','default',{
 });
 gtag('set','ads_data_redaction',true);
 gtag('set','url_passthrough',true);
-<?php if ( $consent ) : ?>
-gtag('consent','update',{
-  ad_storage:<?php echo $has_marketing ? "'granted'" : "'denied'"; ?>,
-  ad_user_data:<?php echo $has_marketing ? "'granted'" : "'denied'"; ?>,
-  ad_personalization:<?php echo $has_marketing ? "'granted'" : "'denied'"; ?>,
-  analytics_storage:<?php echo $has_analytics ? "'granted'" : "'denied'"; ?>,
-  functionality_storage:'granted',
-  personalization_storage:<?php echo $has_analytics ? "'granted'" : "'denied'"; ?>,
-  security_storage:'granted'
-});
-<?php if ( $has_marketing ) : ?>
-gtag('set','ads_data_redaction',false);
-<?php endif; ?>
-<?php endif; ?>
 (function(){
   var cookieMap=<?php echo $cookie_map_json; ?>;
   var manualBlocked=<?php echo $blocked_json; ?>;
-  var consent=<?php echo $consent_state_json; ?>;
+  var lifetime=<?php echo $lifetime_days; ?>*86400000;
+  var consent=null;
+  try{
+    var raw=document.cookie.match(/(?:^|; )cc_consent=([^;]+)/);
+    if(raw){consent=JSON.parse(decodeURIComponent(raw[1]));}
+  }catch(e){consent=null;}
+  if(!consent||typeof consent!=='object'){consent=null;}
+  if(consent&&consent.timestamp&&(Date.now()-consent.timestamp)>lifetime){consent=null;}
+  if(consent){
+    var mk=!!consent.marketing,an=!!consent.analytics;
+    gtag('consent','update',{
+      ad_storage:mk?'granted':'denied',
+      ad_user_data:mk?'granted':'denied',
+      ad_personalization:mk?'granted':'denied',
+      analytics_storage:an?'granted':'denied',
+      functionality_storage:'granted',
+      personalization_storage:an?'granted':'denied',
+      security_storage:'granted'
+    });
+    if(mk){gtag('set','ads_data_redaction',false);}
+    // Iframes skrivs alltid ut blockerade. Dölj platshållaren direkt för godkända
+    // kategorier, så att den inte blinkar till innan bannerns JS har satt tillbaka iframen.
+    var css='';
+    for(var k in consent){
+      if(consent.hasOwnProperty(k)&&consent[k]===true&&/^[a-z0-9_-]+$/.test(k)){
+        css+='.cocookie-iframe-placeholder[data-cc-category="'+k+'"],.ccm-iframe-placeholder[data-cc-category="'+k+'"]{display:none!important}';
+      }
+    }
+    if(css&&document.head){var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);}
+  }
   window.__ccmUpdateConsent=function(c){consent=c;};
   function isBlocked(name){
     for(var i=0;i<manualBlocked.length;i++){if(name===manualBlocked[i])return true;}

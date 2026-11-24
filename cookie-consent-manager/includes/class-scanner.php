@@ -114,21 +114,19 @@ class CCM_Scanner {
 
         // Convert <script data-cc-category="..." src="..."> to type="text/plain"
         // This ensures scripts are blocked until consent is given.
-        // If consent already exists for the category, leave the script unchanged.
-        $consent = self::get_server_consent();
+        //
+        // Blockeringen görs alltid, oavsett besökarens samtycke. HTML-koden kan
+        // sparas av en sidcache och visas för andra besökare, så servern får
+        // aldrig låta en besökares samtycke avgöra vad som skrivs ut. Bannerns JS
+        // läser samtyckeskakan i webbläsaren och aktiverar det som är godkänt.
 
         $html = preg_replace_callback(
             '/<script([^>]*?)data-cc-category=["\']([^"\']+)["\']([^>]*?)>/i',
-            function ( $matches ) use ( $consent ) {
+            function ( $matches ) {
                 $before   = $matches[1];
                 $category = $matches[2];
                 $after    = $matches[3];
                 $full     = $before . $after;
-
-                // Already consented — don't block this script
-                if ( $consent && ! empty( $consent[ $category ] ) ) {
-                    return $matches[0];
-                }
 
                 // Don't modify if already type="text/plain"
                 if ( stripos( $full, 'type="text/plain"' ) !== false || stripos( $full, "type='text/plain'" ) !== false ) {
@@ -171,7 +169,7 @@ class CCM_Scanner {
 
         $html = preg_replace_callback(
             '/<script([^>]*?)src=["\']([^"\']+)["\']([^>]*?)>/i',
-            function ( $matches ) use ( $consent, $auto_block_patterns ) {
+            function ( $matches ) use ( $auto_block_patterns ) {
                 $before = $matches[1];
                 $src    = $matches[2];
                 $after  = $matches[3];
@@ -200,11 +198,6 @@ class CCM_Scanner {
                     return $matches[0];
                 }
 
-                // Already consented — don't block
-                if ( $consent && ! empty( $consent[ $category ] ) ) {
-                    return $matches[0];
-                }
-
                 // Block by changing type and adding category attribute
                 $full = preg_replace( '/\s*type\s*=\s*["\'][^"\']*["\']/i', '', $full );
 
@@ -224,23 +217,10 @@ class CCM_Scanner {
     }
 
     /**
-     * Read consent cookie server-side. Cached per request.
-     *
-     * @return array|null Consent data or null if no consent.
-     */
-    private static function get_server_consent() {
-        static $consent = false;
-        if ( false === $consent ) {
-            $raw = isset( $_COOKIE['cc_consent'] ) ? stripslashes( $_COOKIE['cc_consent'] ) : '';
-            $consent = $raw ? json_decode( $raw, true ) : null;
-        }
-        return $consent;
-    }
-
-    /**
      * Replace a matched iframe tag with a consent placeholder if it matches
      * a known third-party provider or has a manual data-cc-category attribute.
-     * If the visitor has already consented to the category, leave the iframe unchanged.
+     * Görs alltid, oavsett samtycke (se process_buffer). Bannerns JS sätter
+     * tillbaka iframen i webbläsaren för den som har godkänt kategorin.
      */
     private static function replace_iframe( $matches ) {
         $full_tag   = $matches[0];
@@ -280,12 +260,6 @@ class CCM_Scanner {
 
         // Not a known provider and no manual category — leave unchanged
         if ( ! $category ) {
-            return $full_tag;
-        }
-
-        // If visitor already consented to this category, don't block the iframe
-        $consent = self::get_server_consent();
-        if ( $consent && ! empty( $consent[ $category ] ) ) {
             return $full_tag;
         }
 
