@@ -660,6 +660,239 @@
 	vertical-align: middle;
 }
 
+/* === Flytande knapp: sida och ritade stilar ===
+   Grundklassen ovan är emoji-knappen. Stilarna nedan skriver över den.
+   Knappen ligger utanför bannern och får bannerns färger som egna
+   variabler i mallen (public/templates/banner.php). */
+.cocookie-float--right {
+	left: auto;
+	right: 20px;
+}
+
+.cocookie-float--drawn {
+	--cocookie-float-line: rgba(0, 0, 0, 0.14);
+	--cocookie-float-tab: min(var(--cocookie-btn-radius, 8px), 14px);
+	--cocookie-float-corner: min(var(--cocookie-btn-radius, 8px), 60px);
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	box-sizing: border-box;
+	border: 1px solid var(--cocookie-float-line);
+	border-radius: var(--cocookie-btn-radius, 8px);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: none;
+	text-decoration: none;
+	transition: transform 0.2s, box-shadow 0.2s, padding 0.2s;
+}
+
+/* Kantlinjen blandas fram ur bannerns färger, se kommentaren om
+   color-mix() och @supports överst i filen. */
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+	.cocookie-float--drawn {
+		--cocookie-float-line: color-mix(in srgb, var(--cocookie-text, #333) 18%, var(--cocookie-bg, #fff));
+	}
+}
+
+/* Teman färgar ofta om button vid hover och fokus, därav !important. */
+.cocookie-float--drawn,
+.cocookie-float--drawn:hover,
+.cocookie-float--drawn:focus {
+	background: var(--cocookie-bg, #fff) !important;
+	color: var(--cocookie-text, #333) !important;
+}
+
+.cocookie-float--drawn:hover {
+	transform: translateY(-2px);
+}
+
+.cocookie-float--drawn:focus-visible {
+	outline: 2px solid var(--cocookie-text, #333);
+	outline-offset: 2px;
+}
+
+.cocookie-float__icon {
+	display: block;
+	flex: none;
+	width: 22px;
+	height: 22px;
+}
+
+.cocookie-float--drawn img {
+	flex: none;
+}
+
+.cocookie-float__label {
+	white-space: nowrap;
+}
+
+/* Piller med text */
+.cocookie-float--pill {
+	width: auto;
+	height: 42px;
+	padding: 0 16px 0 12px;
+}
+
+.cocookie-float--pill .cocookie-float__icon,
+.cocookie-float--pill img {
+	width: 20px;
+	height: 20px;
+}
+
+/* Växer när man pekar: ikon i vila, texten rullar ut vid hover och fokus. */
+.cocookie-float--grow {
+	width: auto;
+	min-width: 48px;
+	padding: 0 12px;
+	gap: 0;
+	border-color: transparent;
+}
+
+.cocookie-float--grow,
+.cocookie-float--grow:hover,
+.cocookie-float--grow:focus,
+.cocookie-float--side,
+.cocookie-float--side:hover,
+.cocookie-float--side:focus,
+.cocookie-float--corner,
+.cocookie-float--corner:hover,
+.cocookie-float--corner:focus {
+	background: var(--cocookie-accent, #1f7a4d) !important;
+	color: var(--cocookie-accent-text, #fff) !important;
+}
+
+.cocookie-float--grow .cocookie-float__label {
+	max-width: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-width 0.25s, opacity 0.2s, margin 0.25s;
+}
+
+.cocookie-float--grow:hover .cocookie-float__label,
+.cocookie-float--grow:focus-visible .cocookie-float__label {
+	max-width: 220px;
+	margin-left: 8px;
+	opacity: 1;
+}
+
+/* Kantflik: sitter fast i nederkanten och sticker upp lite till vid hover. */
+.cocookie-float--tab {
+	bottom: 0;
+	left: 24px;
+	width: auto;
+	height: 38px;
+	padding: 0 14px 4px;
+	gap: 7px;
+	border-bottom: 0;
+	border-radius: var(--cocookie-float-tab) var(--cocookie-float-tab) 0 0;
+	font-size: 13px;
+	transform: translateY(4px);
+}
+
+.cocookie-float--tab.cocookie-float--right {
+	left: auto;
+	right: 24px;
+}
+
+.cocookie-float--tab:hover {
+	transform: translateY(0);
+}
+
+.cocookie-float--tab .cocookie-float__icon,
+.cocookie-float--tab img {
+	width: 16px;
+	height: 16px;
+}
+
+/* Sidoflik: lodrät text längs sidkanten. Till vänster vrids fliken ett
+   halvt varv så att texten läses nerifrån och upp. */
+.cocookie-float--side {
+	display: block;
+	bottom: 64px;
+	left: 0;
+	width: auto;
+	height: auto;
+	padding: 14px 9px;
+	border: 0;
+	border-radius: var(--cocookie-float-tab) 0 0 var(--cocookie-float-tab);
+	font-size: 13px;
+	letter-spacing: 0.02em;
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+}
+
+.cocookie-float--side:hover {
+	padding: 14px 13px;
+	transform: rotate(180deg);
+}
+
+.cocookie-float--side.cocookie-float--right {
+	left: auto;
+	right: 0;
+	transform: none;
+}
+
+/* Hörn: fyller själva hörnet och växer lite vid hover. */
+.cocookie-float--corner {
+	bottom: 0;
+	left: 0;
+	width: 60px;
+	height: 60px;
+	padding: 0 0 10px 10px;
+	align-items: flex-end;
+	justify-content: flex-start;
+	border: 0;
+	border-radius: 0 var(--cocookie-float-corner) 0 0;
+	transform-origin: bottom left;
+}
+
+.cocookie-float--corner:hover {
+	transform: scale(1.12);
+}
+
+.cocookie-float--corner.cocookie-float--right {
+	left: auto;
+	right: 0;
+	padding: 0 10px 10px 0;
+	justify-content: flex-end;
+	border-radius: var(--cocookie-float-corner) 0 0 0;
+	transform-origin: bottom right;
+}
+
+/* Statusprick: fylld = allt godkänt, halv = eget val, tom ring = bara
+   nödvändiga. Läget sätts av bannerns JS utifrån samtycket i webbläsaren. */
+.cocookie-float__dot {
+	position: absolute;
+	top: -4px;
+	right: -4px;
+	box-sizing: border-box;
+	width: 14px;
+	height: 14px;
+	border: 2px solid var(--cocookie-accent, #1f7a4d);
+	border-radius: 50%;
+	background: var(--cocookie-bg, #fff);
+}
+
+.cocookie-float[data-cocookie-state="all"] .cocookie-float__dot {
+	background: var(--cocookie-accent, #1f7a4d);
+}
+
+.cocookie-float[data-cocookie-state="custom"] .cocookie-float__dot {
+	background: linear-gradient(90deg, var(--cocookie-accent, #1f7a4d) 50%, var(--cocookie-bg, #fff) 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cocookie-float,
+	.cocookie-float__label {
+		transition: none;
+	}
+}
+
 /* === Settings button (shortcode [cocookie_settings]) === */
 .cocookie-settings-link {
 	display: inline-block;
@@ -825,6 +1058,116 @@
 
 	.cocookie-category__table {
 		font-size: 10px;
+	}
+}
+
+/* === Bannerns uppställning: loggans plats och kompakt rad ===
+   Ligger efter mobilreglerna ovan. Loggan döljs fortfarande på mobil. */
+
+/* Logga i flikraden: sist i raden, till höger om flikarna. */
+.cocookie-banner__logo--tabs {
+	flex: 0 1 auto;
+	align-self: center;
+	min-width: 0;
+	max-width: 120px;
+	max-height: 28px;
+	margin: 0 0 0 auto;
+	object-fit: contain;
+}
+
+.cocookie-banner--bottom-left .cocookie-banner__logo--tabs,
+.cocookie-banner--bottom-right .cocookie-banner__logo--tabs {
+	max-width: 72px;
+}
+
+/* Logga bredvid texten: egen kolumn till vänster i samtyckesfliken. */
+.cocookie-banner--logo-beside [data-cocookie-panel="consent"] {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	column-gap: 16px;
+	align-content: start;
+}
+
+.cocookie-banner--logo-beside [data-cocookie-panel="consent"] > * {
+	grid-column: 2;
+}
+
+.cocookie-banner--logo-beside [data-cocookie-panel="consent"] > .cocookie-banner__logo--beside {
+	grid-column: 1;
+	grid-row: 1 / span 4;
+	max-width: 96px;
+	max-height: 48px;
+	margin: 2px 0 0;
+	object-fit: contain;
+}
+
+/* Kompakt rad: logga, text och knappar på en rad utan flikar. När
+   besökaren öppnar inställningarna sätter JS klassen --expanded, och då
+   gäller den vanliga uppställningen med flikar igen. */
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px 20px;
+	padding: 20px 24px;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__tabs {
+	display: none;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__logo {
+	flex: none;
+	max-height: 40px;
+	margin: 0;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__panel {
+	flex: 1 1 220px;
+	min-width: 0;
+	min-height: 0;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__title {
+	margin-bottom: 2px;
+	font-size: 17px;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__text {
+	margin-bottom: 0;
+	line-height: 1.5;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__google {
+	margin: 4px 0 0;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__dnt {
+	margin: 8px 0 0;
+}
+
+.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__buttons {
+	margin-top: 0;
+}
+
+@media (max-width: 480px) {
+	/* Loggan är dold på mobil, så dess kolumn tas bort. */
+	.cocookie-banner--logo-beside [data-cocookie-panel="consent"] {
+		display: block;
+	}
+
+	.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__inner {
+		gap: 10px;
+		padding: 14px 16px 12px;
+	}
+
+	.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__panel,
+	.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__buttons {
+		flex: 1 1 100%;
+	}
+
+	.cocookie-banner--compact:not(.cocookie-banner--expanded) .cocookie-banner__title {
+		font-size: 16px;
 	}
 }
 

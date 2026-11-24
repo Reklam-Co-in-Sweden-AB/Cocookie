@@ -71,6 +71,11 @@ class CoCookie_REST_Config {
 				'reject_all_text'    => 'Reject all',
 				'save_text'          => 'Save settings',
 				'settings_text'      => 'Settings',
+				'float_label'        => 'Cookies',
+				'float_label_long'   => 'Cookie settings',
+				'status_all'         => 'all accepted',
+				'status_custom'      => 'custom choice',
+				'status_necessary'   => 'necessary only',
 				'manage_title'       => 'Manage cookie settings',
 				'manage_text'        => 'Here you can change or withdraw your consent.',
 				'consent_date_label' => 'Consent date:',
@@ -122,6 +127,11 @@ class CoCookie_REST_Config {
 				'reject_all_text' => 'Afvis alle',
 				'save_text' => 'Gem indstillinger',
 				'settings_text' => 'Indstillinger',
+				'float_label' => 'Cookies',
+				'float_label_long' => 'Cookieindstillinger',
+				'status_all' => 'alle accepteret',
+				'status_custom' => 'eget valg',
+				'status_necessary' => 'kun nødvendige',
 				'manage_title' => 'Administrer cookieindstillinger',
 				'manage_text' => 'Her kan du ændre eller trække dit samtykke tilbage.',
 				'consent_date_label' => 'Samtykkedato:',
@@ -169,6 +179,11 @@ class CoCookie_REST_Config {
 				'reject_all_text' => 'Avvis alle',
 				'save_text' => 'Lagre innstillinger',
 				'settings_text' => 'Innstillinger',
+				'float_label' => 'Cookies',
+				'float_label_long' => 'Cookie-innstillinger',
+				'status_all' => 'alle godtatt',
+				'status_custom' => 'eget valg',
+				'status_necessary' => 'kun nødvendige',
 				'manage_title' => 'Administrer cookie-innstillinger',
 				'manage_text' => 'Her kan du endre eller trekke tilbake samtykket ditt.',
 				'consent_date_label' => 'Samtykkedato:',
@@ -328,17 +343,114 @@ class CoCookie_REST_Config {
 	}
 
 	/**
-	 * Standardvärden för designvalen. Motsvarar bannerns utseende före 2.8.0.
+	 * Bannerns uppställning: var loggan står och hur tätt innehållet ligger.
+	 * "stacked" är den ursprungliga uppställningen med loggan på egen rad.
+	 *
+	 * @return array Nyckel => etikett.
+	 */
+	public static function get_content_layout_options() {
+		return array(
+			'stacked'     => __( 'Logga på egen rad', 'cocookie' ),
+			'logo-beside' => __( 'Logga bredvid texten', 'cocookie' ),
+			'logo-tabs'   => __( 'Logga i flikraden', 'cocookie' ),
+			'compact'     => __( 'Kompakt rad', 'cocookie' ),
+		);
+	}
+
+	/**
+	 * Den flytande cookie-knappens stilar. "emoji" är den ursprungliga
+	 * knappen, en vit cirkel med en emoji.
+	 *
+	 * @return array Nyckel => etikett.
+	 */
+	public static function get_float_style_options() {
+		return array(
+			'emoji'  => __( 'Emoji i vit cirkel', 'cocookie' ),
+			'icon'   => __( 'Ritad ikon', 'cocookie' ),
+			'status' => __( 'Ritad ikon med statusprick', 'cocookie' ),
+			'pill'   => __( 'Piller med text', 'cocookie' ),
+			'grow'   => __( 'Växer när man pekar', 'cocookie' ),
+			'tab'    => __( 'Kantflik', 'cocookie' ),
+			'side'   => __( 'Sidoflik', 'cocookie' ),
+			'corner' => __( 'Hörn', 'cocookie' ),
+		);
+	}
+
+	/**
+	 * Stilar där knappen visar ordet "Cookies" i klartext. Där är texten
+	 * knappens namn, så de får ingen aria-label.
+	 *
+	 * @return array
+	 */
+	public static function get_float_text_styles() {
+		return array( 'pill', 'tab', 'side' );
+	}
+
+	/**
+	 * Ritade ikoner till den flytande knappen.
+	 *
+	 * @return array Nyckel => etikett.
+	 */
+	public static function get_float_icon_options() {
+		return array(
+			'cookie'  => __( 'Kaka', 'cocookie' ),
+			'sliders' => __( 'Reglage', 'cocookie' ),
+			'shield'  => __( 'Sköld', 'cocookie' ),
+		);
+	}
+
+	/**
+	 * Vilken sida av skärmen den flytande knappen sitter på.
+	 *
+	 * @return array Nyckel => etikett.
+	 */
+	public static function get_float_side_options() {
+		return array(
+			'left'  => __( 'Vänster', 'cocookie' ),
+			'right' => __( 'Höger', 'cocookie' ),
+		);
+	}
+
+	/**
+	 * SVG-kod för en ritad ikon. Linjeikoner som ärver textfärgen
+	 * (currentColor), så de följer bannerns färger. Innehållet är statiskt
+	 * och kan skrivas ut utan escaping.
+	 *
+	 * @param string $icon Nyckel från get_float_icon_options().
+	 * @return string
+	 */
+	public static function get_float_icon_svg( $icon ) {
+		$shapes = array(
+			'cookie'  => '<path d="M13 3.06A9 9 0 1 0 20.94 11a3.4 3.4 0 0 1-4.44-3.5A3.4 3.4 0 0 1 13 3.06z"/><path d="M8.5 9h.01M12.5 12.5h.01M8 14.5h.01M14.5 17h.01"/>',
+			'sliders' => '<path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/>',
+			'shield'  => '<path d="M12 3l7 3v5.5c0 4.4-2.9 8.1-7 9.5-4.1-1.4-7-5.1-7-9.5V6l7-3z"/><path d="M9 12l2 2 4-4"/>',
+		);
+
+		if ( ! isset( $shapes[ $icon ] ) ) {
+			$icon = 'cookie';
+		}
+
+		return '<svg class="cocookie-float__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $shapes[ $icon ] . '</svg>';
+	}
+
+	/**
+	 * Standardvärden för designvalen. Motsvarar bannerns utseende före 2.8.0,
+	 * och för de senare valen (uppställning och knappstil) utseendet innan
+	 * de fanns.
 	 *
 	 * @return array
 	 */
 	public static function get_design_defaults() {
 		return array(
-			'position'      => 'bottom',
-			'banner_radius' => 'large',
-			'banner_shadow' => 'soft',
-			'banner_border' => false,
-			'button_shape'  => 'rounded',
+			'position'       => 'bottom',
+			'banner_radius'  => 'large',
+			'banner_shadow'  => 'soft',
+			'banner_border'  => false,
+			'button_shape'   => 'rounded',
+			'content_layout' => 'stacked',
+			'float_style'    => 'emoji',
+			'float_icon'     => 'cookie',
+			'float_side'     => 'left',
 		);
 	}
 
@@ -351,10 +463,14 @@ class CoCookie_REST_Config {
 	public static function sanitize_design_settings( $input ) {
 		$defaults = self::get_design_defaults();
 		$lists    = array(
-			'position'      => self::get_layout_options(),
-			'banner_radius' => self::get_radius_options(),
-			'banner_shadow' => self::get_shadow_options(),
-			'button_shape'  => self::get_button_shape_options(),
+			'position'       => self::get_layout_options(),
+			'banner_radius'  => self::get_radius_options(),
+			'banner_shadow'  => self::get_shadow_options(),
+			'button_shape'   => self::get_button_shape_options(),
+			'content_layout' => self::get_content_layout_options(),
+			'float_style'    => self::get_float_style_options(),
+			'float_icon'     => self::get_float_icon_options(),
+			'float_side'     => self::get_float_side_options(),
 		);
 
 		$clean = array();
@@ -372,9 +488,11 @@ class CoCookie_REST_Config {
 	 * både frontend-mallen och förhandsvisningen i admin.
 	 *
 	 * @param array $s Bannerinställningar.
-	 * @return array layout, classes, radius, button_radius.
+	 * @return array layout, classes, radius, button_radius, logo_position,
+	 *               float_style, float_icon, float_classes.
 	 */
 	public static function get_banner_design( $s ) {
+		$has_logo = ! empty( $s['logo_url'] );
 		$s        = self::sanitize_design_settings( $s );
 		$layouts  = self::get_layout_options();
 		$layout   = $s['position'];
@@ -390,11 +508,38 @@ class CoCookie_REST_Config {
 			$classes[] = 'cocookie-banner--bordered';
 		}
 
+		// Uppställning. Loggans plats får bara en klass när det finns en
+		// logga, annars lämnar den en tom kolumn efter sig.
+		$logo_position = 'top';
+		if ( 'compact' === $s['content_layout'] ) {
+			$classes[] = 'cocookie-banner--compact';
+		} elseif ( $has_logo && 'logo-beside' === $s['content_layout'] ) {
+			$classes[]     = 'cocookie-banner--logo-beside';
+			$logo_position = 'beside';
+		} elseif ( $has_logo && 'logo-tabs' === $s['content_layout'] ) {
+			$classes[]     = 'cocookie-banner--logo-tabs';
+			$logo_position = 'tabs';
+		}
+
+		// Den flytande knappen. Emoji-knappen är grundklassen utan tillägg.
+		$float_classes = array( 'cocookie-float' );
+		if ( 'emoji' !== $s['float_style'] ) {
+			$float_classes[] = 'cocookie-float--drawn';
+			$float_classes[] = 'cocookie-float--' . $s['float_style'];
+		}
+		if ( 'right' === $s['float_side'] ) {
+			$float_classes[] = 'cocookie-float--right';
+		}
+
 		return array(
 			'layout'        => $layout,
 			'classes'       => implode( ' ', $classes ),
 			'radius'        => self::get_radius_options()[ $s['banner_radius'] ]['value'],
 			'button_radius' => self::get_button_shape_options()[ $s['button_shape'] ]['value'],
+			'logo_position' => $logo_position,
+			'float_style'   => $s['float_style'],
+			'float_icon'    => $s['float_icon'],
+			'float_classes' => implode( ' ', $float_classes ),
 		);
 	}
 
@@ -460,6 +605,10 @@ class CoCookie_REST_Config {
 				'banner_shadow'      => $settings['banner_shadow'] ?? 'soft',
 				'banner_border'      => ! empty( $settings['banner_border'] ),
 				'button_shape'       => $settings['button_shape'] ?? 'rounded',
+				'content_layout'     => $settings['content_layout'] ?? 'stacked',
+				'float_style'        => $settings['float_style'] ?? 'emoji',
+				'float_icon'         => $settings['float_icon'] ?? 'cookie',
+				'float_side'         => $settings['float_side'] ?? 'left',
 				'primary_color'      => $settings['primary_color'] ?? '#1f7a4d',
 				'primary_text_color' => $settings['primary_text_color'] ?? '#ffffff',
 				'banner_bg_color'    => $settings['banner_bg_color'] ?? '#ffffff',
@@ -471,6 +620,13 @@ class CoCookie_REST_Config {
 				'cookie_icon'        => $settings['cookie_icon'] ?? '',
 				// Saknas nyckeln (äldre installationer) ska knappen visas som tidigare.
 				'float_button_enabled' => ! isset( $settings['float_button_enabled'] ) || ! empty( $settings['float_button_enabled'] ),
+				// Den flytande knappens texter. Statusorden läses upp efter
+				// knappens namn i stilen med statusprick.
+				'float_label'        => __( 'Cookies', 'cocookie' ),
+				'float_label_long'   => __( 'Cookie-inställningar', 'cocookie' ),
+				'status_all'         => __( 'allt godkänt', 'cocookie' ),
+				'status_custom'      => __( 'eget val', 'cocookie' ),
+				'status_necessary'   => __( 'bara nödvändiga', 'cocookie' ),
 				'privacy_policy_url' => function_exists( 'get_privacy_policy_url' ) ? get_privacy_policy_url() : '',
 				'manage_title'       => $settings['manage_title'] ?? __( 'Hantera cookie-inställningar', 'cocookie' ),
 				'manage_text'        => $settings['manage_text'] ?? __( 'Här kan du ändra eller återkalla ditt samtycke.', 'cocookie' ),
@@ -539,6 +695,16 @@ class CoCookie_REST_Config {
 			$config = self::apply_translation( $config, $banner_lang );
 		}
 
+		// "Om cookies" beskriver var knappen sitter. Sitter den till höger
+		// byts hörnet i standardtexten, på alla inbyggda språk.
+		if ( 'right' === $config['settings']['float_side'] ) {
+			$config['settings']['about_manage_desc'] = str_replace(
+				array( 'vänstra hörnet', 'bottom left corner', 'venstre hjørne' ),
+				array( 'högra hörnet', 'bottom right corner', 'no' === $banner_lang ? 'høyre hjørne' : 'højre hjørne' ),
+				$config['settings']['about_manage_desc']
+			);
+		}
+
 		// Språket bannern visas på, för lang-attributet i mallen.
 		$config['lang'] = $banner_lang;
 
@@ -583,6 +749,11 @@ class CoCookie_REST_Config {
 			'reject_all_text'    => 'Avvisa alla',
 			'save_text'          => 'Spara inställningar',
 			'settings_text'      => 'Inställningar',
+			'float_label'        => 'Cookies',
+			'float_label_long'   => 'Cookie-inställningar',
+			'status_all'         => 'allt godkänt',
+			'status_custom'      => 'eget val',
+			'status_necessary'   => 'bara nödvändiga',
 			'manage_title'       => 'Hantera cookie-inställningar',
 			'manage_text'        => 'Här kan du ändra eller återkalla ditt samtycke.',
 			'consent_date_label' => 'Samtyckesdatum:',

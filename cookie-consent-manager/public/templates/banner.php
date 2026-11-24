@@ -17,6 +17,10 @@ $s          = $config['settings'];
 $categories = $config['categories'];
 $design     = CoCookie_REST_Config::get_banner_design( $s );
 $position   = $design['layout'];
+
+// Loggans plats följer uppställningen: på egen rad (top), bredvid texten
+// (beside) eller sist i flikraden (tabs).
+$logo_position = ! empty( $s['logo_url'] ) ? $design['logo_position'] : '';
 ?>
 
 <div id="cocookie-banner"
@@ -41,7 +45,7 @@ $position   = $design['layout'];
 
 	<div class="cocookie-banner__inner">
 
-		<?php if ( ! empty( $s['logo_url'] ) ) : ?>
+		<?php if ( 'top' === $logo_position ) : ?>
 			<img class="cocookie-banner__logo" src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" loading="lazy">
 		<?php endif; ?>
 
@@ -56,10 +60,17 @@ $position   = $design['layout'];
 			<button type="button" class="cocookie-banner__tab" data-cocookie-tab="about">
 				<?php echo esc_html( $s['tab_about'] ?? __( 'Om cookies', 'cocookie' ) ); ?>
 			</button>
+			<?php if ( 'tabs' === $logo_position ) : ?>
+				<img class="cocookie-banner__logo cocookie-banner__logo--tabs" src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" loading="lazy">
+			<?php endif; ?>
 		</div>
 
 		<!-- FLIK: Samtycke -->
 		<div class="cocookie-banner__panel cocookie-banner__panel--active" id="cocookie-panel-consent" data-cocookie-panel="consent">
+
+			<?php if ( 'beside' === $logo_position ) : ?>
+				<img class="cocookie-banner__logo cocookie-banner__logo--beside" src="<?php echo esc_url( $s['logo_url'] ); ?>" alt="" loading="lazy">
+			<?php endif; ?>
 
 			<p class="cocookie-banner__title" id="cocookie-banner-title">
 				<?php echo esc_html( $s['banner_title'] ); ?>
@@ -220,12 +231,39 @@ $position   = $design['layout'];
 $show_float = ! isset( $s['float_button_enabled'] ) || ! empty( $s['float_button_enabled'] );
 ?>
 <?php if ( $show_float ) : ?>
-	<!-- Floating settings button -->
-	<button type="button" id="cocookie-float-btn" class="cocookie-float" style="display:none;" aria-label="<?php esc_attr_e( 'Cookie-inställningar', 'cocookie' ); ?>">
-		<?php if ( ! empty( $s['cookie_icon'] ) ) : ?>
-			<img src="<?php echo esc_url( $s['cookie_icon'] ); ?>" alt="" width="24" height="24">
-		<?php else : ?>
-			&#127850;
+	<?php
+	$float_style = $design['float_style'];
+	// I stilarna med synlig text är texten knappens namn. Övriga visar bara
+	// en ikon och får namnet via aria-label.
+	$float_has_text = in_array( $float_style, CoCookie_REST_Config::get_float_text_styles(), true );
+	?>
+	<!-- Floating settings button. Ligger utanför bannern och får därför
+		bannerns färger som egna variabler. -->
+	<button type="button" id="cocookie-float-btn"
+		class="<?php echo esc_attr( $design['float_classes'] ); ?>"
+		style="display:none;
+			--cocookie-bg: <?php echo esc_attr( $s['banner_bg_color'] ); ?>;
+			--cocookie-text: <?php echo esc_attr( $s['banner_text_color'] ); ?>;
+			--cocookie-accent: <?php echo esc_attr( $s['primary_color'] ); ?>;
+			--cocookie-accent-text: <?php echo esc_attr( $s['primary_text_color'] ); ?>;
+			--cocookie-btn-radius: <?php echo esc_attr( $design['button_radius'] ); ?>;"
+		<?php if ( ! $float_has_text ) : ?>aria-label="<?php echo esc_attr( $s['float_label_long'] ); ?>"<?php endif; ?>>
+		<?php if ( 'side' !== $float_style ) : ?>
+			<?php if ( ! empty( $s['cookie_icon'] ) ) : ?>
+				<img src="<?php echo esc_url( $s['cookie_icon'] ); ?>" alt="" width="24" height="24">
+			<?php elseif ( 'emoji' === $float_style ) : ?>
+				&#127850;
+			<?php else : ?>
+				<?php echo CoCookie_REST_Config::get_float_icon_svg( $design['float_icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- statisk SVG ur pluginet. ?>
+			<?php endif; ?>
+		<?php endif; ?>
+		<?php if ( $float_has_text ) : ?>
+			<span class="cocookie-float__label"><?php echo esc_html( $s['float_label'] ); ?></span>
+		<?php elseif ( 'grow' === $float_style ) : ?>
+			<span class="cocookie-float__label" aria-hidden="true"><?php echo esc_html( $s['float_label_long'] ); ?></span>
+		<?php endif; ?>
+		<?php if ( 'status' === $float_style ) : ?>
+			<span class="cocookie-float__dot" aria-hidden="true"></span>
 		<?php endif; ?>
 	</button>
 <?php endif; ?>

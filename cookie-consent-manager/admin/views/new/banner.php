@@ -24,6 +24,19 @@ $preview_data   = array(
 	'shape'    => wp_list_pluck( $shape_options, 'value' ),
 	'themes'   => wp_list_pluck( $data['themes'], 'values' ),
 );
+
+// Den flytande knappens delar: ikonernas SVG-kod, vilka stilar som visar
+// text och texterna själva.
+$float_icon_options = CoCookie_REST_Config::get_float_icon_options();
+$preview_data['icons'] = array();
+foreach ( array_keys( $float_icon_options ) as $icon_key ) {
+	$preview_data['icons'][ $icon_key ] = CoCookie_REST_Config::get_float_icon_svg( $icon_key );
+}
+$preview_data['floatText'] = CoCookie_REST_Config::get_float_text_styles();
+$preview_data['labels']    = array(
+	'short' => __( 'Cookies', 'cocookie' ),
+	'long'  => __( 'Cookie-inställningar', 'cocookie' ),
+);
 ?>
 
 <!-- Sidhuvud -->
@@ -182,6 +195,17 @@ $preview_data   = array(
 					</td>
 				</tr>
 				<tr>
+					<th><label for="content_layout"><?php esc_html_e( 'Uppställning', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="content_layout" name="content_layout">
+							<?php foreach ( CoCookie_REST_Config::get_content_layout_options() as $key => $label ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['content_layout'], $key ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Var loggan står och hur mycket plats bannern tar. Kompakt rad lägger logga, text och knappar på en rad och visar flikarna först när besökaren klickar på Inställningar. Den passar bäst i de breda layouterna. På mobil döljs loggan i alla uppställningar.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
 					<th><label for="banner_radius"><?php esc_html_e( 'Hörn', 'cocookie' ); ?></label></th>
 					<td>
 						<select id="banner_radius" name="banner_radius">
@@ -219,6 +243,43 @@ $preview_data   = array(
 								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['button_shape'], $key ); ?>><?php echo esc_html( $option['label'] ); ?></option>
 							<?php endforeach; ?>
 						</select>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="float_style"><?php esc_html_e( 'Cookie-knappens stil', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="float_style" name="float_style">
+							<?php foreach ( CoCookie_REST_Config::get_float_style_options() as $key => $label ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $design['float_style'], $key ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<?php // Fylls i av cocookie-banner-preview.js. ?>
+						<div class="cocookie-float-preview" aria-hidden="true">
+							<span id="cocookie-preview-float" class="<?php echo esc_attr( $design['float_classes'] ); ?>"></span>
+						</div>
+						<p class="description"><?php esc_html_e( 'Den flytande knappen som visas när besökaren har gjort sitt val. Rutan visar den i verklig storlek. De ritade stilarna följer bannerns färger och knappform. Statuspricken är fylld när allt är godkänt, halv vid eget val och en tom ring vid bara nödvändiga.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="float_icon"><?php esc_html_e( 'Cookie-knappens ikon', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="float_icon" name="float_icon">
+							<?php foreach ( $float_icon_options as $key => $label ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $design['float_icon'], $key ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Gäller de ritade stilarna. En egen bild under Cookie-ikon längre ner ersätter den ritade ikonen.', 'cocookie' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="float_side"><?php esc_html_e( 'Cookie-knappens sida', 'cocookie' ); ?></label></th>
+					<td>
+						<select id="float_side" name="float_side">
+							<?php foreach ( CoCookie_REST_Config::get_float_side_options() as $key => $label ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $s['float_side'], $key ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Välj den sida där knappen inte krockar med chatt eller andra flytande knappar.', 'cocookie' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -270,7 +331,7 @@ $preview_data   = array(
 								<?php endif; ?>
 							</div>
 						</div>
-						<p class="description"><?php esc_html_e( 'Visas ovanför titeln i bannern. Rekommenderad höjd: 40px.', 'cocookie' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Visas i bannern. Platsen väljs under Uppställning. Rekommenderad höjd: 40px.', 'cocookie' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -291,7 +352,7 @@ $preview_data   = array(
 								<?php endif; ?>
 							</div>
 						</div>
-						<p class="description"><?php esc_html_e( 'Dekorativ ikon som visas i bannern. Rekommenderat: 32×32px SVG.', 'cocookie' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Egen bild på den flytande cookie-knappen. Ersätter emojin eller den ritade ikonen. Rekommenderat: 32×32px SVG.', 'cocookie' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -373,7 +434,7 @@ $preview_data   = array(
 							<span class="cocookie-banner__tab"><?php esc_html_e( 'Detaljer', 'cocookie' ); ?></span>
 							<span class="cocookie-banner__tab"><?php esc_html_e( 'Om cookies', 'cocookie' ); ?></span>
 						</div>
-						<div class="cocookie-banner__panel">
+						<div class="cocookie-banner__panel" data-cocookie-panel="consent">
 							<p class="cocookie-banner__title" data-preview-text="banner_title"><?php echo esc_html( $s['banner_title'] ); ?></p>
 							<p class="cocookie-banner__text">
 								<span data-preview-text="banner_text"><?php echo esc_html( $s['banner_text'] ); ?></span>
@@ -438,6 +499,7 @@ jQuery(function($){
 		iconFrame.on('select', function(){
 			var a = iconFrame.state().get('selection').first().toJSON();
 			$('#cookie_icon').val(a.url);
+			cocookieNotifyPreview('cookie_icon');
 			$('#cocookie-icon-preview').html('<img src="'+a.url+'" alt="" style="max-height:40px;">');
 			$('#cocookie-remove-icon').show();
 		});
@@ -446,6 +508,7 @@ jQuery(function($){
 	$('#cocookie-remove-icon').on('click', function(e){
 		e.preventDefault();
 		$('#cookie_icon').val('');
+		cocookieNotifyPreview('cookie_icon');
 		$('#cocookie-icon-preview').html('');
 		$(this).hide();
 	});

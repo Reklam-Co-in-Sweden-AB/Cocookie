@@ -14,10 +14,16 @@
 	var banner   = document.getElementById( 'cocookie-preview-banner' );
 	var viewport = document.getElementById( 'cocookie-preview-viewport' );
 	var stage    = document.getElementById( 'cocookie-preview-stage' );
+	var floatEl  = document.getElementById( 'cocookie-preview-float' );
 
 	if ( ! form || ! banner || ! viewport || ! stage ) {
 		return;
 	}
+
+	// Loggan flyttas mellan de här tre platserna beroende på uppställning.
+	var inner = banner.querySelector( '.cocookie-banner__inner' );
+	var tabs  = banner.querySelector( '.cocookie-banner__tabs' );
+	var panel = banner.querySelector( '.cocookie-banner__panel' );
 
 	var data = JSON.parse( banner.getAttribute( 'data-preview' ) || '{}' );
 
@@ -71,6 +77,20 @@
 		if ( value( 'banner_border' ) ) {
 			classes.push( 'cocookie-banner--bordered' );
 		}
+
+		// Uppställning. Loggans plats får bara en klass när det finns en logga.
+		var content      = value( 'content_layout' );
+		var logoUrl      = value( 'logo_url' );
+		var logoPosition = 'top';
+		if ( 'compact' === content ) {
+			classes.push( 'cocookie-banner--compact' );
+		} else if ( logoUrl && 'logo-beside' === content ) {
+			classes.push( 'cocookie-banner--logo-beside' );
+			logoPosition = 'beside';
+		} else if ( logoUrl && 'logo-tabs' === content ) {
+			classes.push( 'cocookie-banner--logo-tabs' );
+			logoPosition = 'tabs';
+		}
 		banner.className = classes.join( ' ' );
 
 		// Texter
@@ -84,13 +104,89 @@
 		}
 
 		var logo = banner.querySelector( '[data-preview-logo]' );
-		var url  = value( 'logo_url' );
+		var url  = logoUrl;
 		if ( logo ) {
 			logo.hidden = ! url;
 			if ( url && logo.getAttribute( 'src' ) !== url ) {
 				logo.setAttribute( 'src', url );
 			}
+
+			// Samma platser som i frontend-mallen: sist i flikraden, först i
+			// samtyckesfliken eller på egen rad ovanför flikarna.
+			logo.className = 'cocookie-banner__logo' + ( 'top' === logoPosition ? '' : ' cocookie-banner__logo--' + logoPosition );
+			if ( 'tabs' === logoPosition ) {
+				if ( logo.parentNode !== tabs ) {
+					tabs.appendChild( logo );
+				}
+			} else if ( 'beside' === logoPosition ) {
+				if ( logo.parentNode !== panel ) {
+					panel.insertBefore( logo, panel.firstChild );
+				}
+			} else if ( logo.parentNode !== inner ) {
+				inner.insertBefore( logo, tabs );
+			}
 		}
+
+		renderFloat();
+	}
+
+	// Den flytande knappen. Klasser och innehåll speglar frontend-mallen
+	// (public/templates/banner.php) och get_banner_design().
+	function renderFloat() {
+		if ( ! floatEl ) {
+			return;
+		}
+
+		var style   = value( 'float_style' ) || 'emoji';
+		var custom  = value( 'cookie_icon' );
+		var isText  = ( data.floatText || [] ).indexOf( style ) !== -1;
+		var classes = [ 'cocookie-float' ];
+		var part;
+
+		if ( 'emoji' !== style ) {
+			classes.push( 'cocookie-float--drawn', 'cocookie-float--' + style );
+		}
+		if ( 'right' === value( 'float_side' ) ) {
+			classes.push( 'cocookie-float--right' );
+		}
+		floatEl.className = classes.join( ' ' );
+
+		[ 'banner_bg_color', 'banner_text_color', 'primary_color', 'primary_text_color' ].forEach( function ( name ) {
+			floatEl.style.setProperty( colorVars[ name ], value( name ) );
+		} );
+		floatEl.style.setProperty( '--cocookie-btn-radius', data.shape[ value( 'button_shape' ) ] || '8px' );
+
+		floatEl.innerHTML = '';
+		if ( 'side' !== style ) {
+			if ( custom ) {
+				part        = document.createElement( 'img' );
+				part.src    = custom;
+				part.alt    = '';
+				part.width  = 24;
+				part.height = 24;
+				floatEl.appendChild( part );
+			} else if ( 'emoji' === style ) {
+				floatEl.textContent = '\uD83C\uDF6A';
+			} else {
+				// Statisk SVG-kod från pluginet (get_float_icon_svg()).
+				floatEl.innerHTML = data.icons[ value( 'float_icon' ) ] || data.icons.cookie;
+			}
+		}
+		if ( isText || 'grow' === style ) {
+			part             = document.createElement( 'span' );
+			part.className   = 'cocookie-float__label';
+			part.textContent = isText ? data.labels.short : data.labels.long;
+			floatEl.appendChild( part );
+		}
+		if ( 'status' === style ) {
+			part           = document.createElement( 'span' );
+			part.className = 'cocookie-float__dot';
+			floatEl.appendChild( part );
+			floatEl.setAttribute( 'data-cocookie-state', 'all' );
+		}
+
+		// Avstängd knapp visas nedtonad.
+		floatEl.parentNode.style.opacity = value( 'float_button_enabled' ) ? '' : '0.35';
 	}
 
 	function fit() {

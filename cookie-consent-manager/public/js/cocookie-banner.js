@@ -208,6 +208,38 @@
 		}
 	}
 
+	// --- Flytande knappens statusprick ---
+	// Läget räknas ut här i webbläsaren, aldrig på servern: sidans HTML
+	// sparas av sidcachen och delas av alla besökare.
+	function updateFloatState(consent) {
+		if (!floatBtn) return;
+		var optional = 0;
+		var granted = 0;
+		config.categories.forEach(function (cat) {
+			if (cat.is_required) return;
+			optional++;
+			if (consent && consent[cat.slug]) granted++;
+		});
+		var state = 'custom';
+		if (granted === 0 && optional > 0) state = 'necessary';
+		else if (granted === optional) state = 'all';
+		floatBtn.setAttribute('data-cocookie-state', state);
+
+		// Pricken syns bara i stilen med statusprick. Där läses läget upp
+		// efter knappens namn.
+		if (floatBtn.classList.contains('cocookie-float--status')) {
+			var label = config.settings.float_label_long || '';
+			var status = config.settings['status_' + state] || '';
+			floatBtn.setAttribute('aria-label', status ? label + ', ' + status : label);
+		}
+	}
+
+	// Kompakt rad: flikarna är dolda tills besökaren öppnar inställningarna.
+	// Klassen tas inte bort igen, bannern förblir utfälld tills sidan laddas om.
+	function expandBanner() {
+		banner.classList.add('cocookie-banner--expanded');
+	}
+
 	// --- Show/hide banner ---
 	function showBanner(existingConsent) {
 		isReopen = !!existingConsent;
@@ -217,6 +249,8 @@
 		banner.style.pointerEvents = 'auto';
 
 		if (isReopen && existingConsent) {
+			expandBanner();
+
 			// Update title/text for manage mode
 			if (bannerTitle) bannerTitle.textContent = config.settings.manage_title;
 			if (bannerText) bannerText.textContent = config.settings.manage_text;
@@ -292,6 +326,7 @@
 		}
 
 		gtagUpdate(data);
+		updateFloatState(data);
 
 		if (typeof window.__ccmUpdateConsent === 'function') {
 			window.__ccmUpdateConsent(data);
@@ -389,6 +424,7 @@
 			activateScripts(consent);
 			gtagUpdate(consent);
 			activateIframes(consent);
+			updateFloatState(consent);
 			if (floatBtn) floatBtn.style.display = '';
 			return;
 		}
@@ -461,6 +497,7 @@
 		// Legacy settings button (kept for backward compat)
 		if (settingsBtn) {
 			settingsBtn.addEventListener('click', function () {
+				expandBanner();
 				// Switch to details tab
 				var detailsTab = banner.querySelector('[data-cocookie-tab="details"]');
 				if (detailsTab) detailsTab.click();
