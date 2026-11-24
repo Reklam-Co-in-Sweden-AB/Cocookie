@@ -4,7 +4,7 @@ Tags: cookie, consent, gdpr, privacy, banner
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.8.0
+Stable tag: 2.9.0
 License: GPL-2.0+
 
 Server-side cookie consent management for WordPress. GDPR-compliant banner with category-based consent.
@@ -38,6 +38,14 @@ To block a third-party script until consent is given, change its type and add a 
 The plugin will automatically activate the script when the visitor consents to the matching category.
 
 == Changelog ==
+
+= 2.9.0 =
+* Nytt: åtta stilar för den flytande cookie-knappen under Banner → Utseende. Utöver emojin finns ritad ikon, ritad ikon med statusprick, piller med text, en knapp som växer när man pekar, kantflik, sidoflik och hörn. De ritade stilarna följer bannerns färger och knappform, och en ruta i inställningarna visar knappen i verklig storlek.
+* Nytt: ritade ikoner till knappen (kaka, reglage, sköld) och val av sida (vänster eller höger).
+* Nytt: uppställning för bannern. Loggan kan stå på egen rad som tidigare, bredvid texten eller i flikraden. Kompakt rad lägger logga, text och knappar på en rad och visar flikarna först när besökaren klickar på Inställningar.
+* Förbättring: den flytande knappens namn för skärmläsare följer bannerns språk.
+* Förbättring: texten under "Om cookies" anger rätt hörn när knappen sitter till höger.
+* Fix: sidor som sparas av en sidcache (LiteSpeed med flera) kunde visas med en annan besökares samtycke. Skript kunde då laddas för besökare som inte godkänt, eller blockeras för dem som godkänt. Servern skriver nu alltid ut sidan blockerad, och samtycket läses i webbläsaren.
 
 = 2.8.0 =
 * Nytt: fler layouter för bannern. Utöver botten, topp och modal finns ett flytande kort nere i mitten och en ruta i nedre vänstra eller högra hörnet. På mobil läggs kortet och hörnrutorna längs nederkanten.
